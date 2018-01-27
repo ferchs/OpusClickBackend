@@ -1,12 +1,16 @@
 package com.espiritware.opusclick.security;
 
 import com.espiritware.opusclick.dto.LoginDto;
+import com.espiritware.opusclick.error.AccountNotConfirmedException;
+import com.espiritware.opusclick.error.AccountNotFoundException;
+import com.espiritware.opusclick.error.RoleNotFoundException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.ApplicationContext;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -32,21 +36,26 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 	@Override
 	public Authentication attemptAuthentication(HttpServletRequest req, HttpServletResponse res)
 			throws AuthenticationException {
+		
 		try {
 			LoginDto creds = new ObjectMapper().readValue(req.getInputStream(), LoginDto.class);
-			if(tokenService.validateLoginRol(creds.getEmail(), creds.isUserLogin())) {
+			if(!tokenService.accountExist(creds.getEmail())) {
+				throw new AccountNotFoundException("No se ha registrado una cuenta con este Email");
+			}
+			if(!tokenService.accountConfirmed(creds.getEmail(),creds.isUserLogin())) {
+				throw new AccountNotConfirmedException("Debes confirmar tu cuenta para iniciar sesion. ¡Revisa tu Email!");
+			}
+			if(tokenService.validateLoginRolExist(creds.getEmail(), creds.isUserLogin())) {
 				return authenticationManager.authenticate(
 						new UsernamePasswordAuthenticationToken(creds.getEmail(), creds.getPassword(), new ArrayList<>()));
 			}
 			else {
-				System.out.println("No puede Loguearse....");
-				return authenticationManager.authenticate(
-						new UsernamePasswordAuthenticationToken(null, null, new ArrayList<>()));
+				throw new RoleNotFoundException("No existe una cuenta asociada a este rol");
 			}
 			
 		} catch (IOException e) {
 			throw new RuntimeException(e);
-		}
+		}	
 	}
 
 	@Override
@@ -59,6 +68,23 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 		res.addHeader(HEADER_STRING, TOKEN_PREFIX + token);
 		res.setHeader("Content-Type", "application/json");
 		res.getWriter().print("{\"expiresIn\": " + expirationTime + "}");
+	}
+	
+	@Override
+	protected void unsuccessfulAuthentication(HttpServletRequest request,
+			HttpServletResponse response, AuthenticationException failed)
+			throws IOException, ServletException {
+		SecurityContextHolder.clearContext();
+		
+		if(failed.getClass().equals(AccountNotFoundException.class)) {
+			response.sendError(404,failed.getMessage());	
+		}
+		else if(failed.getClass().equals(AccountNotConfirmedException.class)) {
+			response.sendError(401,failed.getMessage());	
+		}
+		else if(failed.getClass().equals(RoleNotFoundException.class)) {
+			response.sendError(409,failed.getMessage());	
+		}
 	}
 	    
 }

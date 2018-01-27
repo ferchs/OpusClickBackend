@@ -20,5 +20,8 @@ public interface AccountService {
 	State getAccountState(String email);
 	
 	boolean accountExist(String email);
+	
+	boolean accountConfirmed(String email);
+
 		
 }

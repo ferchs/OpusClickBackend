@@ -1,7 +1,6 @@
 package com.espiritware.opusclick.configuration;
 
 import javax.jms.ConnectionFactory;
-
 import org.springframework.boot.autoconfigure.jms.DefaultJmsListenerContainerFactoryConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

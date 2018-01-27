@@ -9,7 +9,6 @@ import org.springframework.security.core.userdetails.User;
 import com.espiritware.opusclick.service.AccountService;
 import com.espiritware.opusclick.service.ProviderService;
 import com.espiritware.opusclick.service.UserService;
-
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -121,13 +120,21 @@ public class TokenService {
 		}
 	}
 	
-	public boolean validateLoginRol(String email, boolean isUserLogin) {
+	public boolean validateLoginRolExist(String email, boolean isUserLogin) {
 		if (isUserLogin) {
 			return userService.userExist(email);
 		} else if(!isUserLogin) {
 			return providerService.providerExist(email);
 		}
 		return false;
+	}
+	
+	public boolean accountExist(String email) {
+		return accountService.accountExist(email);
+	}
+	
+	public boolean accountConfirmed(String email, boolean isUser) {
+		return accountService.accountConfirmed(email);
 	}
 	
 }

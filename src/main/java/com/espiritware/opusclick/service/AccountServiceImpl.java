@@ -67,5 +67,18 @@ public class AccountServiceImpl implements AccountService{
 	public boolean accountExist(String email) {
 		return accountDao.findById(email) != null;
 	}
+	
+	@Override
+	public boolean accountConfirmed(String email) {
+		Account account= new Account();
+		account=accountDao.findById(email);
+		if(account.getState().equals(State.ACCOUNT_CONFIRMED)) {
+			return true;
+		}else {
+			return false;
+		}
+	}
+	
+	
 
 }

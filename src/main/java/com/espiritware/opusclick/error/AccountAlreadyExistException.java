@@ -1,6 +1,6 @@
 package com.espiritware.opusclick.error;
 
-public class AccountAlreadyExistException extends RuntimeException {
+public final class AccountAlreadyExistException extends RuntimeException {
 	
 	private static final long serialVersionUID = 1L;
 
