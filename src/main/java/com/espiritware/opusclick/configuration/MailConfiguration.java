@@ -12,6 +12,7 @@ public class MailConfiguration {
 	@Bean
     public JavaMailSender javaMailService() {
         JavaMailSenderImpl javaMailSender = new JavaMailSenderImpl();
+        javaMailSender.setDefaultEncoding("UTF-8");
         javaMailSender.setHost("smtp.gmail.com");
         javaMailSender.setPort(465);
         javaMailSender.setProtocol("smtps");
@@ -27,6 +28,7 @@ public class MailConfiguration {
         properties.setProperty("mail.smtp.auth", "true");
         properties.setProperty("mail.smtp.starttls.enable", "true");
         properties.setProperty("mail.smtps.timeout", "8000");
+        properties.setProperty("mail.mime.charset", "UTF-8");
         return properties;
     }
 }

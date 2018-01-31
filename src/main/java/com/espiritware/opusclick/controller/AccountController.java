@@ -155,11 +155,14 @@ public class AccountController {
 	
 //Pendiente por implementarlo para que cree la url de manera automatica
 	 private String getAppUrl(HttpServletRequest request) {
-			return "http://" + "localhost" + ":" + "4200" + "/confirmar_registro";
+			//return "http://" + "localhost" + ":" + "4200" + "/confirmar_registro";
+		 
+		 return "http://" + "opusclick.com" + "/confirmar_registro";
 	 }
 	 
 	 private String getResetUrl(HttpServletRequest request) {
-			return "http://" + "localhost" + ":" + "4200" + "/reestablecer_contraseña";
+			//return "http://" + "localhost" + ":" + "4200" + "/reestablecer_contraseña";
+		 return "http://" + "opusclick.com" + "/reestablecer_contraseña";
 	 }
 	 
 }
