@@ -55,7 +55,10 @@ public class ProviderServiceImpl implements ProviderService{
 
 	@Override
 	public List<Provider> findProvidersByProfession(String profession) {
-		// TODO Auto-generated method stub
+		List<Provider> providers=providerDao.findAll();
+		for(int i=0; i<providers.size(); i++) {
+			
+		}
 		return null;
 	}
 

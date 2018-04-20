@@ -9,7 +9,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
@@ -28,20 +28,33 @@ public class Visit implements Serializable{
 	@Column(name="alternative_date")
 	private Date alternativeDate;
 	
-	@OneToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name="fk_work$visit")
-	private Work work;
-	
 	@Enumerated(EnumType.STRING)
 	@Column(name="state")
 	private State state;
+	
+	@Column(name="address")
+	private String address;
+	
+	@Column(name="neighborhood")
+	private String neighborhood;
+	
+	@Column(name="description")
+	private String description;
+	
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name="fk_work$visit")
+	private Work work;
 
-	public String getIdVisit() {
-		return idVisit;
-	}
-
-	public void setIdVisit(String idVisit) {
+	public Visit(String idVisit, Date date, Date alternativeDate, State state, String address, String neighborhood,
+			String description, Work work) {
 		this.idVisit = idVisit;
+		this.date = date;
+		this.alternativeDate = alternativeDate;
+		this.state = state;
+		this.address = address;
+		this.neighborhood = neighborhood;
+		this.description = description;
+		this.work = work;
 	}
 
 	public Date getDate() {
@@ -60,14 +73,6 @@ public class Visit implements Serializable{
 		this.alternativeDate = alternativeDate;
 	}
 
-	public Work getWork() {
-		return work;
-	}
-
-	public void setWork(Work work) {
-		this.work = work;
-	}
-
 	public State getState() {
 		return state;
 	}
@@ -75,5 +80,36 @@ public class Visit implements Serializable{
 	public void setState(State state) {
 		this.state = state;
 	}
-	
+
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
+
+	public String getNeighborhood() {
+		return neighborhood;
+	}
+
+	public void setNeighborhood(String neighborhood) {
+		this.neighborhood = neighborhood;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public Work getWork() {
+		return work;
+	}
+
+	public void setWork(Work work) {
+		this.work = work;
+	}
 }

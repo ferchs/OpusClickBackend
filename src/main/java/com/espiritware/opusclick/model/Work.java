@@ -2,16 +2,18 @@ package com.espiritware.opusclick.model;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 
 @Entity
@@ -27,15 +29,6 @@ public class Work implements Serializable{
 	@Column(name="creation_date")
 	private Date creationDate;
 	
-	@Column(name="start_date")
-	private Date startDate;
-	
-	@Column(name="end_date")
-	private Date endDate;
-	
-	@Column(name="total_value")
-	private double totalValue;
-	
 	@ManyToOne
 	@JoinColumn(name="fk_user$work")
 	private User user;
@@ -48,11 +41,12 @@ public class Work implements Serializable{
 	@Column(name="state")
 	private State state;
 	
-	@OneToOne(mappedBy = "work", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+	@OneToOne(cascade = CascadeType.ALL)
+    @PrimaryKeyJoinColumn
 	private Review review;
 	
-	@OneToOne(mappedBy = "work", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-	private Visit visit;
+	@OneToMany(mappedBy="work")
+	private Set<Visit> visits;
 	
 	public Work() {
 		
@@ -72,30 +66,6 @@ public class Work implements Serializable{
 
 	public void setCreationDate(Date creationDate) {
 		this.creationDate = creationDate;
-	}
-
-	public Date getStartDate() {
-		return startDate;
-	}
-
-	public void setStartDate(Date startDate) {
-		this.startDate = startDate;
-	}
-
-	public Date getEndDate() {
-		return endDate;
-	}
-
-	public void setEndDate(Date endDate) {
-		this.endDate = endDate;
-	}
-
-	public double getTotalValue() {
-		return totalValue;
-	}
-
-	public void setTotalValue(double totalValue) {
-		this.totalValue = totalValue;
 	}
 
 	public User getUser() {
@@ -130,13 +100,12 @@ public class Work implements Serializable{
 		this.review = review;
 	}
 
-	public Visit getVisit() {
-		return visit;
+	public Set<Visit> getVisit() {
+		return visits;
 	}
 
-	public void setVisit(Visit visit) {
-		this.visit = visit;
+	public void setVisit(Set<Visit> visits) {
+		this.visits = visits;
 	}
-	
 	
 }

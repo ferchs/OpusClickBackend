@@ -12,6 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 
 @Entity
@@ -74,8 +75,9 @@ public class Provider implements Serializable{
 	@OneToMany(mappedBy="provider")
 	private Set<Work> works;
 	
-	@OneToOne(mappedBy = "provider", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-	private GlobalRating globalRating;
+	@OneToOne(cascade = CascadeType.ALL)
+    @PrimaryKeyJoinColumn
+    private GlobalRating globalRating;
 	
 	public Provider() {
 	}
