@@ -1,21 +1,40 @@
 package com.espiritware.opusclick.model;
 
+import java.sql.Timestamp;
 import java.util.Date;
+import java.util.Set;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.GenericGenerator;
+
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Table(name="contract")
+@Getter
+@Setter
 public class Contract {
 
 	@Id
-	@JoinColumn(name="fk_work_contract")
-	private String idContract;
+	@GeneratedValue(strategy= GenerationType.AUTO, generator="native")
+	@GenericGenerator(name = "native", strategy = "native")
+	@Column(name="id_contract")
+	private long idContract;
+	
+	@Column(name="contract_number")
+	private String contractNumber;
+	
+	@Column(name="creation_date")
+	private Timestamp creationDate;
 	
 	@Column(name="start_date")
 	private Date startDate;
@@ -29,45 +48,7 @@ public class Contract {
 	@Enumerated(EnumType.STRING)
 	@Column(name="state")
 	private State state;
-
-	public Contract(String idContract, Date startDate, Date endDate, Double totalValue, State state) {
-		super();
-		this.idContract = idContract;
-		this.startDate = startDate;
-		this.endDate = endDate;
-		this.totalValue = totalValue;
-		this.state = state;
-	}
-
-	public Date getStartDate() {
-		return startDate;
-	}
-
-	public void setStartDate(Date startDate) {
-		this.startDate = startDate;
-	}
-
-	public Date getEndDate() {
-		return endDate;
-	}
-
-	public void setEndDate(Date endDate) {
-		this.endDate = endDate;
-	}
-
-	public Double getTotalValue() {
-		return totalValue;
-	}
-
-	public void setTotalValue(Double totalValue) {
-		this.totalValue = totalValue;
-	}
-
-	public State getState() {
-		return state;
-	}
-
-	public void setState(State state) {
-		this.state = state;
-	}
+	
+	@OneToMany(mappedBy="contract")
+	private Set<Milestone> milestones;
 }

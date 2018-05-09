@@ -6,8 +6,9 @@ import org.springframework.core.env.Environment;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Component;
 import com.espiritware.opusclick.event.GenericEvent;
-import com.espiritware.opusclick.event.RegistrationCompleteEvent;
+import com.espiritware.opusclick.event.ProviderRegistrationEvent;
 import com.espiritware.opusclick.event.ResetPasswordEvent;
+import com.espiritware.opusclick.event.UserRegistrationEvent;
 import com.espiritware.opusclick.security.TokenService;
 
 @Component
@@ -26,19 +27,16 @@ public class Mail implements ApplicationListener<GenericEvent>{
 	@Override
 	public void onApplicationEvent(GenericEvent event) {
 		System.out.println("Se ha recibido evento...");
-		if (event instanceof RegistrationCompleteEvent) {
-			RegistrationCompleteEvent registrationEvent = (RegistrationCompleteEvent) event;
-			if(registrationEvent.isUser()) {
-				createUserRegistrationEmailMessage(registrationEvent.getEmail(), registrationEvent.getAppUrl());
-			}
-			else {
-				createProviderRegistrationEmailMessage(registrationEvent.getEmail(), registrationEvent.getAppUrl());
-			}
+		if (event instanceof UserRegistrationEvent) {
+			UserRegistrationEvent registrationEvent = (UserRegistrationEvent) event;
+			createUserRegistrationEmailMessage(registrationEvent.getEmail(), registrationEvent.getAppUrl());
+		} else if (event instanceof ProviderRegistrationEvent) {
+			ProviderRegistrationEvent registrationEvent = (ProviderRegistrationEvent) event;
+			createProviderRegistrationEmailMessage(registrationEvent.getEmail(), registrationEvent.getAppUrl());
 		} else if (event instanceof ResetPasswordEvent) {
 			ResetPasswordEvent resetPasswordEvent = (ResetPasswordEvent) event;
 			createResetPasswordEmail(resetPasswordEvent.getEmail(), resetPasswordEvent.getAppUrl());
 		}
-		
 	}
 	
 	private void createUserRegistrationEmailMessage(String to, String appUrl) {

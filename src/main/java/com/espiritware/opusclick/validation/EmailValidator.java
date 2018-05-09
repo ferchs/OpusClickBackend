@@ -4,6 +4,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
+import com.espiritware.opusclick.annotations.ValidEmail;;
 
 public class EmailValidator implements ConstraintValidator<ValidEmail, String> {
 	

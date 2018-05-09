@@ -4,9 +4,7 @@ import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.espiritware.opusclick.dao.GenericDao;
-import com.espiritware.opusclick.dto.UserDto;
 import com.espiritware.opusclick.error.UserAlreadyExistException;
-import com.espiritware.opusclick.model.City;
 import com.espiritware.opusclick.model.State;
 import com.espiritware.opusclick.model.User;
 
@@ -14,25 +12,31 @@ import com.espiritware.opusclick.model.User;
 @Transactional
 public class UserServiceImpl implements UserService{
 
-	GenericDao< User > userDao;
+	GenericDao< User,String > userDao;
 	
 	@Autowired
-	public void setDao( GenericDao< User > daoToSet ){
+	public void setDao( GenericDao< User,String > daoToSet ){
 		userDao = daoToSet;
 		userDao.setEntityClass( User.class );
 	}
 	
 	@Override
-	public User registerUser(UserDto userDto) {
-		if (userExist(userDto.getEmail())) {
-            throw new UserAlreadyExistException("Ya existe una cuenta registrada con esta dirección de email: " + userDto.getEmail());
+	public void createUser(User user) {
+		userDao.create(user);
+	}
+	
+	@Override
+	public User createUser(String id, String identificationNumber, String phoneNumber, int opusCoins, State state) {
+		if (userExist(id)) {
+            throw new UserAlreadyExistException("Ya existe una cuenta registrada con esta dirección de email: " + id);
         }
 		else {
 			User user = new User();
-	        user.setEmail(userDto.getEmail());
-	        user.setCity(City.valueOf(userDto.getCity()));
-	        user.setOpusCoins(10);
-	        user.setState(State.WAITING_EMAIL_CONFIRMATION);
+			user.setUserId(id);
+			user.setIdentificationNumber(identificationNumber);
+			user.setPhone(phoneNumber);
+	        user.setOpusCoins(opusCoins);
+	        user.setState(state);
 	        userDao.create(user);
 			return user;
 		}

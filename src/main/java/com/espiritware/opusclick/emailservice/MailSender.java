@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -12,6 +13,7 @@ public class MailSender {
 	@Autowired
 	private JavaMailSender mailSender;
 	
+	@Async
 	@JmsListener(destination = "mailbox", containerFactory = "myFactory")
 	 public void sendEmail(EmailMessage emailMessage) {
 		System.out.println("Llega e-mail");

@@ -20,8 +20,9 @@ import org.springframework.context.annotation.Configuration;
 @ComponentScan({"com.espiritware.opusclick.security"})
 public class WebSecurity extends WebSecurityConfigurerAdapter {
 	
-	public static final String USER_REGISTRATION_URL = "/v1/users/registration";
-	public static final String PROVIDER_REGISTRATION_URL = "/v1/providers/registration";
+	public static final String USER_REGISTRATION_URL = "/v1/accounts/user";
+	public static final String PROVIDER_REGISTRATION_URL = "/v1/accounts/provider";
+	public static final String UPDATE_URL = "/v1/providers";
 	public static final String CONFIRM_REGISTRATION_URL = "/v1/registrationConfirm";
 	public static final String SEND_RESET_PASSWORD_EMAIL = "/v1/sendResetPasswordEmail";
 	public static final String RESET_PASSWORD = "/v1/resetPassword";
@@ -40,12 +41,14 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http.cors().and().csrf().disable()
-				.authorizeRequests().antMatchers(HttpMethod.POST, USER_REGISTRATION_URL).permitAll()
-				.antMatchers(HttpMethod.POST, PROVIDER_REGISTRATION_URL).permitAll()
-				.antMatchers(HttpMethod.GET, CONFIRM_REGISTRATION_URL).permitAll()
-				.antMatchers(HttpMethod.POST, SEND_RESET_PASSWORD_EMAIL).permitAll()
-				.antMatchers(HttpMethod.POST, RESET_PASSWORD).permitAll()
-				.anyRequest().authenticated().and()
+		.authorizeRequests().anyRequest().permitAll().and()
+//				.authorizeRequests().antMatchers(HttpMethod.POST, USER_REGISTRATION_URL).permitAll()
+//				.antMatchers(HttpMethod.POST, PROVIDER_REGISTRATION_URL).permitAll()
+//				.antMatchers(HttpMethod.PATCH, UPDATE_URL).permitAll()
+//				.antMatchers(HttpMethod.GET, CONFIRM_REGISTRATION_URL).permitAll()
+//				.antMatchers(HttpMethod.POST, SEND_RESET_PASSWORD_EMAIL).permitAll()
+//				.antMatchers(HttpMethod.POST, RESET_PASSWORD).permitAll()
+//				.anyRequest().authenticated().and()
 				.addFilter(new JWTAuthenticationFilter(authenticationManager(), getApplicationContext()))
 				.addFilter(new JWTAuthorizationFilter(authenticationManager(), getApplicationContext()))
 				// this disables session creation on Spring Security

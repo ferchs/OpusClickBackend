@@ -2,7 +2,6 @@ package com.espiritware.opusclick.service;
 
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.espiritware.opusclick.dao.GenericDao;
 import com.espiritware.opusclick.error.AccountAlreadyExistException;
@@ -13,19 +12,22 @@ import com.espiritware.opusclick.model.State;
 @Transactional
 public class AccountServiceImpl implements AccountService{
 	
-	GenericDao< Account > accountDao;
+	GenericDao<Account,String> accountDao;
 	
 	@Autowired
-	private PasswordEncoder passwordEncoder;
-	
-	@Autowired
-	public void setDao( GenericDao< Account > daoToSet ){
+	public void setDao( GenericDao< Account,String > daoToSet ){
 		accountDao = daoToSet;
 		accountDao.setEntityClass( Account.class );
 	}
-
+	
 	@Override
-	public Account registerAccount(String email, String name, String lastname, String password) {
+	public void createAccount(Account account) {
+		accountDao.create(account);
+	}
+	
+	
+	@Override
+	public Account createAccount(String email, String name, String lastname, String password) {
 		if (accountExist(email)) {
             throw new AccountAlreadyExistException("Ya existe una cuenta registrada con esta dirección de email: " + email);
         }
@@ -34,7 +36,7 @@ public class AccountServiceImpl implements AccountService{
 			account.setEmail(email);
 			account.setName(name);
 			account.setLastname(lastname);
-			account.setPassword(passwordEncoder.encode(password));
+			account.setPassword(password);
 			account.setState(State.WAITING_EMAIL_CONFIRMATION);
 			accountDao.create(account);
 			return account;
@@ -78,7 +80,4 @@ public class AccountServiceImpl implements AccountService{
 			return false;
 		}
 	}
-	
-	
-
 }

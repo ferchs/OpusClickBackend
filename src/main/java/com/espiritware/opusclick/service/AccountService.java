@@ -5,7 +5,9 @@ import com.espiritware.opusclick.model.State;
 
 public interface AccountService {
 	
-	Account registerAccount (String email, String name, String lastname, String password);
+	void createAccount (Account account);
+	
+	Account createAccount (String email, String name, String lastname, String password);
 	
 //	void deleteUserById(String email);
 	

@@ -10,10 +10,16 @@ public class Publisher {
 
 	@Autowired
     private ApplicationEventPublisher applicationEventPublisher;
- 
-    public void publishRegistrationCompleteEvent(final String email, boolean isUser, final Locale locale, final String appUrl ) {
-        RegistrationCompleteEvent registrationCompleteEvent = new RegistrationCompleteEvent(this, email, isUser, locale, appUrl);
-        applicationEventPublisher.publishEvent(registrationCompleteEvent);
+    
+	
+    public void publishUserRegistrationEvent(final String email,final Locale locale, final String appUrl) {
+    		UserRegistrationEvent userRegistrationEvent = new UserRegistrationEvent(this, email, locale, appUrl);
+        applicationEventPublisher.publishEvent(userRegistrationEvent);
+    }
+    
+    public void publishProviderRegistrationEvent(final String email,final Locale locale, final String appUrl ) {
+		ProviderRegistrationEvent registrationCompleteEvent = new ProviderRegistrationEvent(this, email,locale, appUrl);
+		applicationEventPublisher.publishEvent(registrationCompleteEvent);
     }
     
     public void publishResetPasswordEvent(final String email, final Locale locale, final String appUrl ) {

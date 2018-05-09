@@ -6,14 +6,20 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import lombok.Getter;
+import lombok.Setter;
+
 @Entity
 @Table(name="global_rating")
+@Getter
+@Setter
 public class GlobalRating implements Serializable{
 	
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	private String providerId;
+	@Column(name="pk_provider$global_rating")
+	private String globalRatingId;
 	
 	@Column(name="global_satisfaction_level")
 	private double globalSatisfactionLevel;
@@ -24,27 +30,16 @@ public class GlobalRating implements Serializable{
 	public GlobalRating() {
 	}
 	
-	public GlobalRating(String providerId) {
-		this.providerId=providerId;
+	public GlobalRating(String globalRatingId) {
+		this.globalRatingId=globalRatingId;
 		this.globalSatisfactionLevel=0.0;
 		this.globalRecommend=0.0;
 	}
 	
-	public GlobalRating(String providerId, Double globalSatisfactionLevel, Double globalRecommend) {
-		this.providerId=providerId;
+	public GlobalRating(String globalRatingId, Double globalSatisfactionLevel, Double globalRecommend) {
+		this.globalRatingId=globalRatingId;
 		this.globalSatisfactionLevel=globalSatisfactionLevel;
 		this.globalRecommend=globalRecommend;
 	}
 
-	public String getProviderId() {
-		return providerId;
-	}
-
-	public double getGlobalSatisfactionLevel() {
-		return globalSatisfactionLevel;
-	}
-
-	public void setGlobalRecommend(double globalRecommend) {
-		this.globalRecommend = globalRecommend;
-	}	
 }

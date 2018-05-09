@@ -15,17 +15,17 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.util.UriComponentsBuilder;
+import com.espiritware.opusclick.annotations.DTO;
 import com.espiritware.opusclick.dto.PasswordDto;
-import com.espiritware.opusclick.dto.ProviderDto;
-import com.espiritware.opusclick.dto.UserDto;
+import com.espiritware.opusclick.dto.ProviderRegistrationDto;
+import com.espiritware.opusclick.dto.UserRegistrationDto;
 import com.espiritware.opusclick.event.Publisher;
-import com.espiritware.opusclick.model.User;
 import com.espiritware.opusclick.security.TokenService;
 import com.espiritware.opusclick.service.AccountService;
 import com.espiritware.opusclick.service.ProviderService;
 import com.espiritware.opusclick.service.UserService;
 import com.espiritware.opusclick.model.Account;
-import com.espiritware.opusclick.model.Provider;
+import com.espiritware.opusclick.model.Availability;
 import com.espiritware.opusclick.model.State;
 
 @Controller
@@ -33,13 +33,13 @@ import com.espiritware.opusclick.model.State;
 public class AccountController {
 	
 	@Autowired
+	private AccountService accountService;
+	
+	@Autowired
 	private UserService userService;
 	
 	@Autowired
 	private ProviderService providerService;
-	
-	@Autowired
-	private AccountService accountService;
 	
 	@Autowired
 	private Publisher publisher;
@@ -50,45 +50,45 @@ public class AccountController {
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 	
-	@RequestMapping(value = "/users/registration", method = RequestMethod.POST, headers = "Accept=application/json")
+	
+	@RequestMapping(value = "/accounts/user", method = RequestMethod.POST, headers = "Accept=application/json")
 	@ResponseBody
 	@Transactional
-	public ResponseEntity<String> registerUserAccount(@Valid @RequestBody UserDto userAccountDto,
+	public ResponseEntity<String> registerUserAccount(@Valid @DTO(UserRegistrationDto.class) Account account,
 			UriComponentsBuilder uriComponentsBuilder, final HttpServletRequest request) {
-		if (accountService.accountExist(userAccountDto.getEmail())) {
-			return new ResponseEntity<String>(
-					"Ya existe una cuenta registrada con este email",
-					HttpStatus.CONFLICT);
+		if (accountService.accountExist(account.getEmail())) {
+			return new ResponseEntity<String>("Ya existe una cuenta registrada con este email", HttpStatus.CONFLICT);
 		} else {
-			accountService.registerAccount(userAccountDto.getEmail(), userAccountDto.getName(),
-					userAccountDto.getLastname(), userAccountDto.getPassword());
-			final User userRegistered = userService.registerUser(userAccountDto);
-			publisher.publishRegistrationCompleteEvent(userRegistered.getEmail(), true, request.getLocale(),
-					getAppUrl(request));
+			account.setPassword(passwordEncoder.encode(account.getPassword()));
+			account.getUser().setState(State.WAITING_EMAIL_CONFIRMATION);
+			account.getUser().setOpusCoins(10);
+			accountService.createAccount(account);
+			publisher.publishUserRegistrationEvent(account.getEmail(), request.getLocale(), getAppUrl(request));
 			HttpHeaders headers = new HttpHeaders();
-			headers.setLocation(
-					uriComponentsBuilder.path("/cuenta_creada").buildAndExpand(userRegistered.getEmail()).toUri());
+			headers.setLocation(uriComponentsBuilder.path("/cuenta_creada").buildAndExpand(account.getEmail()).toUri());
 			return new ResponseEntity<String>(headers, HttpStatus.CREATED);
 		}
 	}
 	
-	@RequestMapping(value = "/providers/registration", method = RequestMethod.POST, headers = "Accept=application/json")
+	@RequestMapping(value = "/accounts/provider", method = RequestMethod.POST, headers = "Accept=application/json")
 	@ResponseBody
-	public ResponseEntity<String> registerProviderAccount(@Valid @RequestBody ProviderDto providerAccountDto,
+	@Transactional
+	public ResponseEntity<String> registerProviderAccount(
+			@Valid @DTO(ProviderRegistrationDto.class) Account account,
 			UriComponentsBuilder uriComponentsBuilder, final HttpServletRequest request) {
-		if (accountService.accountExist(providerAccountDto.getEmail())) {
-			return new ResponseEntity<String>(
-					"Ya existe una cuenta registrada con este email",
-					HttpStatus.CONFLICT);
+		
+		if (accountService.accountExist(account.getEmail())) {
+			return new ResponseEntity<String>("Ya existe una cuenta registrada con este email", HttpStatus.CONFLICT);
 		} else {
-			accountService.registerAccount(providerAccountDto.getEmail(), providerAccountDto.getName(),
-					providerAccountDto.getLastname(), providerAccountDto.getPassword());
-			final Provider registered = providerService.registerProvider(providerAccountDto);
-			publisher.publishRegistrationCompleteEvent(registered.getEmail(), false, request.getLocale(),
-					getAppUrl(request));
+			account.setPassword(passwordEncoder.encode(account.getPassword()));
+			account.getProvider().setState(State.WAITING_EMAIL_CONFIRMATION);
+			account.getProvider().setAvailability(Availability.AVAILABLE);
+			account.getProvider().setWorkDone(0);
+			account.getProvider().setOpusCoins(0);
+			accountService.updateAccount(account);
+			publisher.publishProviderRegistrationEvent(account.getEmail(), request.getLocale(), getAppUrl(request));
 			HttpHeaders headers = new HttpHeaders();
-			headers.setLocation(
-					uriComponentsBuilder.path("/cuenta_creada").buildAndExpand(registered.getEmail()).toUri());
+			headers.setLocation(uriComponentsBuilder.path("/cuenta_creada").buildAndExpand(account.getEmail()).toUri());
 			return new ResponseEntity<String>(headers, HttpStatus.CREATED);
 		}
 	}
@@ -96,8 +96,9 @@ public class AccountController {
 	@RequestMapping(value = "/registrationConfirm", method = RequestMethod.GET)
 	public ResponseEntity<String> confirmRegistration(@RequestParam(value = "type", required = true) String type,
 			@RequestParam(value = "verifyCode", required = true) String token, final HttpServletRequest request) {
+
+		String subject = tokenService.getSubjectFromEmailToken(token);
 		if (tokenService.validateAccountEmailToken(token)) {
-			String subject = tokenService.getSubjectFromEmailToken(token);
 			accountService.setAccountState(subject, State.ACCOUNT_CONFIRMED);
 			if (type.equalsIgnoreCase("user")) {
 				userService.setUserState(subject, State.INCOMPLETED_PROFILE);
@@ -106,13 +107,12 @@ public class AccountController {
 			}
 			return new ResponseEntity<String>(HttpStatus.OK);
 		} else {
-			String subject = tokenService.getSubjectFromEmailToken(token);
 			if (tokenService.isTokenExpired(token)
 					&& accountService.getAccountState(subject).equals(State.WAITING_EMAIL_CONFIRMATION)) {
 				if (type.equalsIgnoreCase("user")) {
-					publisher.publishRegistrationCompleteEvent(subject, true, request.getLocale(), getAppUrl(request));
+					publisher.publishUserRegistrationEvent(subject, request.getLocale(), getAppUrl(request));
 				} else if (type.equalsIgnoreCase("provider")) {
-					publisher.publishRegistrationCompleteEvent(subject, false, request.getLocale(), getAppUrl(request));
+					publisher.publishProviderRegistrationEvent(subject, request.getLocale(), getAppUrl(request));
 				}
 				return new ResponseEntity<String>(HttpStatus.UNAUTHORIZED);
 			}
@@ -155,14 +155,15 @@ public class AccountController {
 	
 //Pendiente por implementarlo para que cree la url de manera automatica
 	 private String getAppUrl(HttpServletRequest request) {
-			//return "http://" + "localhost" + ":" + "4200" + "/confirmar_registro";
-		 
-		 return "http://" + "opusclick.com" + "/confirmar_registro";
+			return "http://" + "localhost" + ":" + "4200" + "/confirmar_registro";
+		 //return "http://" + "localhost" + ":" + "8083" + "/confirmar_registro";
+		 //return "http://" + "opusclick.com" + "/confirmar_registro";
 	 }
 	 
 	 private String getResetUrl(HttpServletRequest request) {
-			//return "http://" + "localhost" + ":" + "4200" + "/reestablecer_contraseña";
-		 return "http://" + "opusclick.com" + "/reestablecer_contraseña";
+			return "http://" + "localhost" + ":" + "4200" + "/reestablecer_contraseña";
+		 //return "http://" + "localhost" + ":" + "8083" + "/reestablecer_contraseña";
+		 //return "http://" + "opusclick.com" + "/reestablecer_contraseña";
 	 }
 	 
 }

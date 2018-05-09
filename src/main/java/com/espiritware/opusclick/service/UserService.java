@@ -1,13 +1,14 @@
 package com.espiritware.opusclick.service;
 
-import com.espiritware.opusclick.dto.UserDto;
 import com.espiritware.opusclick.model.State;
 import com.espiritware.opusclick.model.User;
 
 public interface UserService {
 
-	User registerUser(UserDto userDto);
-	
+	void createUser(User user);
+
+	User createUser(String id, String identificationNumber, String phoneNumber, int opusCoins, State state);
+		
 //	void deleteUserById(String email);
 	
 	void updateUser(User user);

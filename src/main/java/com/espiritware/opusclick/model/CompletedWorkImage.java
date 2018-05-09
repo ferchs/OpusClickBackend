@@ -10,14 +10,22 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.GenericGenerator;
+
+import lombok.Getter;
+import lombok.Setter;
+
 @Entity
 @Table(name="completed_work_image")
+@Getter
+@Setter
 public class CompletedWorkImage implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
 	@Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+	@GeneratedValue(strategy= GenerationType.AUTO, generator="native")
+	@GenericGenerator(name = "native", strategy = "native")
     @Column(name="id_completed_work_image")
 	private int completedWorkImageId;
 	
@@ -34,37 +42,4 @@ public class CompletedWorkImage implements Serializable {
 	public CompletedWorkImage() {
 		
 	}
-
-	public int getCompletedWorkImageId() {
-		return completedWorkImageId;
-	}
-
-	public void setCompletedWorkImageId(int completedWorkImageId) {
-		this.completedWorkImageId = completedWorkImageId;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public String getUrl() {
-		return url;
-	}
-
-	public void setUrl(String url) {
-		this.url = url;
-	}
-
-	public Review getReview() {
-		return review;
-	}
-
-	public void setReview(Review review) {
-		this.review = review;
-	}
-
 }

@@ -1,4 +1,4 @@
-package com.espiritware.opusclick.validation;
+package com.espiritware.opusclick.annotations;
 
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.ElementType.FIELD;
@@ -9,6 +9,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import javax.validation.Constraint;
 import javax.validation.Payload;
+import com.espiritware.opusclick.validation.EmailValidator;
 
 
 @Target({TYPE, FIELD, ANNOTATION_TYPE}) 

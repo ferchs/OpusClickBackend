@@ -10,29 +10,39 @@ import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 
+import lombok.Getter;
+import lombok.Setter;
+
 @Entity
 @Table(name="provider")
-public class Provider implements Serializable{
+@Getter
+@Setter
+public class Provider implements Serializable, Comparable<Provider>{
 	
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@Column(name="account_email")
-	private String email;
+	@Column(name="pk_account$provider")
+	private String providerId;
 	
 	@Column(name="identification_number")
 	private String identificationNumber;
 	
-	@Column(name="photo")
-	private String photo;
-	
 	@Column(name="phone_number")
 	private String phone;
+	
+	@Enumerated(EnumType.STRING)
+	@Column(name="availability")
+	private Availability availability;
+	
+	@Column(name="photo")
+	private String photo;
 	
 	@Column(name="experience")
 	private int experience;
@@ -40,34 +50,31 @@ public class Provider implements Serializable{
 	@Column(name="about_me")
 	private String aboutMe;
 	
+	@Column(name="opus_coins")
+	private int opusCoins;
+	
 	@Column(name="work_done")
 	private int workDone;
 	
 	@Enumerated(EnumType.STRING)
-	@Column(name="city")
-	private City city;
-	
-	@Column(name="zip_code")
-	private String zipCode;
-	
-	@Column(name="opus_coins")
-	private int opusCoins;
-	
-	@OneToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name="account_email")
-	private Account account;
-	
-	@Enumerated(EnumType.STRING)
-	@Column(name="availability")
-	private Availability availability;
-	
-	@Enumerated(EnumType.STRING)
-	@Column(name="profession")
-	private Profession profession;
-	
-	@Enumerated(EnumType.STRING)
 	@Column(name="state")
 	private State state;
+	
+	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@JoinColumn(name="fk_profession$provider")
+	private Profession profession;
+	
+	@OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@JoinColumn(name="fk_location$provider")
+    private Location location;
+	
+	@OneToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name="pk_account$provider")
+	private Account account;
+	
+	@OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @PrimaryKeyJoinColumn
+    private GlobalRating globalRating;
 	
 	@OneToMany(mappedBy="provider")
 	private Set<Certificate> certificates;
@@ -75,149 +82,19 @@ public class Provider implements Serializable{
 	@OneToMany(mappedBy="provider")
 	private Set<Work> works;
 	
-	@OneToOne(cascade = CascadeType.ALL)
-    @PrimaryKeyJoinColumn
-    private GlobalRating globalRating;
-	
 	public Provider() {
 	}
 
-	public Provider(String identificationNumber, String email, String phone, Profession profession,
-			GlobalRating globalRating, State state) {
-		this.identificationNumber = identificationNumber;
-		this.email = email;
-		this.phone = phone;
-		this.profession = profession;
-		this.globalRating = globalRating;
-		this.state=state;
+	@Override
+	public int compareTo(Provider o) {
+		Double localRating = (this.globalRating.getGlobalRecommend() + this.globalRating.getGlobalSatisfactionLevel())/ 2;
+		Double foreingRating = (o.globalRating.getGlobalRecommend() + o.globalRating.getGlobalSatisfactionLevel()) / 2;
+		if (localRating > foreingRating) {
+			return 1;
+		} else if (localRating < foreingRating) {
+			return -1;
+		} else {
+			return 0;
+		}
 	}
-
-	public String getIdentificationNumber() {
-		return identificationNumber;
-	}
-
-	public void setIdentificationNumber(String identificationNumber) {
-		this.identificationNumber = identificationNumber;
-	}
-
-	public String getEmail() {
-		return email;
-	}
-
-	public void setEmail(String email) {
-		this.email = email;
-	}
-
-	public String getPhoto() {
-		return photo;
-	}
-
-	public void setPhoto(String photo) {
-		this.photo = photo;
-	}
-
-	public String getPhone() {
-		return phone;
-	}
-
-	public void setPhone(String phone) {
-		this.phone = phone;
-	}
-
-	public City getCity() {
-		return city;
-	}
-
-	public void setCity(City city) {
-		this.city = city;
-	}
-
-	public String getZipCode() {
-		return zipCode;
-	}
-
-	public void setZipCode(String zipCode) {
-		this.zipCode = zipCode;
-	}
-
-	public int getExperience() {
-		return experience;
-	}
-
-	public void setExperience(int experience) {
-		this.experience = experience;
-	}
-
-	public String getAboutMe() {
-		return aboutMe;
-	}
-
-	public void setAboutMe(String aboutMe) {
-		this.aboutMe = aboutMe;
-	}
-
-	public int getWorkDone() {
-		return workDone;
-	}
-
-	public void setWorkDone(int workDone) {
-		this.workDone = workDone;
-	}
-
-	public int getOpusCoins() {
-		return opusCoins;
-	}
-
-	public void setOpusCoins(int opusCoins) {
-		this.opusCoins = opusCoins;
-	}
-
-	public Availability getAvailability() {
-		return availability;
-	}
-
-	public void setAvailability(Availability availability) {
-		this.availability = availability;
-	}
-
-	public Profession getProfession() {
-		return profession;
-	}
-	
-	public State getState() {
-		return state;
-	}
-
-	public void setState(State state) {
-		this.state = state;
-	}
-
-	public void setProfession(Profession profession) {
-		this.profession = profession;
-	}
-
-	public Set<Certificate> getCertificates() {
-		return certificates;
-	}
-
-	public void setCertificates(Set<Certificate> certificates) {
-		this.certificates = certificates;
-	}
-
-	public Set<Work> getWorks() {
-		return works;
-	}
-
-	public void setWorks(Set<Work> works) {
-		this.works = works;
-	}
-
-	public GlobalRating getGlobalRating() {
-		return globalRating;
-	}
-
-	public void setGlobalRating(GlobalRating globalRating) {
-		this.globalRating = globalRating;
-	}
-
 }

@@ -3,31 +3,46 @@ package com.espiritware.opusclick.model;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Set;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.GenericGenerator;
+
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Table(name="work")
+@Getter
+@Setter
 public class Work implements Serializable{
 	
 	private static final long serialVersionUID = 1L;
 
 	@Id
+	@GeneratedValue(strategy= GenerationType.AUTO, generator="native")
+	@GenericGenerator(name = "native", strategy = "native")
 	@Column(name="id_work")
-	private String idWork;
+	private long workId;
+	
+	@Column(name="work_number")
+	private String workNumber;
 	
 	@Column(name="creation_date")
 	private Date creationDate;
+	
+	@Enumerated(EnumType.STRING)
+	@Column(name="state")
+	private State state;
 	
 	@ManyToOne
 	@JoinColumn(name="fk_user$work")
@@ -37,75 +52,13 @@ public class Work implements Serializable{
 	@JoinColumn(name="fk_provider$work")
 	private Provider provider;
 	
-	@Enumerated(EnumType.STRING)
-	@Column(name="state")
-	private State state;
-	
-	@OneToOne(cascade = CascadeType.ALL)
-    @PrimaryKeyJoinColumn
-	private Review review;
-	
 	@OneToMany(mappedBy="work")
 	private Set<Visit> visits;
 	
+	@OneToMany(mappedBy="work")
+	private Set<Review> reviews;
+	
 	public Work() {
 		
-	}
-
-	public String getIdWork() {
-		return idWork;
-	}
-
-	public void setIdWork(String idWork) {
-		this.idWork = idWork;
-	}
-
-	public Date getCreationDate() {
-		return creationDate;
-	}
-
-	public void setCreationDate(Date creationDate) {
-		this.creationDate = creationDate;
-	}
-
-	public User getUser() {
-		return user;
-	}
-
-	public void setUser(User user) {
-		this.user = user;
-	}
-
-	public Provider getProvider() {
-		return provider;
-	}
-
-	public void setProvider(Provider provider) {
-		this.provider = provider;
-	}
-
-	public State getState() {
-		return state;
-	}
-
-	public void setState(State state) {
-		this.state = state;
-	}
-
-	public Review getReview() {
-		return review;
-	}
-
-	public void setReview(Review review) {
-		this.review = review;
-	}
-
-	public Set<Visit> getVisit() {
-		return visits;
-	}
-
-	public void setVisit(Set<Visit> visits) {
-		this.visits = visits;
-	}
-	
+	}	
 }

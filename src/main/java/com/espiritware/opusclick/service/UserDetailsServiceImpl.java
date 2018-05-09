@@ -6,12 +6,14 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.espiritware.opusclick.model.Account;
 
 import static java.util.Collections.emptyList;
 
 @Service
+@Transactional
 public class UserDetailsServiceImpl implements UserDetailsService {
 	
 	@Autowired
