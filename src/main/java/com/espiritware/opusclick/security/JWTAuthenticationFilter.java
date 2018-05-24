@@ -46,6 +46,7 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 				throw new AccountNotConfirmedException("Debes confirmar tu cuenta para iniciar sesion. ¡Revisa tu Email!");
 			}
 			if(tokenService.validateLoginRolExist(creds.getEmail(), creds.isUserLogin())) {
+				//UserDetailsServiceImpl class implements the authentication package com.espiritware.opusclick.service
 				return authenticationManager.authenticate(
 						new UsernamePasswordAuthenticationToken(creds.getEmail(), creds.getPassword(), new ArrayList<>()));
 			}

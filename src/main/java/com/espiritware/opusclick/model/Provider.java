@@ -11,10 +11,15 @@ import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.MapsId;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
+
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -23,6 +28,9 @@ import lombok.Setter;
 @Table(name="provider")
 @Getter
 @Setter
+@JsonIdentityInfo(
+		  generator = ObjectIdGenerators.PropertyGenerator.class, 
+		  property = "providerId")
 public class Provider implements Serializable, Comparable<Provider>{
 	
 	private static final long serialVersionUID = 1L;
@@ -57,29 +65,29 @@ public class Provider implements Serializable, Comparable<Provider>{
 	private int workDone;
 	
 	@Enumerated(EnumType.STRING)
-	@Column(name="state")
+	@Column(name="state", nullable = false)
 	private State state;
 	
-	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@ManyToOne(fetch=FetchType.EAGER, cascade = CascadeType.ALL)
 	@JoinColumn(name="fk_profession$provider")
 	private Profession profession;
 	
-	@OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@OneToOne(fetch=FetchType.EAGER, cascade = CascadeType.ALL)
 	@JoinColumn(name="fk_location$provider")
     private Location location;
 	
-	@OneToOne(fetch = FetchType.EAGER)
+	@OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@JoinColumn(name="pk_account$provider")
 	private Account account;
 	
-	@OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@OneToOne(fetch=FetchType.LAZY, cascade = CascadeType.ALL)
     @PrimaryKeyJoinColumn
     private GlobalRating globalRating;
 	
-	@OneToMany(mappedBy="provider")
+	@OneToMany(fetch=FetchType.LAZY, mappedBy="provider", cascade = CascadeType.ALL)
 	private Set<Certificate> certificates;
 	
-	@OneToMany(mappedBy="provider")
+	@OneToMany(fetch=FetchType.LAZY, mappedBy="provider", cascade = CascadeType.ALL)
 	private Set<Work> works;
 	
 	public Provider() {

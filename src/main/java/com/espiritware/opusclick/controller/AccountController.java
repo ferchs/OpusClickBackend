@@ -40,7 +40,7 @@ public class AccountController {
 	
 	@Autowired
 	private ProviderService providerService;
-	
+		
 	@Autowired
 	private Publisher publisher;
 	
@@ -62,6 +62,7 @@ public class AccountController {
 			account.setPassword(passwordEncoder.encode(account.getPassword()));
 			account.getUser().setState(State.WAITING_EMAIL_CONFIRMATION);
 			account.getUser().setOpusCoins(10);
+			account.setProvider(account.getProvider());
 			accountService.createAccount(account);
 			publisher.publishUserRegistrationEvent(account.getEmail(), request.getLocale(), getAppUrl(request));
 			HttpHeaders headers = new HttpHeaders();
@@ -85,6 +86,7 @@ public class AccountController {
 			account.getProvider().setAvailability(Availability.AVAILABLE);
 			account.getProvider().setWorkDone(0);
 			account.getProvider().setOpusCoins(0);
+			account.getProvider().getGlobalRating().setScore(100);
 			accountService.updateAccount(account);
 			publisher.publishProviderRegistrationEvent(account.getEmail(), request.getLocale(), getAppUrl(request));
 			HttpHeaders headers = new HttpHeaders();

@@ -2,7 +2,6 @@ package com.espiritware.opusclick.model;
 
 import java.io.Serializable;
 import java.util.Set;
-
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -11,9 +10,15 @@ import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.MapsId;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -21,6 +26,9 @@ import lombok.Setter;
 @Table(name="user")
 @Getter
 @Setter
+@JsonIdentityInfo(
+		  generator = ObjectIdGenerators.PropertyGenerator.class, 
+		  property = "userId")
 public class User implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -45,7 +53,7 @@ public class User implements Serializable {
 	@Column(name="state")
 	private State state;
 	
-	@OneToOne(fetch = FetchType.LAZY)
+	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@JoinColumn(name="pk_account$user")
 	private Account account;
 	

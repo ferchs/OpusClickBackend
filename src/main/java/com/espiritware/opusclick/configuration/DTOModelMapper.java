@@ -24,13 +24,17 @@ import java.lang.reflect.Type;
 import java.util.Collections;
 
 public class DTOModelMapper extends RequestResponseBodyMethodProcessor {
+	
 	private static final ModelMapper modelMapper = new ModelMapper();
-
+	
     private EntityManager entityManager;
+    
 
     public DTOModelMapper(ObjectMapper objectMapper, EntityManager entityManager) {
         super(Collections.singletonList(new MappingJackson2HttpMessageConverter(objectMapper)));
         this.entityManager = entityManager;
+        modelMapper.getConfiguration().setAmbiguityIgnored(true);
+        //modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
     }
 
     @Override

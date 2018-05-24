@@ -9,7 +9,14 @@ import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
+import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,6 +24,9 @@ import lombok.Setter;
 @Table(name="account")
 @Getter
 @Setter
+@JsonIdentityInfo(
+		  generator = ObjectIdGenerators.PropertyGenerator.class, 
+		  property = "email")
 public class Account implements Serializable{
 
 	private static final long serialVersionUID = 1L;
@@ -31,6 +41,7 @@ public class Account implements Serializable{
 	@Column(name="lastname")
 	private String lastname;
 	
+	@JsonIgnore
 	@Column(name="password")
 	private String password;
 	

@@ -27,19 +27,9 @@ public class GlobalRating implements Serializable{
 	@Column(name="global_recommend")
 	private double globalRecommend;
 	
+	@Column(name="score")
+	private double score;
+	
 	public GlobalRating() {
 	}
-	
-	public GlobalRating(String globalRatingId) {
-		this.globalRatingId=globalRatingId;
-		this.globalSatisfactionLevel=0.0;
-		this.globalRecommend=0.0;
-	}
-	
-	public GlobalRating(String globalRatingId, Double globalSatisfactionLevel, Double globalRecommend) {
-		this.globalRatingId=globalRatingId;
-		this.globalSatisfactionLevel=globalSatisfactionLevel;
-		this.globalRecommend=globalRecommend;
-	}
-
 }
