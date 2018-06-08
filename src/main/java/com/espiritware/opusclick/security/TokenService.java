@@ -4,6 +4,8 @@ import java.util.Date;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
+
+import com.espiritware.opusclick.model.Account;
 import com.espiritware.opusclick.model.State;
 import org.springframework.security.core.userdetails.User;
 import com.espiritware.opusclick.service.AccountService;
@@ -35,8 +37,9 @@ public class TokenService {
 		
 	}
 
-	public String createVerificationEmailToken(String email) {
+	public String createVerificationEmailToken(int id,String email) {
 		String emailToken = Jwts.builder()
+				.setId(id+"")
 				.setSubject(email)
 				.setIssuedAt(new Date())
 				.setExpiration(new Date(System.currentTimeMillis() + expirationTime))
@@ -83,8 +86,15 @@ public class TokenService {
 		return (String) claims.get("sub");
 	}
 	
+	public int getIdFromEmailToken(String token) {
+		Claims claims = Jwts.parser().setSigningKey(SECRET).parseClaimsJws(token).getBody();
+		return Integer.parseInt((String) claims.get("jti"));
+	}
+	
 	public String createAuthenticationToken(Authentication auth) {
-		String token = Jwts.builder().setSubject(((User) auth.getPrincipal()).getUsername()).setIssuedAt(new Date())
+		String token = Jwts.builder()
+				.setSubject(((User) auth.getPrincipal()).getUsername())
+				.setIssuedAt(new Date())
 				.setExpiration(new Date(System.currentTimeMillis() + expirationTime))
 				.signWith(SignatureAlgorithm.HS512, SECRET.getBytes()).compact();
 		return token;
@@ -121,10 +131,13 @@ public class TokenService {
 	}
 	
 	public boolean validateLoginRolExist(String email, boolean isUserLogin) {
-		if (isUserLogin) {
-			return userService.userExist(email);
-		} else if(!isUserLogin) {
-			return providerService.providerExist(email);
+		Account account=accountService.findAccountByEmail(email);
+		if(account!=null) {
+			if (isUserLogin) {
+				return userService.userExist(account.getId());
+			} else if(!isUserLogin) {
+				return providerService.providerExist(account.getId());
+			}
 		}
 		return false;
 	}

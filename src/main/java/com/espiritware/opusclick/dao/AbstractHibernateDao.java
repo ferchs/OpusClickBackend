@@ -29,13 +29,15 @@ public abstract class AbstractHibernateDao<T,E extends Serializable> {
 	}
 	
 	@Transactional
-	public void create(T entity) {
+	public T create(T entity) {
 		getCurrentSession().persist(entity);
+		return entity;
 	}
 	
 	@Transactional
-	public void update(T entity) {
+	public T update(T entity) {
 		getCurrentSession().merge(entity);
+		return entity;
 	}
 	
 	@Transactional
@@ -50,7 +52,7 @@ public abstract class AbstractHibernateDao<T,E extends Serializable> {
 	}
 	
 	@Transactional
-	public T findByUniquefield(String fieldName, String fieldValue) {
+	public T findByField(String fieldName, String fieldValue) {
 		String entity= entityClass.getName().substring(entityClass.getName().lastIndexOf(".")+1,entityClass.getName().length());
 		return (T) getCurrentSession()
 				.createQuery("from " + entity + " where " + fieldName + " = :fieldValue")
@@ -58,7 +60,7 @@ public abstract class AbstractHibernateDao<T,E extends Serializable> {
 	}
 	
 	@Transactional
-	public List<T> findByfield(String fieldName, String fieldValue) {
+	public List<T> findAllByField(String fieldName, String fieldValue) {
 		String entity= entityClass.getName().substring(entityClass.getName().lastIndexOf(".")+1,entityClass.getName().length());
 		return getCurrentSession()
 				.createQuery("from " + entity + " where " + fieldName + " = :fieldValue")

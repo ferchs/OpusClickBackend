@@ -25,7 +25,7 @@ import com.espiritware.opusclick.service.AccountService;
 import com.espiritware.opusclick.service.ProviderService;
 import com.espiritware.opusclick.service.UserService;
 import com.espiritware.opusclick.model.Account;
-import com.espiritware.opusclick.model.Availability;
+import com.espiritware.opusclick.model.GlobalRating;
 import com.espiritware.opusclick.model.State;
 
 @Controller
@@ -60,11 +60,9 @@ public class AccountController {
 			return new ResponseEntity<String>("Ya existe una cuenta registrada con este email", HttpStatus.CONFLICT);
 		} else {
 			account.setPassword(passwordEncoder.encode(account.getPassword()));
-			account.getUser().setState(State.WAITING_EMAIL_CONFIRMATION);
-			account.getUser().setOpusCoins(10);
-			account.setProvider(account.getProvider());
-			accountService.createAccount(account);
-			publisher.publishUserRegistrationEvent(account.getEmail(), request.getLocale(), getAppUrl(request));
+			account.getUser().setAccount(account);
+			account=accountService.createAccount(account);
+			publisher.publishUserRegistrationEvent(account.getId(),account.getEmail(), request.getLocale(), getAppUrl(request));
 			HttpHeaders headers = new HttpHeaders();
 			headers.setLocation(uriComponentsBuilder.path("/cuenta_creada").buildAndExpand(account.getEmail()).toUri());
 			return new ResponseEntity<String>(headers, HttpStatus.CREATED);
@@ -82,13 +80,14 @@ public class AccountController {
 			return new ResponseEntity<String>("Ya existe una cuenta registrada con este email", HttpStatus.CONFLICT);
 		} else {
 			account.setPassword(passwordEncoder.encode(account.getPassword()));
-			account.getProvider().setState(State.WAITING_EMAIL_CONFIRMATION);
-			account.getProvider().setAvailability(Availability.AVAILABLE);
-			account.getProvider().setWorkDone(0);
-			account.getProvider().setOpusCoins(0);
-			account.getProvider().getGlobalRating().setScore(100);
-			accountService.updateAccount(account);
-			publisher.publishProviderRegistrationEvent(account.getEmail(), request.getLocale(), getAppUrl(request));
+			GlobalRating initialGlobalRating=account.getProvider().getGlobalRating();
+			account.getProvider().setGlobalRating(null);
+			account.getProvider().setAccount(account);
+			account=accountService.createAccount(account);
+			initialGlobalRating.setGlobalRatingId(account.getId());
+			account.getProvider().setGlobalRating(initialGlobalRating);
+			account=accountService.updateAccount(account);
+			publisher.publishProviderRegistrationEvent(account.getId(),account.getEmail(), request.getLocale(), getAppUrl(request));
 			HttpHeaders headers = new HttpHeaders();
 			headers.setLocation(uriComponentsBuilder.path("/cuenta_creada").buildAndExpand(account.getEmail()).toUri());
 			return new ResponseEntity<String>(headers, HttpStatus.CREATED);
@@ -98,23 +97,24 @@ public class AccountController {
 	@RequestMapping(value = "/registrationConfirm", method = RequestMethod.GET)
 	public ResponseEntity<String> confirmRegistration(@RequestParam(value = "type", required = true) String type,
 			@RequestParam(value = "verifyCode", required = true) String token, final HttpServletRequest request) {
-
-		String subject = tokenService.getSubjectFromEmailToken(token);
+		
+		int id=tokenService.getIdFromEmailToken(token);
 		if (tokenService.validateAccountEmailToken(token)) {
-			accountService.setAccountState(subject, State.ACCOUNT_CONFIRMED);
+			accountService.setAccountState(id, State.ACCOUNT_CONFIRMED);
 			if (type.equalsIgnoreCase("user")) {
-				userService.setUserState(subject, State.INCOMPLETED_PROFILE);
+				userService.setUserState(id, State.INCOMPLETED_PROFILE);
 			} else if (type.equalsIgnoreCase("provider")) {
-				providerService.setProviderState(subject, State.WAITING_APPROVAL);
+				providerService.setProviderState(id, State.WAITING_APPROVAL);
 			}
 			return new ResponseEntity<String>(HttpStatus.OK);
 		} else {
 			if (tokenService.isTokenExpired(token)
-					&& accountService.getAccountState(subject).equals(State.WAITING_EMAIL_CONFIRMATION)) {
+					&& accountService.getAccountState(id).equals(State.WAITING_EMAIL_CONFIRMATION)) {
+				String subject=tokenService.getSubjectFromEmailToken(token);
 				if (type.equalsIgnoreCase("user")) {
-					publisher.publishUserRegistrationEvent(subject, request.getLocale(), getAppUrl(request));
+					publisher.publishUserRegistrationEvent(id,subject, request.getLocale(), getAppUrl(request));
 				} else if (type.equalsIgnoreCase("provider")) {
-					publisher.publishProviderRegistrationEvent(subject, request.getLocale(), getAppUrl(request));
+					publisher.publishProviderRegistrationEvent(id,subject, request.getLocale(), getAppUrl(request));
 				}
 				return new ResponseEntity<String>(HttpStatus.UNAUTHORIZED);
 			}
@@ -125,7 +125,7 @@ public class AccountController {
 	@RequestMapping(value = "/sendResetPasswordEmail", method = RequestMethod.POST)
 	public ResponseEntity<String> sendResetPasswordEmail(@RequestBody String email, final HttpServletRequest request) {
 		if (email != null) {
-			if (accountService.findAccountById(email) != null) {
+			if (accountService.findAccountByEmail(email) != null) {
 				publisher.publishResetPasswordEvent(email, request.getLocale(), getResetUrl(request));
 				return new ResponseEntity<String>(HttpStatus.OK);
 			} else {
@@ -141,7 +141,7 @@ public class AccountController {
 			@RequestParam(value = "verifyCode", required = false) String token,
 			@Valid @RequestBody PasswordDto passwordDto, final HttpServletRequest request) {
 		if (tokenService.validateResetPasswordToken(token)) {
-			Account account = accountService.findAccountById(email);
+			Account account = accountService.findAccountByEmail(email);
 			account.setPassword(passwordEncoder.encode(passwordDto.getPassword()));
 			accountService.updateAccount(account);
 			return new ResponseEntity<String>(HttpStatus.OK);

@@ -1,5 +1,6 @@
 package com.espiritware.opusclick.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import javax.transaction.Transactional;
 import org.hibernate.SessionFactory;
@@ -18,80 +19,42 @@ import com.espiritware.opusclick.model.State;
 @Service("providerService")
 @Transactional
 public class ProviderServiceImpl implements ProviderService{
-
-	GenericDao< Provider,String > providerDao;
+	
+	GenericDao< Provider,Integer > providerDao;
 	
 	@Autowired
-	public void setDao( GenericDao< Provider,String > daoToSet ){
+	public void setDao( GenericDao< Provider,Integer > daoToSet ){
 		providerDao = daoToSet;
 		providerDao.setEntityClass( Provider.class );
 	}
-	
+
 	@Override
 	public Provider createProvider(String id, PersonalInformation personalInformation, Profession profession,
 			Availability availability, OpusClickInformation opusClickInformation, State state, Location location) {
-
-		if (providerExist(id)) {
-			throw new ProviderAlreadyExistException(
-					"Ya existe una cuenta registrada con esta dirección de email: " + id);
-		} else {
-			Provider provider = new Provider();
-			provider.setProviderId(id);
-			if (personalInformation.getIdentificationNumber() != null) {
-				provider.setIdentificationNumber(personalInformation.getIdentificationNumber().toString());
-			} else {
-				provider.setIdentificationNumber(null);
-			}
-			if (personalInformation.getPhoneNumber() != null) {
-				provider.setPhone(personalInformation.getPhoneNumber().toString());
-			} else {
-				provider.setPhone(null);
-			}
-			if (personalInformation.getExperience() != null) {
-				provider.setExperience(personalInformation.getExperience().getExperienceData());
-			} else {
-				provider.setExperience(0);
-			}
-			if (personalInformation.getExperience() != null) {
-				provider.setAboutMe(personalInformation.getAboutMe().toString());
-			} else {
-				provider.setAboutMe(null);
-			}
-			if (opusClickInformation.getOpuscoins() != null) {
-				provider.setOpusCoins(opusClickInformation.getOpuscoins().getOpusCoinsAmount());
-			} else {
-				provider.setOpusCoins(0);
-			}
-			if (opusClickInformation.getWorkdones() != null) {
-				provider.setWorkDone(opusClickInformation.getWorkdones().getWorkDoneNumber());
-			} else {
-				provider.setWorkDone(0);
-			}
-			provider.setAvailability(availability);
-			provider.setState(state);
-			provider.setProfession(profession);
-			provider.setLocation(location);
-			providerDao.create(provider);
-			return provider;
-		}
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override
 	public void updateProvider(Provider provider) {
-		providerDao.update(provider);
+		providerDao.update(provider);		
 	}
 
 	@Override
-	public Provider findProviderById(String email) {
-		return providerDao.findById(email);
+	public Provider findProviderById(int id) {
+		return providerDao.findById(id);
 	}
 
 	@Override
 	public List<Provider> findProvidersByProfessionName(String profession) {
-		SessionFactory sf = (SessionFactory) providerDao.getSessionFactory();
-		return sf.getCurrentSession().createQuery(
-				"SELECT prov from Provider as prov INNER JOIN prov.profession as prof WHERE prof.name = :professionName")
-				.setParameter("professionName", profession).list();
+		List<Provider> providers=providerDao.findAll();
+		ArrayList professionals= new ArrayList();
+		for(Provider provider:providers) {
+			if(provider.getProfession().getName().equalsIgnoreCase(profession)) {
+				professionals.add(provider);
+			}
+		}
+		return professionals;
 	}
 
 	@Override
@@ -101,21 +64,114 @@ public class ProviderServiceImpl implements ProviderService{
 	}
 
 	@Override
-	public boolean providerExist(String email) {
-		return providerDao.findById(email) != null;
+	public boolean providerExist(int id) {
+		return providerDao.findById(id) != null;
 	}
 
 	@Override
-	public State getProviderState(String email) {
-		Provider provider = providerDao.findById(email);
+	public State getProviderState(int id) {
+		Provider provider = providerDao.findById(id);
 		return provider.getState();
 	}
 
 	@Override
-	public void setProviderState(String email, State state) {
-		Provider provider = providerDao.findById(email);
+	public void setProviderState(int id, State state) {
+		Provider provider = providerDao.findById(id);
 		provider.setState(state);
 		providerDao.update(provider);
 	}
+
+
+//	@Override
+//	public Provider createProvider(String email, PersonalInformation personalInformation, Profession profession,
+//			Availability availability, OpusClickInformation opusClickInformation, State state, Location location) {
+//
+//		if (providerExist(email)) {
+//			throw new ProviderAlreadyExistException(
+//					"Ya existe una cuenta registrada con esta dirección de email: " + email);
+//		} else {
+//			
+//			Provider provider = new Provider();
+//			provider.setProviderId(id);
+//			if (personalInformation.getIdentificationNumber() != null) {
+//				provider.setIdentificationNumber(personalInformation.getIdentificationNumber().toString());
+//			} else {
+//				provider.setIdentificationNumber(null);
+//			}
+//			if (personalInformation.getPhoneNumber() != null) {
+//				provider.setPhone(personalInformation.getPhoneNumber().toString());
+//			} else {
+//				provider.setPhone(null);
+//			}
+//			if (personalInformation.getExperience() != null) {
+//				provider.setExperience(personalInformation.getExperience().getExperienceData());
+//			} else {
+//				provider.setExperience(0);
+//			}
+//			if (personalInformation.getExperience() != null) {
+//				provider.setAboutMe(personalInformation.getAboutMe().toString());
+//			} else {
+//				provider.setAboutMe(null);
+//			}
+//			if (opusClickInformation.getOpuscoins() != null) {
+//				provider.setOpusCoins(opusClickInformation.getOpuscoins().getOpusCoinsAmount());
+//			} else {
+//				provider.setOpusCoins(0);
+//			}
+//			if (opusClickInformation.getWorkdones() != null) {
+//				provider.setWorkDone(opusClickInformation.getWorkdones().getWorkDoneNumber());
+//			} else {
+//				provider.setWorkDone(0);
+//			}
+//			provider.setAvailability(availability);
+//			provider.setState(state);
+//			provider.setProfession(profession);
+//			provider.setLocation(location);
+//			providerDao.create(provider);
+//			return provider;
+//		}
+//	}
+//
+//	@Override
+//	public void updateProvider(Provider provider) {
+//		providerDao.update(provider);
+//	}
+//
+//	@Override
+//	public Provider findProviderById(int email) {
+//		return providerDao.findById(email);
+//	}
+//
+//	@Override
+//	public List<Provider> findProvidersByProfessionName(String profession) {
+//		SessionFactory sf = (SessionFactory) providerDao.getSessionFactory();
+//		return sf.getCurrentSession().createQuery(
+//				"SELECT prov from Provider as prov INNER JOIN prov.profession as prof WHERE prof.name = :professionName")
+//				.setParameter("professionName", profession).list();
+//	}
+//
+//	@Override
+//	public List<Provider> findAllProviders() {
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
+//
+//	@Override
+//	public boolean providerExist(int email) {
+//		return providerDao.findById(email) != null;
+//	}
+//
+//	@Override
+//	public State getProviderState(int email) {
+//		Provider provider = providerDao.findById(email);
+//		return provider.getState();
+//	}
+//
+//	@Override
+//	public void setProviderState(int email, State state) {
+//		Provider provider = providerDao.findById(email);
+//		provider.setState(state);
+//		providerDao.update(provider);
+//	}
 	
 }

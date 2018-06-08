@@ -7,7 +7,7 @@ public interface UserService {
 
 	void createUser(User user);
 
-	User createUser(String id, String identificationNumber, String phoneNumber, int opusCoins, State state);
+	User createUser(int id, String identificationNumber, String phoneNumber, int opusCoins, State state);
 		
 //	void deleteUserById(String email);
 	
@@ -15,12 +15,12 @@ public interface UserService {
 	
 //	List<User> findAllUsers();
 
-	User findUserById(String email);
+	User findUserById(int id);
 	
-	boolean userExist(String email);
+	boolean userExist(int id);
 	
-	State getUserState(String email);
+	State getUserState(int id);
 	
-	void setUserState(String email, State state);
+	void setUserState(int id, State state);
 	
 }

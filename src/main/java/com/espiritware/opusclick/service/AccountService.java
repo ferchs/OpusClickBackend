@@ -5,25 +5,35 @@ import com.espiritware.opusclick.model.State;
 
 public interface AccountService {
 	
-	void createAccount (Account account);
+	Account createAccount (Account account);
 	
-	Account createAccount (String email, String name, String lastname, String password);
+	Account createAccount (int id,String email, String name, String lastname, String password);
 	
 //	void deleteUserById(String email);
 	
-	void updateAccount(Account account);
+	Account updateAccount(Account account);
 	
 //	List<User> findAllUsers();
 
-	Account findAccountById(String email);
+	Account findAccountById(int id);
+	
+	Account findAccountByEmail(String email);
 	
 	void setAccountState(String email, State state);
 	
+	void setAccountState(int id, State state);
+	
 	State getAccountState(String email);
+
+	State getAccountState(int id);
 	
 	boolean accountExist(String email);
 	
+	boolean accountExist(int id);
+	
 	boolean accountConfirmed(String email);
+	
+	boolean accountConfirmed(int id);
 
 		
 }

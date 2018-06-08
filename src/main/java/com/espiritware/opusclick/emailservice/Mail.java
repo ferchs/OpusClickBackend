@@ -29,29 +29,29 @@ public class Mail implements ApplicationListener<GenericEvent>{
 		System.out.println("Se ha recibido evento...");
 		if (event instanceof UserRegistrationEvent) {
 			UserRegistrationEvent registrationEvent = (UserRegistrationEvent) event;
-			createUserRegistrationEmailMessage(registrationEvent.getEmail(), registrationEvent.getAppUrl());
+			createUserRegistrationEmailMessage(registrationEvent.getId(),registrationEvent.getEmail(), registrationEvent.getAppUrl());
 		} else if (event instanceof ProviderRegistrationEvent) {
 			ProviderRegistrationEvent registrationEvent = (ProviderRegistrationEvent) event;
-			createProviderRegistrationEmailMessage(registrationEvent.getEmail(), registrationEvent.getAppUrl());
+			createProviderRegistrationEmailMessage(registrationEvent.getId(), registrationEvent.getEmail(), registrationEvent.getAppUrl());
 		} else if (event instanceof ResetPasswordEvent) {
 			ResetPasswordEvent resetPasswordEvent = (ResetPasswordEvent) event;
 			createResetPasswordEmail(resetPasswordEvent.getEmail(), resetPasswordEvent.getAppUrl());
 		}
 	}
 	
-	private void createUserRegistrationEmailMessage(String to, String appUrl) {
+	private void createUserRegistrationEmailMessage(int id, String to, String appUrl) {
 		String subject = "Confirmación de registro";
 		final String message = "Gracias por utilizar OpusClick. Por favor haga click en el enlace que aparece a continuación para confirmar su cuenta.";
-		final String confirmationUrl = appUrl + "?verifyCode="+ tokenUtil.createVerificationEmailToken(to) +"&type=user";
+		final String confirmationUrl = appUrl + "?verifyCode="+ tokenUtil.createVerificationEmailToken(id,to) +"&type=user";
 		String body = message + " \r\n" + confirmationUrl;
 		EmailMessage emailMessage = new EmailMessage(env.getProperty("support.email"), to, subject, body);
 		jmsTemplate.convertAndSend("mailbox",emailMessage);
 	}
 	
-	private void createProviderRegistrationEmailMessage(String to, String appUrl) {
+	private void createProviderRegistrationEmailMessage(int id, String to, String appUrl) {
 		String subject = "Confirmación de registro";
 		final String message = "Gracias por utilizar OpusClick. Por favor haga click en el enlace que aparece a continuación para confirmar su cuenta.";
-		final String confirmationUrl = appUrl + "?verifyCode="+ tokenUtil.createVerificationEmailToken(to)+"&type=provider";
+		final String confirmationUrl = appUrl + "?verifyCode="+ tokenUtil.createVerificationEmailToken(id,to)+"&type=provider";
 		String body = message + " \r\n" + confirmationUrl;
 		EmailMessage emailMessage = new EmailMessage(env.getProperty("support.email"), to, subject, body);
 		jmsTemplate.convertAndSend("mailbox",emailMessage);

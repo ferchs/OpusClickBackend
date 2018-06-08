@@ -22,7 +22,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
 	@Override
 	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-		Account account = accountService.findAccountById(email);
+		Account account = accountService.findAccountByEmail(email);
 		if (account != null) {
 //			List<GrantedAuthority> grantedAuthorities = new ArrayList<>();
 //	        grantedAuthorities.add(new SimpleGrantedAuthority(userOptional.get().role));

@@ -27,7 +27,7 @@ public class ProfessionServiceImpl implements ProfessionService {
 
 	@Override
 	public Profession findProfessionByName(String professionName) {
-		return professionDao.findByUniquefield("name",professionName);
+		return professionDao.findByField("name",professionName);
 	}
 
 	@Override

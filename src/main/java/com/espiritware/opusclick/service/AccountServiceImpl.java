@@ -12,23 +12,23 @@ import com.espiritware.opusclick.model.State;
 @Transactional
 public class AccountServiceImpl implements AccountService{
 	
-	GenericDao<Account,String> accountDao;
+	GenericDao<Account, Integer> accountDao;
 	
 	@Autowired
-	public void setDao( GenericDao< Account,String > daoToSet ){
+	public void setDao( GenericDao< Account,Integer > daoToSet ){
 		accountDao = daoToSet;
 		accountDao.setEntityClass( Account.class );
 	}
 	
 	@Override
-	public void createAccount(Account account) {
-		accountDao.create(account);
+	public Account createAccount(Account account) {
+		return accountDao.create(account);
 	}
 	
 	
 	@Override
-	public Account createAccount(String email, String name, String lastname, String password) {
-		if (accountExist(email)) {
+	public Account createAccount(int id,String email, String name, String lastname, String password) {
+		if (accountExist(id)) {
             throw new AccountAlreadyExistException("Ya existe una cuenta registrada con esta dirección de email: " + email);
         }
 		else {
@@ -44,36 +44,69 @@ public class AccountServiceImpl implements AccountService{
 	}
 
 	@Override
-	public void updateAccount(Account account) {
-		accountDao.update(account);
+	public Account updateAccount(Account account) {
+		return accountDao.update(account);
 	}
 
 	@Override
-	public Account findAccountById(String email) {
-		return accountDao.findById(email);
+	public Account findAccountById(int id) {
+		return accountDao.findById(id);
+	}
+	
+	@Override
+	public Account findAccountByEmail(String email) {
+		return accountDao.findByField("email", email);
 	}
 	
 	@Override
 	public State getAccountState(String email) {
-		return accountDao.findById(email).getState();
+		return accountDao.findByField("email", email).getState();
+	}
+	
+	@Override
+	public State getAccountState(int id) {
+		return accountDao.findById(id).getState();
 	}
 	
 	@Override
 	public void setAccountState(String email, State state) {
-		Account account=accountDao.findById(email);
+		Account account=accountDao.findByField("email", email);
+		account.setState(state);
+		accountDao.update(account);
+	}
+	
+	@Override
+	public void setAccountState(int id, State state) {
+		Account account=accountDao.findById(id);
 		account.setState(state);
 		accountDao.update(account);
 	}
 
 	@Override
 	public boolean accountExist(String email) {
-		return accountDao.findById(email) != null;
+		return accountDao.findByField("email", email) != null;
+	}
+	
+	@Override
+	public boolean accountExist(int id) {
+		return accountDao.findById(id) != null;
 	}
 	
 	@Override
 	public boolean accountConfirmed(String email) {
 		Account account= new Account();
-		account=accountDao.findById(email);
+		account=accountDao.findByField("email", email);
+		if(account.getState().equals(State.ACCOUNT_CONFIRMED)) {
+			return true;
+		}else {
+			return false;
+		}
+	}
+	
+	@Override
+	public boolean accountConfirmed(int id) {
+		Account account= new Account();
+		account=accountDao.findById(id);
 		if(account.getState().equals(State.ACCOUNT_CONFIRMED)) {
 			return true;
 		}else {

@@ -15,7 +15,7 @@ import lombok.Setter;
 public class ProviderUpdateDto {
 	
 	@Id
-	private String providerId;
+	private int id;
 
 	private String accountName;
 	

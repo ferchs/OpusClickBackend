@@ -6,12 +6,12 @@ public interface GlobalRatingService {
 	
 	void create (GlobalRating globalRating);
 	
-	GlobalRating create (String id, double globalSatisfactionLevel, double globalRecommend, double score);
+	GlobalRating create (int id, double globalSatisfactionLevel, double globalRecommend, double score);
 	
 //	void deleteUserById(String email);
 	
 	void update (GlobalRating globalRating);
 	
-	void update (String id, double globalSatisfactionLevel, double globalRecommend, double score);
+	void update (int id, double globalSatisfactionLevel, double globalRecommend, double score);
 		
 }

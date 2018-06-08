@@ -16,11 +16,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
-
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-
 import lombok.Getter;
 import lombok.Setter;
 
@@ -30,14 +27,13 @@ import lombok.Setter;
 @Setter
 @JsonIdentityInfo(
 		  generator = ObjectIdGenerators.PropertyGenerator.class, 
-		  property = "providerId")
+		  property = "id")
 public class Provider implements Serializable, Comparable<Provider>{
 	
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@Column(name="pk_account$provider")
-	private String providerId;
+	private int id;
 	
 	@Column(name="identification_number")
 	private String identificationNumber;
@@ -68,7 +64,7 @@ public class Provider implements Serializable, Comparable<Provider>{
 	@Column(name="state", nullable = false)
 	private State state;
 	
-	@ManyToOne(fetch=FetchType.EAGER, cascade = CascadeType.ALL)
+	@ManyToOne(fetch=FetchType.EAGER, cascade = CascadeType.MERGE)
 	@JoinColumn(name="fk_profession$provider")
 	private Profession profession;
 	
@@ -76,12 +72,13 @@ public class Provider implements Serializable, Comparable<Provider>{
 	@JoinColumn(name="fk_location$provider")
     private Location location;
 	
-	@OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@OneToOne
 	@JoinColumn(name="pk_account$provider")
+	@MapsId
 	private Account account;
 	
-	@OneToOne(fetch=FetchType.LAZY, cascade = CascadeType.ALL)
-    @PrimaryKeyJoinColumn
+	@OneToOne(fetch=FetchType.EAGER, cascade = CascadeType.ALL, optional = false)
+	@PrimaryKeyJoinColumn
     private GlobalRating globalRating;
 	
 	@OneToMany(fetch=FetchType.LAZY, mappedBy="provider", cascade = CascadeType.ALL)

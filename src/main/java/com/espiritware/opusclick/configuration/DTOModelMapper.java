@@ -1,8 +1,11 @@
 package com.espiritware.opusclick.configuration;
 
 import com.espiritware.opusclick.annotations.DTO;
+import com.espiritware.opusclick.dto.ProviderRegistrationDto;
+import com.espiritware.opusclick.model.Account;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.PropertyMap;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.http.HttpInputMessage;
@@ -34,6 +37,13 @@ public class DTOModelMapper extends RequestResponseBodyMethodProcessor {
         super(Collections.singletonList(new MappingJackson2HttpMessageConverter(objectMapper)));
         this.entityManager = entityManager;
         modelMapper.getConfiguration().setAmbiguityIgnored(true);
+        modelMapper.addMappings(new PropertyMap<ProviderRegistrationDto, Account>() {
+			  @Override
+			  protected void configure() {
+				map().getProvider().getLocation().setCity(source.getCity());
+				map().getProvider().setProfession(source.getProfession());
+			  }
+			});
         //modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
     }
 
@@ -53,6 +63,7 @@ public class DTOModelMapper extends RequestResponseBodyMethodProcessor {
 		Object id = getEntityId(dto);
 		if (id == null) {
 			return modelMapper.map(dto, parameter.getParameterType());
+			
 		} else {
 			Object persistedObject = entityManager.find(parameter.getParameterType(), id);
 			modelMapper.map(dto, persistedObject);

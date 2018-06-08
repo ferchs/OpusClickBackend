@@ -24,7 +24,7 @@ public class CityServiceImpl implements CityService{
 	
 	@Override
 	public City findCityByName(String name) {
-		return cityDao.findByUniquefield("name", name);
+		return cityDao.findByField("name", name);
 	}
 
 	@Override

@@ -12,10 +12,10 @@ import com.espiritware.opusclick.model.User;
 @Transactional
 public class UserServiceImpl implements UserService{
 
-	GenericDao< User,String > userDao;
+	GenericDao< User,Integer > userDao;
 	
 	@Autowired
-	public void setDao( GenericDao< User,String > daoToSet ){
+	public void setDao( GenericDao< User,Integer > daoToSet ){
 		userDao = daoToSet;
 		userDao.setEntityClass( User.class );
 	}
@@ -26,7 +26,7 @@ public class UserServiceImpl implements UserService{
 	}
 	
 	@Override
-	public User createUser(String id, String identificationNumber, String phoneNumber, int opusCoins, State state) {
+	public User createUser(int id, String identificationNumber, String phoneNumber, int opusCoins, State state) {
 		if (userExist(id)) {
             throw new UserAlreadyExistException("Ya existe una cuenta registrada con esta dirección de email: " + id);
         }
@@ -43,7 +43,7 @@ public class UserServiceImpl implements UserService{
 	}
 
 	
-	public boolean userExist(String email) {
+	public boolean userExist(int email) {
         return userDao.findById(email) != null;
     }
 
@@ -63,19 +63,19 @@ public class UserServiceImpl implements UserService{
 //	}
 
 	@Override
-	public User findUserById(String email) {
-		return userDao.findById(email);
+	public User findUserById(int id) {
+		return userDao.findById(id);
 	}
 	
 	
 	@Override
-	public State getUserState(String email) {
-		return userDao.findById(email).getState();
+	public State getUserState(int id) {
+		return userDao.findById(id).getState();
 	}
 	
 	@Override
-	public void setUserState(String email, State state) {
-		User user= userDao.findById(email);
+	public void setUserState(int id, State state) {
+		User user= userDao.findById(id);
 		user.setState(state);
 		userDao.update(user);
 	}

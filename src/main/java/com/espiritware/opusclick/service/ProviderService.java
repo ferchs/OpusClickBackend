@@ -1,7 +1,6 @@
 package com.espiritware.opusclick.service;
 
 import java.util.List;
-
 import com.espiritware.opusclick.dto.OpusClickInformation;
 import com.espiritware.opusclick.dto.PersonalInformation;
 import com.espiritware.opusclick.model.Availability;
@@ -17,16 +16,16 @@ public interface ProviderService {
 	
 	void updateProvider(Provider provider);
 	
-	Provider findProviderById(String email);
-		
+	Provider findProviderById(int id);
+			
 	List<Provider> findProvidersByProfessionName(String profession);
 	
 	List<Provider> findAllProviders();
 	
-	boolean providerExist(String email);
+	boolean providerExist(int id);
 	
-	State getProviderState(String email);
+	State getProviderState(int id);
 	
-	void setProviderState(String email, State state);
+	void setProviderState(int id, State state);
 
 }

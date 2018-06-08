@@ -20,10 +20,10 @@ public class City implements Serializable, Comparable<City>{
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@GeneratedValue(strategy= GenerationType.AUTO, generator="native")
-	@GenericGenerator(name = "native", strategy = "native")
+//	@GeneratedValue(strategy= GenerationType.AUTO, generator="native")
+//	@GenericGenerator(name = "native", strategy = "native")
 	@Column(name="id_city")
-	private long id;
+	private int id;
 	
 	@Column(name="name")
 	private String name;

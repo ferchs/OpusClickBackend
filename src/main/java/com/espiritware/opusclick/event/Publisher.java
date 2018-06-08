@@ -12,13 +12,13 @@ public class Publisher {
     private ApplicationEventPublisher applicationEventPublisher;
     
 	
-    public void publishUserRegistrationEvent(final String email,final Locale locale, final String appUrl) {
-    		UserRegistrationEvent userRegistrationEvent = new UserRegistrationEvent(this, email, locale, appUrl);
+    public void publishUserRegistrationEvent(final int id, final String email,final Locale locale, final String appUrl) {
+    		UserRegistrationEvent userRegistrationEvent = new UserRegistrationEvent(this, id, email, locale, appUrl);
         applicationEventPublisher.publishEvent(userRegistrationEvent);
     }
     
-    public void publishProviderRegistrationEvent(final String email,final Locale locale, final String appUrl ) {
-		ProviderRegistrationEvent registrationCompleteEvent = new ProviderRegistrationEvent(this, email,locale, appUrl);
+    public void publishProviderRegistrationEvent(final int id, final String email,final Locale locale, final String appUrl ) {
+		ProviderRegistrationEvent registrationCompleteEvent = new ProviderRegistrationEvent(this, id, email,locale, appUrl);
 		applicationEventPublisher.publishEvent(registrationCompleteEvent);
     }
     

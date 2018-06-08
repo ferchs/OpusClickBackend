@@ -11,17 +11,17 @@ public interface GenericDao<T,E extends Serializable> {
 	
 	List<T> findAll();
 	
-	void create(final T entity);
+	T create(final T entity);
 	 
-	void update(final T entity);
+	T update(final T entity);
 	 
 	void delete(final T entity);
 	 
 	void deleteById(final E entityId);
 	
-	T findByUniquefield(String fieldName, String fieldValue);
+	T findByField(String fieldName, String fieldValue);
 	
-	List<T> findByfield(String fieldName, String fieldValue);
+	List<T> findAllByField(String fieldName, String fieldValue);
 	
 	T getSessionFactory();
 	

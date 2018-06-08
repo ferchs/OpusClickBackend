@@ -22,8 +22,8 @@ public class Profession implements Serializable, Comparable<Profession> {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@GeneratedValue(strategy= GenerationType.AUTO, generator="native")
-	@GenericGenerator(name = "native", strategy = "native")
+//	@GeneratedValue(strategy = GenerationType.AUTO, generator = "native")
+//	@GenericGenerator(name = "native", strategy = "native")
 	@Column(name="id_profession")
 	private int professionId;
 	

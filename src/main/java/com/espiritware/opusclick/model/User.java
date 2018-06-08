@@ -7,18 +7,14 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.MapsId;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-
 import lombok.Getter;
 import lombok.Setter;
 
@@ -34,8 +30,7 @@ public class User implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	@Id
-	@Column(name="pk_account$user")
-	private String userId;
+	private int userId;
 	
 	@Column(name="identification_number", unique = true)
 	private String identificationNumber;
@@ -53,8 +48,9 @@ public class User implements Serializable {
 	@Column(name="state")
 	private State state;
 	
-	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@OneToOne
 	@JoinColumn(name="pk_account$user")
+	@MapsId
 	private Account account;
 	
 	@OneToMany(cascade = CascadeType.ALL)

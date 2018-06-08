@@ -5,7 +5,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,7 +18,7 @@ public class GlobalRating implements Serializable{
 
 	@Id
 	@Column(name="pk_provider$global_rating")
-	private String globalRatingId;
+	private int globalRatingId;
 	
 	@Column(name="global_satisfaction_level")
 	private double globalSatisfactionLevel;
@@ -29,6 +28,7 @@ public class GlobalRating implements Serializable{
 	
 	@Column(name="score")
 	private double score;
+	
 	
 	public GlobalRating() {
 	}

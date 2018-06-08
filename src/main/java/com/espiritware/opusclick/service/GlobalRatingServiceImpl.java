@@ -10,10 +10,10 @@ import com.espiritware.opusclick.model.GlobalRating;
 @Transactional
 public class GlobalRatingServiceImpl implements GlobalRatingService{
 	
-	GenericDao<GlobalRating,String> globalRatingDao;
+	GenericDao<GlobalRating,Integer> globalRatingDao;
 	
 	@Autowired
-	public void setDao( GenericDao< GlobalRating,String > daoToSet ){
+	public void setDao( GenericDao< GlobalRating,Integer > daoToSet ){
 		globalRatingDao = daoToSet;
 		globalRatingDao.setEntityClass( GlobalRating.class );
 	}
@@ -24,7 +24,7 @@ public class GlobalRatingServiceImpl implements GlobalRatingService{
 	}
 
 	@Override
-	public GlobalRating create(String id, double globalSatisfactionLevel, double globalRecommend, double score) {
+	public GlobalRating create(int id, double globalSatisfactionLevel, double globalRecommend, double score) {
 		GlobalRating globalRating= new GlobalRating();
 		globalRating.setGlobalRatingId(id);
 		globalRating.setGlobalSatisfactionLevel(globalSatisfactionLevel);
@@ -41,7 +41,7 @@ public class GlobalRatingServiceImpl implements GlobalRatingService{
 	}
 
 	@Override
-	public void update(String id, double globalSatisfactionLevel, double globalRecommend, double score) {
+	public void update(int id, double globalSatisfactionLevel, double globalRecommend, double score) {
 		// TODO Auto-generated method stub
 		
 	}
