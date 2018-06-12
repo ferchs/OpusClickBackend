@@ -32,7 +32,7 @@ public class UserServiceImpl implements UserService{
         }
 		else {
 			User user = new User();
-			user.setUserId(id);
+			user.setId(id);
 			user.setIdentificationNumber(identificationNumber);
 			user.setPhone(phoneNumber);
 	        user.setOpusCoins(opusCoins);

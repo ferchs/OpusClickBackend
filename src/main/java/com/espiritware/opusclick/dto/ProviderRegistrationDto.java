@@ -52,6 +52,9 @@ public class ProviderRegistrationDto {
     private final Availability providerAvailability=Availability.AVAILABLE;
 	
 	@JsonIgnore
+	private String photo="https://s3-sa-east-1.amazonaws.com/opusclick.com/provider-profile-images/default-profile-photo.png";
+	
+	@JsonIgnore
     private final int providerWorkDone=0;
 	
 	@JsonIgnore

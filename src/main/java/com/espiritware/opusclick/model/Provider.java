@@ -72,7 +72,7 @@ public class Provider implements Serializable, Comparable<Provider>{
 	@JoinColumn(name="fk_location$provider")
     private Location location;
 	
-	@OneToOne
+	@OneToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name="pk_account$provider")
 	@MapsId
 	private Account account;

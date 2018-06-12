@@ -30,7 +30,7 @@ public class User implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	@Id
-	private int userId;
+	private int id;
 	
 	@Column(name="identification_number", unique = true)
 	private String identificationNumber;
@@ -48,7 +48,7 @@ public class User implements Serializable {
 	@Column(name="state")
 	private State state;
 	
-	@OneToOne
+	@OneToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name="pk_account$user")
 	@MapsId
 	private Account account;

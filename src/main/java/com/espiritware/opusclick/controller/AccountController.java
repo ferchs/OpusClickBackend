@@ -77,8 +77,11 @@ public class AccountController {
 			UriComponentsBuilder uriComponentsBuilder, final HttpServletRequest request) {
 		
 		if (accountService.accountExist(account.getEmail())) {
-			return new ResponseEntity<String>("Ya existe una cuenta registrada con este email", HttpStatus.CONFLICT);
-		} else {
+			return new ResponseEntity<String>("409-1", HttpStatus.CONFLICT);
+		} else if(providerService.phoneExist(account.getProvider().getPhone())) {
+			return new ResponseEntity<String>("409-2", HttpStatus.CONFLICT);
+		}
+		else {
 			account.setPassword(passwordEncoder.encode(account.getPassword()));
 			GlobalRating initialGlobalRating=account.getProvider().getGlobalRating();
 			account.getProvider().setGlobalRating(null);

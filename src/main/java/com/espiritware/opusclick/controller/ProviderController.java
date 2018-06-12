@@ -21,7 +21,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
 import com.espiritware.opusclick.annotations.DTO;
 import com.espiritware.opusclick.dto.ProviderGetByProfessionDto;
-import com.espiritware.opusclick.dto.ProviderGetProfileDto;
 import com.espiritware.opusclick.dto.ProviderUpdateDto;
 import com.espiritware.opusclick.error.CustomErrorType;
 import com.espiritware.opusclick.model.Provider;
@@ -34,7 +33,7 @@ import com.espiritware.opusclick.service.ProviderService;
 @RequestMapping("/v1")
 public class ProviderController {
 	
-	public static final String PROVIDERS_UPLOADED_FOLDER="Images/Providers/";
+	private static final String PROVIDER_IMAGES_FOLDER="provider-profile-images/";
 	
 	@Autowired
 	private ProviderService providerService;
@@ -65,8 +64,7 @@ public class ProviderController {
 	
 	@RequestMapping(value = "/providers", method = RequestMethod.GET, headers = "Accept=application/json")
 	@Transactional
-	public ResponseEntity<List<?>> getProviders(@RequestParam(value = "email", required = false) String providerEmail,
-			@RequestParam(value = "profession", required = false) String professionName,
+	public ResponseEntity<List<?>> getProviders(@RequestParam(value = "profession", required = false) String professionName,
 			UriComponentsBuilder uriComponentsBuilder) {
 		List<Provider> providers = new ArrayList<Provider>();
 		if (professionName != null) {
@@ -133,7 +131,7 @@ public class ProviderController {
 		if (provider.getPhoto() != null) {
 			if (!provider.getPhoto().isEmpty()) {
 				try {
-					amazonClient.deleteFileFromS3Bucket(provider.getPhoto());
+					amazonClient.deleteFileFromS3Bucket(PROVIDER_IMAGES_FOLDER,provider.getPhoto());
 				} catch (Exception e) {
 					return new ResponseEntity<>(
 							new CustomErrorType("Provider with id: " + emailProvider + " can't be erased"),
@@ -142,7 +140,7 @@ public class ProviderController {
 			}
 		}
 		try {
-			String fileUrl = amazonClient.uploadFile(multipartFile);
+			String fileUrl = amazonClient.uploadFile(PROVIDER_IMAGES_FOLDER,multipartFile);
 			provider.setPhoto(fileUrl);
 			providerService.updateProvider(provider);
 			return new ResponseEntity<String>(fileUrl, HttpStatus.OK);

@@ -19,8 +19,6 @@ import com.amazonaws.services.s3.model.PutObjectRequest;
 
 @Service
 public class AmazonClient {
-
-	private static final String PROVIDER_IMAGES_FOLDER="provider-profile-images/";
 	
 	@Autowired
     private AmazonS3 s3Client;
@@ -30,10 +28,10 @@ public class AmazonClient {
     @Value("${amazonS3Properties.bucketName}")
     private String bucketName;
        
-	public String uploadFile(MultipartFile multipartFile) throws AmazonServiceException,AmazonClientException, IOException {
+	public String uploadFile(String folder, MultipartFile multipartFile) throws AmazonServiceException,AmazonClientException, IOException {
 		String fileUrl = "";
 		File file = convertMultiPartToFile(multipartFile);
-		String fileName = generateFileName(multipartFile);
+		String fileName = generateFileName(folder,multipartFile);
 		fileUrl = endpointUrl + "/" + bucketName + "/" + fileName;
 		uploadFileTos3bucket(fileName, file);
 		file.delete();
@@ -48,7 +46,7 @@ public class AmazonClient {
 		return convFile;
 	}
 
-	private String generateFileName(MultipartFile multiPart) {
+	private String generateFileName(String folder,MultipartFile multiPart) {
 //		Date date= new Date();
 //		SimpleDateFormat dateFormat= new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
 //		String dateName= dateFormat.format(date);
@@ -58,7 +56,7 @@ public class AmazonClient {
 //		byte[] photoBytes= multipartFile.getBytes();
 //		Path path= Paths.get(PROVIDERS_UPLOADED_FOLDER + filename);
 //		Files.write(path, photoBytes);
-		return PROVIDER_IMAGES_FOLDER + new Date().getTime() + "-" + multiPart.getOriginalFilename().replace(" ", "_");
+		return folder + new Date().getTime() + "-" + multiPart.getOriginalFilename().replace(" ", "_");
 	}
 
 	private void uploadFileTos3bucket(String fileName, File file) throws AmazonServiceException,AmazonClientException {
@@ -66,8 +64,8 @@ public class AmazonClient {
 				new PutObjectRequest(bucketName, fileName, file).withCannedAcl(CannedAccessControlList.PublicRead));
 	}
 
-	public String deleteFileFromS3Bucket(String fileUrl) throws AmazonServiceException, AmazonClientException {
-		String fileName = PROVIDER_IMAGES_FOLDER + fileUrl.substring(fileUrl.lastIndexOf("/") + 1);
+	public String deleteFileFromS3Bucket(String folder, String fileUrl) throws AmazonServiceException, AmazonClientException {
+		String fileName = folder + fileUrl.substring(fileUrl.lastIndexOf("/") + 1);
 		s3Client.deleteObject(new DeleteObjectRequest(bucketName, fileName));
 		return "Successfully deleted";
 	}

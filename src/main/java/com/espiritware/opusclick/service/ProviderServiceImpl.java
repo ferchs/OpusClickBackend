@@ -81,6 +81,11 @@ public class ProviderServiceImpl implements ProviderService{
 		providerDao.update(provider);
 	}
 
+	@Override
+	public boolean phoneExist(String phoneNumber) {
+		return providerDao.findByField("phone", phoneNumber) != null;
+	}
+
 
 //	@Override
 //	public Provider createProvider(String email, PersonalInformation personalInformation, Profession profession,

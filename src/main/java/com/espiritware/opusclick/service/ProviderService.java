@@ -24,6 +24,8 @@ public interface ProviderService {
 	
 	boolean providerExist(int id);
 	
+	boolean phoneExist(String phoneNumber);
+	
 	State getProviderState(int id);
 	
 	void setProviderState(int id, State state);
