@@ -62,7 +62,7 @@ public class AccountController {
 			account.setPassword(passwordEncoder.encode(account.getPassword()));
 			account.getUser().setAccount(account);
 			account=accountService.createAccount(account);
-			publisher.publishUserRegistrationEvent(account.getId(),account.getEmail(), request.getLocale(), getAppUrl(request));
+			publisher.publishUserRegistrationEvent(account.getId(),account.getEmail(),account.getName(),request.getLocale(), getAppUrl(request));
 			HttpHeaders headers = new HttpHeaders();
 			headers.setLocation(uriComponentsBuilder.path("/cuenta_creada").buildAndExpand(account.getEmail()).toUri());
 			return new ResponseEntity<String>(headers, HttpStatus.CREATED);
@@ -90,7 +90,7 @@ public class AccountController {
 			initialGlobalRating.setGlobalRatingId(account.getId());
 			account.getProvider().setGlobalRating(initialGlobalRating);
 			account=accountService.updateAccount(account);
-			publisher.publishProviderRegistrationEvent(account.getId(),account.getEmail(), request.getLocale(), getAppUrl(request));
+			publisher.publishProviderRegistrationEvent(account.getId(),account.getEmail(),account.getName(), request.getLocale(), getAppUrl(request));
 			HttpHeaders headers = new HttpHeaders();
 			headers.setLocation(uriComponentsBuilder.path("/cuenta_creada").buildAndExpand(account.getEmail()).toUri());
 			return new ResponseEntity<String>(headers, HttpStatus.CREATED);
@@ -115,9 +115,9 @@ public class AccountController {
 					&& accountService.getAccountState(id).equals(State.WAITING_EMAIL_CONFIRMATION)) {
 				String subject=tokenService.getSubjectFromEmailToken(token);
 				if (type.equalsIgnoreCase("user")) {
-					publisher.publishUserRegistrationEvent(id,subject, request.getLocale(), getAppUrl(request));
+					publisher.publishUserRegistrationEvent(id,subject,accountService.findAccountById(id).getName(),request.getLocale(), getAppUrl(request));
 				} else if (type.equalsIgnoreCase("provider")) {
-					publisher.publishProviderRegistrationEvent(id,subject, request.getLocale(), getAppUrl(request));
+					publisher.publishProviderRegistrationEvent(id,subject,accountService.findAccountById(id).getName(),request.getLocale(), getAppUrl(request));
 				}
 				return new ResponseEntity<String>(HttpStatus.UNAUTHORIZED);
 			}

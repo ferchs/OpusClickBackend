@@ -1,7 +1,6 @@
 package com.espiritware.opusclick.dto;
 
 import javax.persistence.Id;
-
 import com.espiritware.opusclick.model.Location;
 import com.espiritware.opusclick.model.Profession;
 import com.fasterxml.jackson.annotation.JsonInclude;

@@ -16,7 +16,7 @@ public interface UserService {
 //	List<User> findAllUsers();
 
 	User findUserById(int id);
-	
+		
 	boolean userExist(int id);
 	
 	State getUserState(int id);

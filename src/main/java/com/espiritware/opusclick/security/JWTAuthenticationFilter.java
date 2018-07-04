@@ -4,6 +4,8 @@ import com.espiritware.opusclick.dto.LoginDto;
 import com.espiritware.opusclick.error.AccountNotConfirmedException;
 import com.espiritware.opusclick.error.AccountNotFoundException;
 import com.espiritware.opusclick.error.RoleNotFoundException;
+import com.espiritware.opusclick.model.Account;
+import com.espiritware.opusclick.service.AccountService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.ApplicationContext;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -28,9 +30,19 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     
     private TokenService tokenService;
     
+    private AccountService accountService;
+        
+    private int userId;
+    
+    private int providerId;
+
+    private boolean userLogin;
+    
     public JWTAuthenticationFilter(AuthenticationManager authenticationManager, ApplicationContext ctx) {
         this.authenticationManager = authenticationManager;
         tokenService=ctx.getBean(TokenService.class);
+        accountService=ctx.getBean(AccountService.class);
+        this.userLogin=false;
     }
 
 	@Override
@@ -46,6 +58,14 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 				throw new AccountNotConfirmedException("Debes confirmar tu cuenta para iniciar sesion. ¡Revisa tu Email!");
 			}
 			if(tokenService.validateLoginRolExist(creds.getEmail(), creds.isUserLogin())) {
+				Account account=accountService.findAccountByEmail(creds.getEmail());
+				if(creds.isUserLogin()) {
+					this.userId=account.getUser().getId();
+					this.userLogin=true;
+				}else {
+					this.providerId=account.getProvider().getId();
+					this.userLogin=false;
+				}
 				//UserDetailsServiceImpl class implements the authentication package com.espiritware.opusclick.service
 				return authenticationManager.authenticate(
 						new UsernamePasswordAuthenticationToken(creds.getEmail(), creds.getPassword(), new ArrayList<>()));
@@ -68,7 +88,11 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 		res.addHeader("Access-Control-Expose-Headers", "Authorization");
 		res.addHeader(HEADER_STRING, TOKEN_PREFIX + token);
 		res.setHeader("Content-Type", "application/json");
-		res.getWriter().print("{\"expiresIn\": " + expirationTime + "}");
+		if(this.userLogin) {
+			res.getWriter().print("{\"expiresIn\": " + expirationTime + ",\"userId\": "+ this.userId+ "}");
+		}else {
+			res.getWriter().print("{\"expiresIn\": " + expirationTime + ",\"providerId\": "+ this.providerId+ "}");
+		}
 	}
 	
 	@Override

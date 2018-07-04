@@ -15,7 +15,7 @@ public class UserServiceImpl implements UserService{
 	GenericDao< User,Integer > userDao;
 	
 	@Autowired
-	public void setDao( GenericDao< User,Integer > daoToSet ){
+	public void setDao( GenericDao< User,Integer> daoToSet ){
 		userDao = daoToSet;
 		userDao.setEntityClass( User.class );
 	}

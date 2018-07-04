@@ -5,7 +5,7 @@ import com.espiritware.opusclick.model.Profession;
 
 public interface ProfessionService {
 	
-	Profession findProfessionById(long id);
+	Profession findProfessionById(int id);
 	
 	Profession findProfessionByName(String professionName);
 	

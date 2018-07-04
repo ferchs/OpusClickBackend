@@ -14,10 +14,10 @@ import com.espiritware.opusclick.model.City;
 public class CityServiceImpl implements CityService{
 	
 	
-	GenericDao< City,Long > cityDao;
+	GenericDao< City,Integer > cityDao;
 
 	@Autowired
-	public void setDao( GenericDao< City,Long > daoToSet ){
+	public void setDao( GenericDao< City,Integer> daoToSet ){
 		cityDao = daoToSet;
 		cityDao.setEntityClass( City.class );
 	}

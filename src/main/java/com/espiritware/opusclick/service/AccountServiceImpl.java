@@ -15,7 +15,7 @@ public class AccountServiceImpl implements AccountService{
 	GenericDao<Account, Integer> accountDao;
 	
 	@Autowired
-	public void setDao( GenericDao< Account,Integer > daoToSet ){
+	public void setDao( GenericDao< Account,Integer> daoToSet ){
 		accountDao = daoToSet;
 		accountDao.setEntityClass( Account.class );
 	}

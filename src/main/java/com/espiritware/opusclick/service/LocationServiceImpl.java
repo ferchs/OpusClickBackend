@@ -12,10 +12,10 @@ import com.espiritware.opusclick.model.User;
 @Transactional
 public class LocationServiceImpl implements LocationService {
 
-	GenericDao<Location,Long> locationDao;
+	GenericDao<Location,Integer> locationDao;
 		
 	@Autowired
-	public void setDao( GenericDao<Location,Long> daoToSet ){
+	public void setDao( GenericDao<Location,Integer> daoToSet ){
 		locationDao = daoToSet;
 		locationDao.setEntityClass( Location.class );
 	}

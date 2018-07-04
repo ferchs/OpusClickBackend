@@ -12,16 +12,16 @@ import com.espiritware.opusclick.model.Profession;
 @Transactional
 public class ProfessionServiceImpl implements ProfessionService {
 
-	GenericDao<Profession,Long> professionDao;
+	GenericDao<Profession,Integer> professionDao;
 	
 	@Autowired
-	public void setDao( GenericDao<Profession,Long> daoToSet ){
+	public void setDao( GenericDao<Profession,Integer> daoToSet ){
 		professionDao = daoToSet;
 		professionDao.setEntityClass( Profession.class );
 	}
 
 	@Override
-	public Profession findProfessionById(long id) {
+	public Profession findProfessionById(int id) {
 		return professionDao.findById(id);
 	}
 

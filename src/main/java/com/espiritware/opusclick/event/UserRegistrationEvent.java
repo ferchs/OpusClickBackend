@@ -12,12 +12,14 @@ public class UserRegistrationEvent extends GenericEvent {
 	private final Locale locale;
 	private final int id;
 	private final String email;
+	private final String name;
 
-	public UserRegistrationEvent(Object source, int id, String email, Locale locale, String appUrl) {
+	public UserRegistrationEvent(Object source, int id, String email, String name, Locale locale, String appUrl) {
         super(source);
         this.id=id;
         this.email=email;
         this.locale=locale;
         this.appUrl=appUrl;
+        this.name=name;
     }
 }

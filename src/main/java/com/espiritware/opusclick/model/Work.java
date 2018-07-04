@@ -3,6 +3,8 @@ package com.espiritware.opusclick.model;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Set;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -32,7 +34,7 @@ public class Work implements Serializable{
 	@GeneratedValue(strategy= GenerationType.AUTO, generator="native")
 	@GenericGenerator(name = "native", strategy = "native")
 	@Column(name="id_work")
-	private long workId;
+	private int workId;
 	
 	@Column(name="work_number")
 	private String workNumber;
@@ -52,10 +54,10 @@ public class Work implements Serializable{
 	@JoinColumn(name="fk_provider$work")
 	private Provider provider;
 	
-	@OneToMany(mappedBy="work")
+	@OneToMany(mappedBy="work", cascade = CascadeType.ALL)
 	private Set<Visit> visits;
 	
-	@OneToMany(mappedBy="work")
+	@OneToMany(mappedBy="work", cascade = CascadeType.ALL)
 	private Set<Review> reviews;
 	
 	public Work() {

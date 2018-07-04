@@ -10,10 +10,10 @@ import com.espiritware.opusclick.model.Search;
 @Transactional
 public class SearchServiceImpl implements SearchService{
 	
-	GenericDao< Search,Long > searchDao;
+	GenericDao< Search,Integer > searchDao;
 
 	@Autowired
-	public void setDao( GenericDao< Search,Long > daoToSet ){
+	public void setDao( GenericDao< Search,Integer> daoToSet ){
 		searchDao = daoToSet;
 		searchDao.setEntityClass( Search.class );
 	}

@@ -7,6 +7,8 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.espiritware.opusclick.model.State;
+
 public abstract class AbstractHibernateDao<T,E extends Serializable> {
 
 	@Autowired
@@ -67,11 +69,15 @@ public abstract class AbstractHibernateDao<T,E extends Serializable> {
 				.setParameter("fieldValue", fieldValue).list();
 	}
 	
-	public T getSessionFactory() {
-		return (T) sessionFactory;
+	@Transactional
+	public List<T> findAllByField(String fieldName, String[] fieldValues) {
+		String entity= entityClass.getName().substring(entityClass.getName().lastIndexOf(".")+1,entityClass.getName().length());
+		return getCurrentSession()
+				.createQuery("from " + entity + " where " + fieldName + " in (:fieldValues)")
+				.setParameterList("fieldValues", fieldValues).list();
 	}
 
-	private Session getCurrentSession() {
+	public Session getCurrentSession() {
 		return sessionFactory.getCurrentSession();
 	}
 	

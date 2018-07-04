@@ -2,6 +2,7 @@ package com.espiritware.opusclick.dao;
 
 import java.io.Serializable;
 import java.util.List;
+import org.hibernate.Session;
 
 public interface GenericDao<T,E extends Serializable> {
 	
@@ -23,6 +24,8 @@ public interface GenericDao<T,E extends Serializable> {
 	
 	List<T> findAllByField(String fieldName, String fieldValue);
 	
-	T getSessionFactory();
+	List<T> findAllByField(String fieldName, String [] fieldValues);
+	
+	Session getCurrentSession();
 	
 }

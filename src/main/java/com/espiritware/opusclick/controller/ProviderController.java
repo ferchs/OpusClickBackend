@@ -69,10 +69,10 @@ public class ProviderController {
 		List<Provider> providers = new ArrayList<Provider>();
 		if (professionName != null) {
 			providers = providerService.findProvidersByProfessionName(professionName);
-			Collections.sort(providers);
 			if (providers.isEmpty()) {
 				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 			} else {
+				Collections.sort(providers);
 				List<ProviderGetByProfessionDto> dtoList=getProviderDtoList(providers);
 				return new ResponseEntity<List<?>>(dtoList, HttpStatus.OK);
 			}
