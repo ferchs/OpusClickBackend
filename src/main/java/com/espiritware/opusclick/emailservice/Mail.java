@@ -2,14 +2,12 @@ package com.espiritware.opusclick.emailservice;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.core.env.Environment;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
 import com.espiritware.opusclick.event.GenericEvent;
 import com.espiritware.opusclick.event.ProviderRegistrationEvent;
 import com.espiritware.opusclick.event.ProviderVisitAcceptedEvent;
@@ -18,6 +16,7 @@ import com.espiritware.opusclick.event.ProviderVisitPostponedEvent;
 import com.espiritware.opusclick.event.ProviderVisitRejectedEvent;
 import com.espiritware.opusclick.event.ProviderVisitUnfulfilledEvent;
 import com.espiritware.opusclick.event.ResetPasswordEvent;
+import com.espiritware.opusclick.event.UserQuotationEvent;
 import com.espiritware.opusclick.event.UserRegistrationEvent;
 import com.espiritware.opusclick.event.UserVisitAcceptedEvent;
 import com.espiritware.opusclick.event.UserVisitChangeDateEvent;
@@ -25,6 +24,7 @@ import com.espiritware.opusclick.event.UserVisitPostponedEvent;
 import com.espiritware.opusclick.event.UserVisitRejectedEvent;
 import com.espiritware.opusclick.event.UserVisitRequestEvent;
 import com.espiritware.opusclick.event.UserVisitUnfulfilledEvent;
+import com.espiritware.opusclick.model.OnlineQuote;
 import com.espiritware.opusclick.model.Visit;
 import com.espiritware.opusclick.security.TokenService;
 
@@ -54,6 +54,10 @@ public class Mail implements ApplicationListener<GenericEvent>{
 			UserVisitRequestEvent userVisitRequestEvent = (UserVisitRequestEvent) event;
 			createProviderVisitNotificationEmail(userVisitRequestEvent.getVisit());
 			createUserVisitReminderEmail(userVisitRequestEvent.getVisit());
+		} else if (event instanceof UserQuotationEvent) {
+			UserQuotationEvent userQuotationEvent = (UserQuotationEvent) event;
+			createProviderQuoteNotificationEmail(userQuotationEvent.getOnlineQuote());
+			createUserQuoteReminderEmail(userQuotationEvent.getOnlineQuote());
 		} else if (event instanceof UserVisitChangeDateEvent) {
 			UserVisitChangeDateEvent userVisitChangeDateEvent = (UserVisitChangeDateEvent) event;
 			createUserVisitChangeDateNotificationEmail(userVisitChangeDateEvent.getVisit());
@@ -278,6 +282,51 @@ public class Mail implements ApplicationListener<GenericEvent>{
 		jmsTemplate.convertAndSend("mailbox",emailMessage);
 	}
 	
+	private void createProviderQuoteNotificationEmail(OnlineQuote onlineQuote) {
+		String subject = "¡"+onlineQuote.getWork().getUser().getAccount().getName()+" te ha solicitado una cotización!";
+		StringBuilder body = new StringBuilder();
+		body.append("<!DOCTYPE HTML>\n" + 
+				"<html>\n" + 
+				"  <head>\n" + 
+				"    <link href=\"https://fonts.googleapis.com/css?family=Open+Sans\" rel=\"stylesheet\">\n" + 
+				"  </head>\n" + 
+				"  <body style=\"background-color: #ffffff; padding-left: 30px; padding-right: 30px;\">\n" + 
+				"    <div style=\"background-color: #fafafa;\">\n" + 
+				"      <div style=\"background-color: #fafafa; margin:auto;\">\n" + 
+				"        <img style=\"display: table; margin: 0 auto; background-color: #fafafa;\" src=\"https://s3-sa-east-1.amazonaws.com/opusclick.com/assets/OpusClickLogo.png\">\n" + 
+				"      </div>\n" + 
+				"    <div style=\"display: table; margin: 0 auto; color: #202020\" >\n" + 
+				"      <h1 style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Solicitud de cotización</h1>\n" + 
+				"    </div>\n" + 
+				"    <div style=\"display: inline-block; margin: 0 auto; text-align: justify; padding-left: 30px; padding-right: 30px;\" >\n" + 
+				"      <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Hola "+onlineQuote.getWork().getProvider().getAccount().getName()+",</p>\n" + 
+				"      <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\"><strong>"+onlineQuote.getWork().getUser().getAccount().getName()+
+				" "+onlineQuote.getWork().getUser().getAccount().getLastname()+"</strong> te ha seleccionado entre todos para que le realices una cotización, \n" + 
+				"        por favor revisa toda la información y hazle una oferta sincera para realizar este trabajo.</p>\n" + 
+				"      <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Recuerda que el hecho de realizar esta cotización aumentará tu reputación en la plataforma</p>\n" +
+				"      <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Equipo OpusClick.</p>\n" + 
+				"      <br> \n" + 
+				"  </div>\n" + 
+				"  <div style=\"display: flex; margin: 0 auto; text-align: justify;\">\n" + 
+				"<a href=\"http://localhost:4200/dashboard_experto/visitas/nuevas\" style=\"font-family: 'Open Sans', sans-serif;\n" + 
+				"    display: flex; margin: 0 auto;\n" + 
+				"    background-color: #294664;\n" + 
+				"    border: none;\n" + 
+				"    color: white;\n" + 
+				"    padding: 15px 32px;\n" + 
+				"    text-align: center;\n" + 
+				"    text-decoration: none;\n" + 
+				"    display: inline-block;\n" + 
+				"    font-size: 16px;\">VER SOLICITUD</a>\n" + 
+				"  </div>\n" + 
+				"  <div style=\"background-color: #fafafa; height:100px;\"></div>\n" + 
+				"  </div>\n" + 
+				"  </body>\n" + 
+				"</html>");
+		EmailMessage emailMessage = new EmailMessage(env.getProperty("support.email"), onlineQuote.getWork().getProvider().getAccount().getEmail(), subject, body.toString());
+		jmsTemplate.convertAndSend("mailbox",emailMessage);
+	}
+	
 	private void createUserVisitReminderEmail(Visit visit) {
 		String subject ="Visita en espera de ser aceptada";
 		StringBuilder body = new StringBuilder();
@@ -322,6 +371,50 @@ public class Mail implements ApplicationListener<GenericEvent>{
 				"  </body>\n" + 
 				"</html>");
 		EmailMessage emailMessage = new EmailMessage(env.getProperty("support.email"), visit.getWork().getUser().getAccount().getEmail(), subject, body.toString());
+		jmsTemplate.convertAndSend("mailbox",emailMessage);
+	}
+	
+	private void createUserQuoteReminderEmail(OnlineQuote onlineQuote){
+		String subject ="Solicitud de cotización en espera de ser contestada";
+		StringBuilder body = new StringBuilder();
+		body.append("<!DOCTYPE HTML>\n" + 
+				"<html>\n" + 
+				"  <head>\n" + 
+				"    <link href=\"https://fonts.googleapis.com/css?family=Open+Sans\" rel=\"stylesheet\">\n" + 
+				"  </head>\n" + 
+				"  <body style=\"background-color: #ffffff; padding-left: 30px; padding-right: 30px;\">\n" + 
+				"    <div style=\"background-color: #fafafa;\">\n" + 
+				"      <div style=\"background-color: #fafafa; margin:auto;\">\n" + 
+				"        <img style=\"display: table; margin: 0 auto; background-color: #fafafa;\" src=\"https://s3-sa-east-1.amazonaws.com/opusclick.com/assets/OpusClickLogo.png\">\n" + 
+				"      </div>\n" + 
+				"    <div style=\"display: table; margin: 0 auto; color: #202020\" >\n" + 
+				"      <h1 style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Solicitud de cotización</h1>\n" + 
+				"    </div>\n" + 
+				"    <div style=\"display: inline-block; margin: 0 auto; text-align: justify; padding-left: 30px; padding-right: 30px;\" >\n" + 
+				"      <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Hola "+onlineQuote.getWork().getUser().getAccount().getName()+",</p>\n" + 
+				"      <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Haz solicitado la cotización de código <strong>"+onlineQuote.getQuotationNumber()+
+				"</strong> al experto <strong>"+onlineQuote.getWork().getProvider().getAccount().getName()+" "+onlineQuote.getWork().getProvider().getAccount().getLastname()+"</strong>, recuerda que \n" + 
+				"        debes esperar a que "+onlineQuote.getWork().getProvider().getAccount().getName()+" elabore la cotización. Una vez elaborada, serás notificado por este medio.</p>\n" + 
+				"      <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Equipo OpusClick.</p>\n" + 
+				"      <br> \n" + 
+				"  </div>\n" + 
+				"  <div style=\"display: flex; margin: 0 auto; text-align: justify;\">\n" + 
+				"<a href=\"http://localhost:4200/dashboard_usuario/visitas/pendientes\" style=\"font-family: 'Open Sans', sans-serif;\n" + 
+				"    display: flex; margin: 0 auto;\n" + 
+				"    background-color: #008d98;\n" + 
+				"    border: none;\n" + 
+				"    color: white;\n" + 
+				"    padding: 15px 32px;\n" + 
+				"    text-align: center;\n" + 
+				"    text-decoration: none;\n" + 
+				"    display: inline-block;\n" + 
+				"    font-size: 16px;\">VER VISITA</a>\n" + 
+				"  </div>\n" + 
+				"  <div style=\"background-color: #fafafa; height:100px;\"></div>\n" + 
+				"  </div>\n" + 
+				"  </body>\n" + 
+				"</html>");
+		EmailMessage emailMessage = new EmailMessage(env.getProperty("support.email"), onlineQuote.getWork().getUser().getAccount().getEmail(), subject, body.toString());
 		jmsTemplate.convertAndSend("mailbox",emailMessage);
 	}
 	

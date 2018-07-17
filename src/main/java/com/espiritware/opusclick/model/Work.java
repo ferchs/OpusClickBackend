@@ -46,6 +46,12 @@ public class Work implements Serializable{
 	@Column(name="state")
 	private State state;
 	
+	@Column(name="state_changes")
+	private String historyStateChanges;
+	
+	@Column(name="comment")
+	private String comment;
+	
 	@ManyToOne
 	@JoinColumn(name="fk_user$work")
 	private User user;
@@ -56,6 +62,9 @@ public class Work implements Serializable{
 	
 	@OneToMany(mappedBy="work", cascade = CascadeType.ALL)
 	private Set<Visit> visits;
+	
+	@OneToMany(mappedBy="work", cascade = CascadeType.ALL)
+	private Set<OnlineQuote> quotes;
 	
 	@OneToMany(mappedBy="work", cascade = CascadeType.ALL)
 	private Set<Review> reviews;

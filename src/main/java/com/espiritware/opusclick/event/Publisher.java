@@ -4,7 +4,7 @@ import java.util.Locale;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
-
+import com.espiritware.opusclick.model.OnlineQuote;
 import com.espiritware.opusclick.model.Visit;
 
 @Component
@@ -32,6 +32,11 @@ public class Publisher {
     public void publishUserVisitRequestEvent(final Visit visit) {
     	UserVisitRequestEvent userVisitRequestEvent = new UserVisitRequestEvent(this,visit);
         applicationEventPublisher.publishEvent(userVisitRequestEvent);
+    }
+    
+    public void publishUserQuotationEvent(final OnlineQuote onlineQuote) {
+    	UserQuotationEvent userQuotationEvent = new UserQuotationEvent(this,onlineQuote);
+        applicationEventPublisher.publishEvent(userQuotationEvent);
     }
     
     public void publishUserVisitChangeDateEvent(final Visit visit) {

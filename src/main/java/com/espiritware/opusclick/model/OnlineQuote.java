@@ -1,5 +1,7 @@
 package com.espiritware.opusclick.model;
 
+import java.util.Date;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -13,19 +15,16 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.TypeDef;
-import org.hibernate.annotations.TypeDefs;
 import org.hibernate.annotations.Type;
-import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.vladmihalcea.hibernate.type.json.JsonStringType;
 import lombok.Getter;
 import lombok.Setter;
 
 @Entity
 @Table(name="online_quote")
-@TypeDefs({
-    @TypeDef(name = "json", typeClass = JsonStringType.class),
-    @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
-})
+//@TypeDef(name = "jsonb-node", typeClass = JsonNodeBinaryType.class)
+@TypeDef(name = "json", typeClass = JsonStringType.class)
 @Getter
 @Setter
 public class OnlineQuote {
@@ -33,18 +32,24 @@ public class OnlineQuote {
 	@Id
 	@GeneratedValue(strategy= GenerationType.AUTO, generator="native")
 	@GenericGenerator(name = "native", strategy = "native")
-	@Column(name="id_quote")
-	private long quoteId;
+	@Column(name="id_online_quote")
+	private int id;
+	
+	@Column(name="quotation_number")
+	private String quotationNumber;
+	
+	@Column(name="date")
+	private Date date;
 	
 	@Type(type = "json")
     @Column(columnDefinition = "json", name="quote_requirements")
-	private String requirements;
+	private JsonNode requirements;
 	
 	@Enumerated(EnumType.STRING)
 	@Column(name="state")
 	private State state;
 	
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name="fk_work$visit")
+	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@JoinColumn(name="fk_work$online_quote")
 	private Work work;
 }

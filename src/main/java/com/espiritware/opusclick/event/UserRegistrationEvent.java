@@ -7,7 +7,6 @@ import lombok.Getter;
 public class UserRegistrationEvent extends GenericEvent {
 
 	private static final long serialVersionUID = 1L;
-	
 	private final String appUrl;
 	private final Locale locale;
 	private final int id;

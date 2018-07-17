@@ -98,6 +98,7 @@ public class VisitController {
 				work.setWorkNumber(RandomStringUtils.randomAlphanumeric(8).toUpperCase());
 				work.setCreationDate(new Date());
 				work.setState(State.PENDING_BY_VISIT);
+				work.setHistoryStateChanges("PENDING_BY_VISIT, ");
 				work.setUser(userService.findUserById(Integer.parseInt(userId)));
 				work.setProvider(providerService.findProviderById(Integer.parseInt(providerId)));
 				Set<Visit> visits = new HashSet<Visit>();
@@ -114,51 +115,54 @@ public class VisitController {
 	}
 	
 	/*private Date setHourToDate(Date date, Time hour) {
-		Calendar calendar = Calendar.getInstance();
-		calendar.setTime(hour);
-		int hourTmp=calendar.get(Calendar.HOUR);
-		int minuteTmp=calendar.get(Calendar.MINUTE);
-		calendar.setTime(date);
-		calendar.set(Calendar.HOUR_OF_DAY,hourTmp);
-		calendar.set(Calendar.MINUTE,minuteTmp);
-		calendar.set(Calendar.SECOND,0);
-		calendar.set(Calendar.MILLISECOND,0);
-		return calendar.getTime();
-	}*/
-	
+	Calendar calendar = Calendar.getInstance();
+	calendar.setTime(hour);
+	int hourTmp=calendar.get(Calendar.HOUR);
+	int minuteTmp=calendar.get(Calendar.MINUTE);
+	calendar.setTime(date);
+	calendar.set(Calendar.HOUR_OF_DAY,hourTmp);
+	calendar.set(Calendar.MINUTE,minuteTmp);
+	calendar.set(Calendar.SECOND,0);
+	calendar.set(Calendar.MILLISECOND,0);
+	return calendar.getTime();
+}*/
+
 	@RequestMapping(value = "/visits", method = RequestMethod.GET, headers = "Accept=application/json")
 	@Transactional
 	public ResponseEntity<?> getVisits(@RequestParam(value = "rol", required = true) String rolName,
 			@RequestParam(value = "id", required = true) int id,
 			@RequestParam(value = "work", required = false) String workId,
 			@RequestParam(value = "state", required = false) String state, UriComponentsBuilder uriComponentsBuilder) {
-		
+
 		if (rolName.equalsIgnoreCase("user")) {
 			if (state != null && workId != null) {
-				String [] states=state.split("\\,");
-				if(states.length>1) {
-					List<VisitGetDto> visitsDto =new ArrayList<VisitGetDto>();
-					 visitsDto =generateVisitsDto(visitService.findVisitsOfUserByWorkAndStates(Integer.parseInt(workId), id, convertStringArrayToStateArray(states)));
+				String[] states = state.split("\\,");
+				if (states.length > 1) {
+					List<VisitGetDto> visitsDto = new ArrayList<VisitGetDto>();
+					visitsDto = generateVisitsDto(visitService.findVisitsOfUserByWorkAndStates(Integer.parseInt(workId),
+							id, convertStringArrayToStateArray(states)));
+					return new ResponseEntity<>(visitsDto, HttpStatus.OK);
+				} else {
+					List<VisitGetDto> visitsDto = generateVisitsDto(visitService
+							.findVisitsOfUserByWorkAndState(Integer.parseInt(workId), id, State.valueOf(state)));
 					return new ResponseEntity<>(visitsDto, HttpStatus.OK);
 				}
-				else {
-					List<VisitGetDto> visitsDto = generateVisitsDto(visitService.findVisitsOfUserByWorkAndState(Integer.parseInt(workId), id, State.valueOf(state)));
-					return new ResponseEntity<>(visitsDto, HttpStatus.OK);
-				}
-				
+
 			} else {
 				if (state != null) {
-					String [] statesName=state.split("\\,");
-					if(statesName.length>1) {
-						List<VisitGetDto> visitsDto =new ArrayList<VisitGetDto>();
-						 visitsDto =generateVisitsDto(visitService.findVisitsOfUserByStates(id,statesName));
+					String[] statesName = state.split("\\,");
+					if (statesName.length > 1) {
+						List<VisitGetDto> visitsDto = new ArrayList<VisitGetDto>();
+						visitsDto = generateVisitsDto(visitService.findVisitsOfUserByStates(id, statesName));
 						return new ResponseEntity<>(visitsDto, HttpStatus.OK);
-					}else {
-						List<VisitGetDto> visitsDto = generateVisitsDto(visitService.findVisitsOfUserByState(id, State.valueOf(state)));
+					} else {
+						List<VisitGetDto> visitsDto = generateVisitsDto(
+								visitService.findVisitsOfUserByState(id, State.valueOf(state)));
 						return new ResponseEntity<>(visitsDto, HttpStatus.OK);
 					}
 				} else if (workId != null) {
-					List<VisitGetDto> visitsDto = generateVisitsDto(visitService.findVisitsOfUserByWork(Integer.parseInt(workId), id));
+					List<VisitGetDto> visitsDto = generateVisitsDto(
+							visitService.findVisitsOfUserByWork(Integer.parseInt(workId), id));
 					return new ResponseEntity<>(visitsDto, HttpStatus.OK);
 				} else {
 					List<VisitGetDto> visitsDto = generateVisitsDto(visitService.findAllVisitsOfUser(id));
@@ -168,29 +172,32 @@ public class VisitController {
 
 		} else if (rolName.equalsIgnoreCase("provider")) {
 			if (state != null && workId != null) {
-				String [] states=state.split("\\,");
-				if(states.length>1) {
-					List<VisitGetDto> visitsDto =new ArrayList<VisitGetDto>();
-					 visitsDto =generateVisitsDto(visitService.findVisitsOfProviderByWorkAndStates(Integer.parseInt(workId), id, convertStringArrayToStateArray(states)));
+				String[] states = state.split("\\,");
+				if (states.length > 1) {
+					List<VisitGetDto> visitsDto = new ArrayList<VisitGetDto>();
+					visitsDto = generateVisitsDto(visitService.findVisitsOfProviderByWorkAndStates(
+							Integer.parseInt(workId), id, convertStringArrayToStateArray(states)));
 					return new ResponseEntity<>(visitsDto, HttpStatus.OK);
-				}
-				else {
-					List<VisitGetDto> visitsDto = generateVisitsDto(visitService.findVisitsOfProviderByWorkAndState(Integer.parseInt(workId), id, State.valueOf(state)));
+				} else {
+					List<VisitGetDto> visitsDto = generateVisitsDto(visitService
+							.findVisitsOfProviderByWorkAndState(Integer.parseInt(workId), id, State.valueOf(state)));
 					return new ResponseEntity<>(visitsDto, HttpStatus.OK);
 				}
 			} else {
 				if (state != null) {
-					String [] statesName=state.split("\\,");
-					if(statesName.length>1) {
-						List<VisitGetDto> visitsDto =new ArrayList<VisitGetDto>();
-						 visitsDto =generateVisitsDto(visitService.findVisitsOfProviderByStates(id,statesName));
+					String[] statesName = state.split("\\,");
+					if (statesName.length > 1) {
+						List<VisitGetDto> visitsDto = new ArrayList<VisitGetDto>();
+						visitsDto = generateVisitsDto(visitService.findVisitsOfProviderByStates(id, statesName));
 						return new ResponseEntity<>(visitsDto, HttpStatus.OK);
-					}else {
-						List<VisitGetDto> visitsDto = generateVisitsDto(visitService.findVisitsOfProviderByState(id, State.valueOf(state)));
+					} else {
+						List<VisitGetDto> visitsDto = generateVisitsDto(
+								visitService.findVisitsOfProviderByState(id, State.valueOf(state)));
 						return new ResponseEntity<>(visitsDto, HttpStatus.OK);
 					}
 				} else if (workId != null) {
-					List<VisitGetDto> visitsDto = generateVisitsDto(visitService.findVisitsOfProviderByWork(Integer.parseInt(workId), id));
+					List<VisitGetDto> visitsDto = generateVisitsDto(
+							visitService.findVisitsOfProviderByWork(Integer.parseInt(workId), id));
 					return new ResponseEntity<>(visitsDto, HttpStatus.OK);
 				} else {
 					List<VisitGetDto> visitsDto = generateVisitsDto(visitService.findAllVisitsOfProvider(id));
@@ -201,7 +208,7 @@ public class VisitController {
 			return new ResponseEntity<>("El parametro rol debe ser 'user' o 'provider'", HttpStatus.BAD_REQUEST);
 		}
 	}
-	
+
 	private List<VisitGetDto> generateVisitsDto(List<Visit> visits){
 		List<VisitGetDto> visitsDto = new ArrayList<VisitGetDto>();
 		for (Visit visit : visits) {
@@ -210,7 +217,7 @@ public class VisitController {
 		}
 		return visitsDto;
 	}
-	
+
 	private State[] convertStringArrayToStateArray(String[] elements) {
 		State[] states= new State[elements.length];
 		for (int i = 0; i < states.length; i++) {

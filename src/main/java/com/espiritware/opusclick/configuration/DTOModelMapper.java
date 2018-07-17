@@ -37,14 +37,13 @@ public class DTOModelMapper extends RequestResponseBodyMethodProcessor {
         super(Collections.singletonList(new MappingJackson2HttpMessageConverter(objectMapper)));
         this.entityManager = entityManager;
         modelMapper.getConfiguration().setAmbiguityIgnored(true);
-        modelMapper.addMappings(new PropertyMap<ProviderRegistrationDto, Account>() {
-			  @Override
-			  protected void configure() {
+		modelMapper.addMappings(new PropertyMap<ProviderRegistrationDto, Account>() {
+			@Override
+			protected void configure() {
 				map().getProvider().getLocation().setCity(source.getCity());
 				map().getProvider().setProfession(source.getProfession());
-			  }
-			});
-        //modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+			}
+		});
     }
 
     @Override

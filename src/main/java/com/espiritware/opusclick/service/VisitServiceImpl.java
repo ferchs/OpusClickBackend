@@ -45,7 +45,7 @@ public class VisitServiceImpl implements VisitService{
 	public List<Visit> findVisitsOfProviderByState(int idProvider, State state) {
 		List<Visit> providerVisits = new ArrayList<Visit>();
 		if (state!=null) {
-			List<Work> providerWorks = workService.findProviderWorks(idProvider);
+			List<Work> providerWorks = workService.findAllWorksOfProvider(idProvider);
 			for (Work work : providerWorks) {
 				for (Visit visit : work.getVisits()) {
 					if (visit.getState().equals(state)) {
@@ -55,7 +55,7 @@ public class VisitServiceImpl implements VisitService{
 			}
 			return providerVisits;
 		} else {
-			List<Work> providerWorks = workService.findProviderWorks(idProvider);
+			List<Work> providerWorks = workService.findAllWorksOfProvider(idProvider);
 			for (Work work : providerWorks) {
 				for (Visit visit : work.getVisits()) {
 					providerVisits.add(visit);
@@ -69,7 +69,7 @@ public class VisitServiceImpl implements VisitService{
 	public List<Visit> findVisitsOfUserByState(int idUser, State state) {
 		List<Visit> userVisits = new ArrayList<Visit>();
 		if (state!=null) {
-			List<Work> userWorks = workService.findUserWorks(idUser);
+			List<Work> userWorks = workService.findAllWorksOfUser(idUser);
 			for (Work work : userWorks) {
 				for (Visit visit : work.getVisits()) {
 					if (visit.getState().equals(state)) {
@@ -79,7 +79,7 @@ public class VisitServiceImpl implements VisitService{
 			}
 			return userVisits;
 		} else {
-			List<Work> userWorks = workService.findUserWorks(idUser);
+			List<Work> userWorks = workService.findAllWorksOfUser(idUser);
 			for (Work work : userWorks) {
 				for (Visit visit : work.getVisits()) {
 					userVisits.add(visit);
