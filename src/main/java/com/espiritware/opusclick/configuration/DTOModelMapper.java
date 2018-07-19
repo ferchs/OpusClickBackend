@@ -2,7 +2,9 @@ package com.espiritware.opusclick.configuration;
 
 import com.espiritware.opusclick.annotations.DTO;
 import com.espiritware.opusclick.dto.ProviderRegistrationDto;
+import com.espiritware.opusclick.dto.WorkUpdateDto;
 import com.espiritware.opusclick.model.Account;
+import com.espiritware.opusclick.model.Work;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.PropertyMap;
@@ -42,6 +44,13 @@ public class DTOModelMapper extends RequestResponseBodyMethodProcessor {
 			protected void configure() {
 				map().getProvider().getLocation().setCity(source.getCity());
 				map().getProvider().setProfession(source.getProfession());
+			}
+		});
+		modelMapper.addMappings(new PropertyMap<WorkUpdateDto, Work>() {
+			@Override
+			protected void configure() {
+				map().setProviderLabel(source.getProviderLabel());
+				map().setUserLabel(source.getUserLabel());
 			}
 		});
     }

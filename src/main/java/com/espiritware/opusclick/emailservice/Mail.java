@@ -301,7 +301,7 @@ public class Mail implements ApplicationListener<GenericEvent>{
 				"    <div style=\"display: inline-block; margin: 0 auto; text-align: justify; padding-left: 30px; padding-right: 30px;\" >\n" + 
 				"      <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Hola "+onlineQuote.getWork().getProvider().getAccount().getName()+",</p>\n" + 
 				"      <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\"><strong>"+onlineQuote.getWork().getUser().getAccount().getName()+
-				" "+onlineQuote.getWork().getUser().getAccount().getLastname()+"</strong> te ha seleccionado entre todos para que le realices una cotización, \n" + 
+				" "+onlineQuote.getWork().getUser().getAccount().getLastname()+"</strong> te ha elegido entre todos los expertos para que realices una cotización, \n" + 
 				"        por favor revisa toda la información y hazle una oferta sincera para realizar este trabajo.</p>\n" + 
 				"      <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Recuerda que el hecho de realizar esta cotización aumentará tu reputación en la plataforma</p>\n" +
 				"      <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Equipo OpusClick.</p>\n" + 

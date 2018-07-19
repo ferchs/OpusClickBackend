@@ -39,6 +39,12 @@ public class Work implements Serializable{
 	@Column(name="work_number")
 	private String workNumber;
 	
+	@Column(name="provider_label")
+	private String providerLabel;
+	
+	@Column(name="user_label")
+	private String userLabel;
+	
 	@Column(name="creation_date")
 	private Date creationDate;
 	

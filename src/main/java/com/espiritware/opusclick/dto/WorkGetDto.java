@@ -7,11 +7,15 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class WorkDto {
+public class WorkGetDto {
 
 	public int id;
 	
 	public String workNumber;
+	
+	public String providerLabel;
+
+	public String userLabel;
 	
 	public Date creationDate;
 

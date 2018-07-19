@@ -8,7 +8,7 @@ public interface WorkService {
 
 	void createWork(Work work);
 			
-	void updateWork(Work user);
+	void updateWork(Work work);
 	
 	Work findWorkById(int id);
 	

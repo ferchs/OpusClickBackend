@@ -96,6 +96,8 @@ public class VisitController {
 				Work work = new Work();// Cual es el problema si yo mismo decido instanciar el objeto Work, y no uso el
 										// @Autowired para este objetivo.
 				work.setWorkNumber(RandomStringUtils.randomAlphanumeric(8).toUpperCase());
+				work.setProviderLabel(work.getWorkNumber());
+				work.setUserLabel(work.getWorkNumber());
 				work.setCreationDate(new Date());
 				work.setState(State.PENDING_BY_VISIT);
 				work.setHistoryStateChanges("PENDING_BY_VISIT, ");

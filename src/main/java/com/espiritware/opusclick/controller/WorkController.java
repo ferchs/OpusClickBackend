@@ -5,6 +5,8 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.modelmapper.ModelMapper;
@@ -17,11 +19,14 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.util.UriComponentsBuilder;
 import com.espiritware.opusclick.annotations.DTO;
 import com.espiritware.opusclick.dto.VisitGetDto;
 import com.espiritware.opusclick.dto.VisitScheduleDto;
-import com.espiritware.opusclick.dto.WorkDto;
+import com.espiritware.opusclick.dto.VisitUpdateDto;
+import com.espiritware.opusclick.dto.WorkGetDto;
+import com.espiritware.opusclick.dto.WorkUpdateDto;
 import com.espiritware.opusclick.event.Publisher;
 import com.espiritware.opusclick.model.State;
 import com.espiritware.opusclick.model.Visit;
@@ -53,30 +58,30 @@ public class WorkController {
 			if (state != null) {
 				String [] statesName=state.split("\\,");
 				if(statesName.length>1) {
-					List<WorkDto> workDtos =new ArrayList<WorkDto>();
+					List<WorkGetDto> workDtos =new ArrayList<WorkGetDto>();
 					workDtos =generateWorkDtos(workService.findWorksOfUserByStates(id,statesName));
 					return new ResponseEntity<>(workDtos, HttpStatus.OK);
 				}else {
-					List<WorkDto> workDtos = generateWorkDtos(workService.findWorksOfUserByState(id, State.valueOf(state)));
+					List<WorkGetDto> workDtos = generateWorkDtos(workService.findWorksOfUserByState(id, State.valueOf(state)));
 					return new ResponseEntity<>(workDtos, HttpStatus.OK);
 				}
 			} else {
-				List<WorkDto> worksDto = generateWorkDtos(workService.findAllWorksOfUser(id));
+				List<WorkGetDto> worksDto = generateWorkDtos(workService.findAllWorksOfUser(id));
 				return new ResponseEntity<>(worksDto, HttpStatus.OK);
 			}
 		} else if (rolName.equalsIgnoreCase("provider")) {
 			if (state != null) {
 				String [] statesName=state.split("\\,");
 				if(statesName.length>1) {
-					List<WorkDto> workDtos =new ArrayList<WorkDto>();
+					List<WorkGetDto> workDtos =new ArrayList<WorkGetDto>();
 					workDtos =generateWorkDtos(workService.findWorksOfProviderByStates(id,statesName));
 					return new ResponseEntity<>(workDtos, HttpStatus.OK);
 				}else {
-					List<WorkDto> workDtos = generateWorkDtos(workService.findWorksOfProviderByState(id, State.valueOf(state)));
+					List<WorkGetDto> workDtos = generateWorkDtos(workService.findWorksOfProviderByState(id, State.valueOf(state)));
 					return new ResponseEntity<>(workDtos, HttpStatus.OK);
 				}
 			} else {
-				List<WorkDto> worksDto = generateWorkDtos(workService.findAllWorksOfProvider(id));
+				List<WorkGetDto> worksDto = generateWorkDtos(workService.findAllWorksOfProvider(id));
 				return new ResponseEntity<>(worksDto, HttpStatus.OK);
 			}
 		}
@@ -85,10 +90,10 @@ public class WorkController {
 		}
 	}
 	
-	private List<WorkDto> generateWorkDtos(List<Work> works){
-		List<WorkDto> worksDto = new ArrayList<WorkDto>();
+	private List<WorkGetDto> generateWorkDtos(List<Work> works){
+		List<WorkGetDto> worksDto = new ArrayList<WorkGetDto>();
 		for (Work work : works) {
-			WorkDto dto = modelMapper.map(work, WorkDto.class);
+			WorkGetDto dto = modelMapper.map(work, WorkGetDto.class);
 			worksDto.add(dto);
 		}
 		return worksDto;
@@ -100,6 +105,15 @@ public class WorkController {
 			states[i]=State.valueOf(elements[i]);
 		}
 		return states;
+	}
+	
+	@RequestMapping(value = "/works", method = RequestMethod.PUT, headers = "Accept=application/json")
+	@ResponseBody
+	@Transactional
+	public ResponseEntity<?> updateVisit(@DTO(WorkUpdateDto.class) Work work,
+			UriComponentsBuilder uriComponentsBuilder, final HttpServletRequest request) {
+		workService.updateWork(work);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
 }
