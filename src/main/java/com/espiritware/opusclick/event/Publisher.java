@@ -6,6 +6,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import com.espiritware.opusclick.model.OnlineQuote;
 import com.espiritware.opusclick.model.Visit;
+import com.espiritware.opusclick.model.Work;
 
 @Component
 public class Publisher {
@@ -64,6 +65,16 @@ public class Publisher {
         applicationEventPublisher.publishEvent(userVisitUnfulfilledEvent);
     }
     
+    public void publishUserNoAgreementEvent(final Work work) {
+    	UserNoAgreementEvent userNoAgreementEvent = new UserNoAgreementEvent(this,work);
+        applicationEventPublisher.publishEvent(userNoAgreementEvent);
+    }
+    
+    public void publishUserWorkRejectedEventEvent(final Work work) {
+    	UserWorkRejectedEvent userWorkRejectedEvent = new UserWorkRejectedEvent(this,work);
+        applicationEventPublisher.publishEvent(userWorkRejectedEvent);
+    }
+    
     public void publishProviderVisitChangeDateEvent(final Visit visit) {
     	ProviderVisitChangeDateEvent providerVisitChangeDateEvent = new ProviderVisitChangeDateEvent(this,visit);
         applicationEventPublisher.publishEvent(providerVisitChangeDateEvent);
@@ -87,5 +98,15 @@ public class Publisher {
     public void publishProviderVisitUnfulfilledEvent(final Visit visit) {
     	ProviderVisitUnfulfilledEvent providerVisitUnfulfilledEvent = new ProviderVisitUnfulfilledEvent(this,visit);
         applicationEventPublisher.publishEvent(providerVisitUnfulfilledEvent);
+    }
+    
+    public void publishProviderNoAgreementEvent(final Work work) {
+    	ProviderNoAgreementEvent providerNoAgreementEvent = new ProviderNoAgreementEvent(this,work);
+        applicationEventPublisher.publishEvent(providerNoAgreementEvent);
+    }
+    
+    public void publishProviderWorkRejectedEventEvent(final Work work) {
+    	ProviderWorkRejectedEvent providerWorkRejectedEvent = new ProviderWorkRejectedEvent(this,work);
+        applicationEventPublisher.publishEvent(providerWorkRejectedEvent);
     }
 }

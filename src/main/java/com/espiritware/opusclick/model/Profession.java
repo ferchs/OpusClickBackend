@@ -3,13 +3,8 @@ package com.espiritware.opusclick.model;
 import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import org.hibernate.annotations.GenericGenerator;
-
 import lombok.Getter;
 import lombok.Setter;
 
@@ -30,6 +25,8 @@ public class Profession implements Serializable, Comparable<Profession> {
 	@Column(name="name")
 	private String name;
 	
+	@Column(name="form_id")
+	private String formId;
 	
 	@Override
 	public int compareTo(Profession o) {

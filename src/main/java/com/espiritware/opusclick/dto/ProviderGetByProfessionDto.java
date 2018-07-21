@@ -10,6 +10,8 @@ public class ProviderGetByProfessionDto {
 
 	public String photo;
 	
+	public String professionFormId;
+	
 	public double globalRatingGlobalSatisfactionLevel;
 	
 	public double globalRatingGlobalRecommend;

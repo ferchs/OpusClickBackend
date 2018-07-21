@@ -7,11 +7,13 @@ import lombok.Getter;
 public class WorkUpdateDto {
 	
 	@Id
-	public int id;
+	private int id;
 
-	public String providerLabel;
+	private String providerLabel;
 
-	public String userLabel;
+	private String userLabel;
 	
-	public State state;
+	private State state;
+	
+	private String comment;
 }

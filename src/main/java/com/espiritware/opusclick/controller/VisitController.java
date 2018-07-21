@@ -348,6 +348,7 @@ public class VisitController {
 			}
 			visitService.updateVisit(visit);
 			publisher.publishProviderVisitRejectedEvent(visit);
+			return new ResponseEntity<>(HttpStatus.OK);
 		} else if (newState.equals(State.REJECTED_BY_USER)) {
 			visit.setPreviousState(previousState);
 			if (previousStateChanges != null) {
@@ -357,8 +358,10 @@ public class VisitController {
 			}
 			visitService.updateVisit(visit);
 			publisher.publishUserVisitRejectedEvent(visit);
+			return new ResponseEntity<>(HttpStatus.OK);
+		}else {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
-		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
 }

@@ -5,7 +5,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -28,6 +27,7 @@ import com.espiritware.opusclick.dto.VisitUpdateDto;
 import com.espiritware.opusclick.dto.WorkGetDto;
 import com.espiritware.opusclick.dto.WorkUpdateDto;
 import com.espiritware.opusclick.event.Publisher;
+import com.espiritware.opusclick.model.OnlineQuote;
 import com.espiritware.opusclick.model.State;
 import com.espiritware.opusclick.model.Visit;
 import com.espiritware.opusclick.model.Work;
@@ -44,13 +44,13 @@ public class WorkController {
 	@Autowired
 	private ModelMapper modelMapper;
 	
-//	@Autowired
-//	private Publisher publisher;
+	@Autowired
+	private Publisher publisher;
 	
 	
 	@RequestMapping(value = "/works", method = RequestMethod.GET, headers = "Accept=application/json")
 	@Transactional
-	public ResponseEntity<?> getVisits(@RequestParam(value = "rol", required = true) String rolName,
+	public ResponseEntity<?> getWorks(@RequestParam(value = "rol", required = true) String rolName,
 			@RequestParam(value = "id", required = true) int id,
 			@RequestParam(value = "state", required = false) String state, UriComponentsBuilder uriComponentsBuilder) {
 	
@@ -110,10 +110,64 @@ public class WorkController {
 	@RequestMapping(value = "/works", method = RequestMethod.PUT, headers = "Accept=application/json")
 	@ResponseBody
 	@Transactional
-	public ResponseEntity<?> updateVisit(@DTO(WorkUpdateDto.class) Work work,
-			UriComponentsBuilder uriComponentsBuilder, final HttpServletRequest request) {
-		workService.updateWork(work);
-		return new ResponseEntity<>(HttpStatus.OK);
+	public ResponseEntity<?> updateVisit(@DTO(WorkUpdateDto.class) Work work, UriComponentsBuilder uriComponentsBuilder,
+			final HttpServletRequest request) {
+
+		String previousStateChanges = workService.findWorkById(work.getWorkId()).getHistoryStateChanges();
+		if (work.getState().equals(State.NO_AGREEMENT_BY_USER)) {
+			if (previousStateChanges != null) {
+				work.setHistoryStateChanges(previousStateChanges + "NO_AGREEMENT_BY_USER,");
+			} else {
+				work.setHistoryStateChanges("NO_AGREEMENT_BY_USER,");
+			}
+			work = finalizeWork(work, State.NO_AGREEMENT_BY_USER);
+			workService.updateWork(work);
+			publisher.publishUserNoAgreementEvent(work);
+			return new ResponseEntity<>(HttpStatus.OK);
+		} else if (work.getState().equals(State.NO_AGREEMENT_BY_PROVIDER)) {
+			if (previousStateChanges != null) {
+				work.setHistoryStateChanges(previousStateChanges + "NO_AGREEMENT_BY_PROVIDER,");
+			} else {
+				work.setHistoryStateChanges("NO_AGREEMENT_BY_PROVIDER,");
+			}
+			work = finalizeWork(work, State.NO_AGREEMENT_BY_PROVIDER);
+			workService.updateWork(work);
+			publisher.publishProviderNoAgreementEvent(work);
+			return new ResponseEntity<>(HttpStatus.OK);
+		} else if (work.getState().equals(State.PENDING_BY_VISIT)) {
+			workService.updateWork(work);
+			return new ResponseEntity<>(HttpStatus.OK);
+		} else if (work.getState().equals(State.REJECTED_BY_USER)) {
+			if (previousStateChanges != null) {
+				work.setHistoryStateChanges(previousStateChanges + "REJECTED_BY_USER,");
+			} else {
+				work.setHistoryStateChanges("REJECTED_BY_USER,");
+			}
+			work = finalizeWork(work, State.REJECTED_BY_USER);
+			workService.updateWork(work);
+			publisher.publishUserWorkRejectedEventEvent(work);
+			return new ResponseEntity<>(HttpStatus.OK);
+		} else if (work.getState().equals(State.REJECTED_BY_PROVIDER)) {
+			if (previousStateChanges != null) {
+				work.setHistoryStateChanges(previousStateChanges + "REJECTED_BY_PROVIDER,");
+			} else {
+				work.setHistoryStateChanges("REJECTED_BY_PROVIDER,");
+			}
+			work = finalizeWork(work, State.REJECTED_BY_PROVIDER);
+			workService.updateWork(work);
+			publisher.publishProviderWorkRejectedEventEvent(work);
+			return new ResponseEntity<>(HttpStatus.OK);
+		}
+		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+	}
+
+	private Work finalizeWork(Work work, State state) {
+		Set<Visit> visits=work.getVisits();
+		for(Visit visit:visits) {
+			visit.setState(state);
+			visit.setHistoryStateChanges(visit.getHistoryStateChanges()+","+state.toString());
+		}
+		return work;
 	}
 	
 }
