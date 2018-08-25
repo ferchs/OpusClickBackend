@@ -24,7 +24,7 @@ import lombok.Setter;
 @Setter
 @JsonIdentityInfo(
 		  generator = ObjectIdGenerators.PropertyGenerator.class, 
-		  property = "userId")
+		  property = "id")
 public class User implements Serializable {
 
 	private static final long serialVersionUID = 1L;

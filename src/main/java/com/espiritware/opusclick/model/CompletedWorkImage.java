@@ -29,9 +29,6 @@ public class CompletedWorkImage implements Serializable {
     @Column(name="id_completed_work_image")
 	private int completedWorkImageId;
 	
-	@Column(name="name")
-	private String name;
-	
 	@Column(name="url")
 	private String url;
 	

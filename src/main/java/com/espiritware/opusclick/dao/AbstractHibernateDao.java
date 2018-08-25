@@ -7,8 +7,6 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.espiritware.opusclick.model.State;
-
 public abstract class AbstractHibernateDao<T,E extends Serializable> {
 
 	@Autowired

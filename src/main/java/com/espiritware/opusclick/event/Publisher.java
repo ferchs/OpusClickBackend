@@ -4,7 +4,10 @@ import java.util.Locale;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
+
+import com.espiritware.opusclick.model.Contract;
 import com.espiritware.opusclick.model.OnlineQuote;
+import com.espiritware.opusclick.model.ProviderQuote;
 import com.espiritware.opusclick.model.Visit;
 import com.espiritware.opusclick.model.Work;
 
@@ -65,16 +68,16 @@ public class Publisher {
         applicationEventPublisher.publishEvent(userVisitUnfulfilledEvent);
     }
     
-    public void publishUserNoAgreementEvent(final Work work) {
-    	UserNoAgreementEvent userNoAgreementEvent = new UserNoAgreementEvent(this,work);
-        applicationEventPublisher.publishEvent(userNoAgreementEvent);
+    public void publishUserCancelWorkEvent(final Work work) {
+    	UserCancelWorkEvent userCancelWorkEvent = new UserCancelWorkEvent(this,work);
+        applicationEventPublisher.publishEvent(userCancelWorkEvent);
     }
     
-    public void publishUserWorkRejectedEventEvent(final Work work) {
-    	UserWorkRejectedEvent userWorkRejectedEvent = new UserWorkRejectedEvent(this,work);
-        applicationEventPublisher.publishEvent(userWorkRejectedEvent);
+    public void publishUserModifiesContractEvent(final Contract contract) {
+    	UserModifiesContractEvent userModifiesContractEvent = new UserModifiesContractEvent(this,contract);
+        applicationEventPublisher.publishEvent(userModifiesContractEvent);
     }
-    
+     
     public void publishProviderVisitChangeDateEvent(final Visit visit) {
     	ProviderVisitChangeDateEvent providerVisitChangeDateEvent = new ProviderVisitChangeDateEvent(this,visit);
         applicationEventPublisher.publishEvent(providerVisitChangeDateEvent);
@@ -100,13 +103,28 @@ public class Publisher {
         applicationEventPublisher.publishEvent(providerVisitUnfulfilledEvent);
     }
     
-    public void publishProviderNoAgreementEvent(final Work work) {
-    	ProviderNoAgreementEvent providerNoAgreementEvent = new ProviderNoAgreementEvent(this,work);
-        applicationEventPublisher.publishEvent(providerNoAgreementEvent);
+    public void publishProviderCancelWorkEvent(final Work work) {
+    	ProviderCancelWorkEvent providerCancelWorkEvent = new ProviderCancelWorkEvent(this,work);
+        applicationEventPublisher.publishEvent(providerCancelWorkEvent);
     }
     
-    public void publishProviderWorkRejectedEventEvent(final Work work) {
-    	ProviderWorkRejectedEvent providerWorkRejectedEvent = new ProviderWorkRejectedEvent(this,work);
-        applicationEventPublisher.publishEvent(providerWorkRejectedEvent);
+    public void publishProviderQuoteMadeEvent(final ProviderQuote providerQuote) {
+    	QuoteMadeEvent quoteMadeEvent = new QuoteMadeEvent(this,providerQuote);
+        applicationEventPublisher.publishEvent(quoteMadeEvent);
+    }
+    
+    public void publishProviderAcceptContractEvent(final Contract contract) {
+    	ProviderAcceptContractEvent providerAcceptContractEvent = new ProviderAcceptContractEvent(this,contract);
+        applicationEventPublisher.publishEvent(providerAcceptContractEvent);
+    }
+    
+    public void publishProviderModifiesContractEvent(final Contract contract) {
+    	ProviderModifiesContractEvent providerModifiesContractEvent = new ProviderModifiesContractEvent(this,contract);
+        applicationEventPublisher.publishEvent(providerModifiesContractEvent);
+    }
+    
+    public void publishUserMakesPaymentEvent(final Contract contract) {
+    	UserMakesPaymentEvent userMakesPaymentEvent = new UserMakesPaymentEvent(this,contract);
+        applicationEventPublisher.publishEvent(userMakesPaymentEvent);
     }
 }

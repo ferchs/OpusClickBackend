@@ -5,11 +5,12 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import org.hibernate.annotations.GenericGenerator;
 import lombok.Getter;
@@ -24,8 +25,8 @@ public class Milestone {
 	@Id
 	@GeneratedValue(strategy= GenerationType.AUTO, generator="native")
 	@GenericGenerator(name = "native", strategy = "native")
-	@Column(name="id_contract")
-	private long idMilestone;
+	@Column(name="id_milestone")
+	private int id;
 	
 	@Column(name="start_date")
 	private Date startDate;
@@ -33,21 +34,15 @@ public class Milestone {
 	@Column(name="end_date")
 	private Date endDate;
 	
-	@Column(name="description")
-	private String description;
-	
-	@Column(name="value")
-	private double value;
-	
-	@Column(name="exp_guarantee")
-	private Date expirationGuarantee;
-	
 	@Enumerated(EnumType.STRING)
 	@Column(name="state")
 	private State state;
 	
-	@ManyToOne
-	@JoinColumn(name="fk_contract$milestone")
-	private Contract contract;
-
+	@Column(name="state_changes")
+	private String historyStateChanges;
+	
+	@OneToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name="fk_item$milestone")
+    private Item item;
+	
 }

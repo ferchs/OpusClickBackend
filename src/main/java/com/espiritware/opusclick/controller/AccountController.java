@@ -25,7 +25,6 @@ import com.espiritware.opusclick.service.AccountService;
 import com.espiritware.opusclick.service.ProviderService;
 import com.espiritware.opusclick.service.UserService;
 import com.espiritware.opusclick.model.Account;
-import com.espiritware.opusclick.model.GlobalRating;
 import com.espiritware.opusclick.model.State;
 
 @Controller
@@ -83,13 +82,8 @@ public class AccountController {
 		}
 		else {
 			account.setPassword(passwordEncoder.encode(account.getPassword()));
-			GlobalRating initialGlobalRating=account.getProvider().getGlobalRating();
-			account.getProvider().setGlobalRating(null);
 			account.getProvider().setAccount(account);
-			account=accountService.createAccount(account);
-			initialGlobalRating.setGlobalRatingId(account.getId());
-			account.getProvider().setGlobalRating(initialGlobalRating);
-			account=accountService.updateAccount(account);
+			accountService.createAccount(account);
 			publisher.publishProviderRegistrationEvent(account.getId(),account.getEmail(),account.getName(), request.getLocale(), getAppUrl(request));
 			HttpHeaders headers = new HttpHeaders();
 			headers.setLocation(uriComponentsBuilder.path("/cuenta_creada").buildAndExpand(account.getEmail()).toUri());

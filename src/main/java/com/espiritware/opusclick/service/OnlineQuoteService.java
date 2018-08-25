@@ -3,7 +3,7 @@ package com.espiritware.opusclick.service;
 import com.espiritware.opusclick.model.OnlineQuote;
 import com.espiritware.opusclick.model.State;
 
-public interface QuotationService {
+public interface OnlineQuoteService {
 	
 	OnlineQuote createQuote (OnlineQuote quote);
 			

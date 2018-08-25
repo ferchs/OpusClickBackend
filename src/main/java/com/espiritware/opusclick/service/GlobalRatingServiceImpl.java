@@ -26,7 +26,7 @@ public class GlobalRatingServiceImpl implements GlobalRatingService{
 	@Override
 	public GlobalRating create(int id, double globalSatisfactionLevel, double globalRecommend, double score) {
 		GlobalRating globalRating= new GlobalRating();
-		globalRating.setGlobalRatingId(id);
+		globalRating.setId(id);
 		globalRating.setGlobalSatisfactionLevel(globalSatisfactionLevel);
 		globalRating.setGlobalRecommend(globalRecommend);
 		globalRating.setScore(score);

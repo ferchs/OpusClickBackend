@@ -9,7 +9,7 @@ import com.espiritware.opusclick.model.State;
 
 @Service("quotationService")
 @Transactional
-public class QuotationServiceImpl implements QuotationService {
+public class OnlineQuoteServiceImpl implements OnlineQuoteService {
 	
 	GenericDao<OnlineQuote,Integer> quotationDao;
 	

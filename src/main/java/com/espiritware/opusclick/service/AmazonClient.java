@@ -37,6 +37,14 @@ public class AmazonClient {
 		file.delete();
 		return fileUrl;
 	}
+	
+	public String uploadFile(String folder, File file) throws AmazonServiceException,AmazonClientException, IOException {
+		String fileName = generateFileName(folder,file);
+		String fileUrl = endpointUrl + "/" + bucketName + "/" + fileName;
+		uploadFileTos3bucket(fileName, file);
+		file.delete();
+		return fileUrl;
+	}
 
 	private File convertMultiPartToFile(MultipartFile file) throws IOException {
 		File convFile = new File(file.getOriginalFilename());
@@ -44,6 +52,11 @@ public class AmazonClient {
 		fos.write(file.getBytes());
 		fos.close();
 		return convFile;
+	}
+	
+	private String generateFileName(String folder,File file) {
+
+		return folder + new Date().getTime() + "-" + file.getName();
 	}
 
 	private String generateFileName(String folder,MultipartFile multiPart) {
@@ -59,7 +72,7 @@ public class AmazonClient {
 		return folder + new Date().getTime() + "-" + multiPart.getOriginalFilename().replace(" ", "_");
 	}
 
-	private void uploadFileTos3bucket(String fileName, File file) throws AmazonServiceException,AmazonClientException {
+	public void uploadFileTos3bucket(String fileName, File file) throws AmazonServiceException,AmazonClientException {
 		s3Client.putObject(
 				new PutObjectRequest(bucketName, fileName, file).withCannedAcl(CannedAccessControlList.PublicRead));
 	}

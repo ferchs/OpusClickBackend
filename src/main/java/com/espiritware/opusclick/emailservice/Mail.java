@@ -9,16 +9,20 @@ import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import com.espiritware.opusclick.event.GenericEvent;
-import com.espiritware.opusclick.event.ProviderNoAgreementEvent;
+import com.espiritware.opusclick.event.ProviderAcceptContractEvent;
+import com.espiritware.opusclick.event.ProviderCancelWorkEvent;
+import com.espiritware.opusclick.event.ProviderModifiesContractEvent;
 import com.espiritware.opusclick.event.ProviderRegistrationEvent;
 import com.espiritware.opusclick.event.ProviderVisitAcceptedEvent;
 import com.espiritware.opusclick.event.ProviderVisitChangeDateEvent;
 import com.espiritware.opusclick.event.ProviderVisitPostponedEvent;
 import com.espiritware.opusclick.event.ProviderVisitRejectedEvent;
 import com.espiritware.opusclick.event.ProviderVisitUnfulfilledEvent;
-import com.espiritware.opusclick.event.ProviderWorkRejectedEvent;
+import com.espiritware.opusclick.event.QuoteMadeEvent;
 import com.espiritware.opusclick.event.ResetPasswordEvent;
-import com.espiritware.opusclick.event.UserNoAgreementEvent;
+import com.espiritware.opusclick.event.UserCancelWorkEvent;
+import com.espiritware.opusclick.event.UserMakesPaymentEvent;
+import com.espiritware.opusclick.event.UserModifiesContractEvent;
 import com.espiritware.opusclick.event.UserQuotationEvent;
 import com.espiritware.opusclick.event.UserRegistrationEvent;
 import com.espiritware.opusclick.event.UserVisitAcceptedEvent;
@@ -27,7 +31,7 @@ import com.espiritware.opusclick.event.UserVisitPostponedEvent;
 import com.espiritware.opusclick.event.UserVisitRejectedEvent;
 import com.espiritware.opusclick.event.UserVisitRequestEvent;
 import com.espiritware.opusclick.event.UserVisitUnfulfilledEvent;
-import com.espiritware.opusclick.event.UserWorkRejectedEvent;
+import com.espiritware.opusclick.model.Contract;
 import com.espiritware.opusclick.model.OnlineQuote;
 import com.espiritware.opusclick.model.Visit;
 import com.espiritware.opusclick.model.Work;
@@ -79,13 +83,16 @@ public class Mail implements ApplicationListener<GenericEvent>{
 		} else if (event instanceof UserVisitPostponedEvent) {
 			UserVisitPostponedEvent userVisitPostponedEvent = (UserVisitPostponedEvent) event;
 			createUserVisitPostponedNotificationEmail(userVisitPostponedEvent.getVisit());
-		} else if (event instanceof UserNoAgreementEvent) {
-			UserNoAgreementEvent userNoAgreementEvent = (UserNoAgreementEvent) event;
-			createUserNoAgreementNotificationEmail(userNoAgreementEvent.getWork());
-		} else if (event instanceof UserWorkRejectedEvent) {
-			UserWorkRejectedEvent userWorkRejectedEvent = (UserWorkRejectedEvent) event;
-			createUserWorkRejectedNotificationEmail(userWorkRejectedEvent.getWork());
-		} else if (event instanceof ProviderRegistrationEvent) {
+		} else if (event instanceof UserCancelWorkEvent) {
+			UserCancelWorkEvent userCancelWorkEvent = (UserCancelWorkEvent) event;
+			createUserCancelWorkNotificationEmail(userCancelWorkEvent.getWork());
+		} else if (event instanceof UserModifiesContractEvent) {
+			UserModifiesContractEvent userModifiesContractEvent = (UserModifiesContractEvent) event;
+			createUserModifiesContractNotificationEmail(userModifiesContractEvent.getContract());
+		}else if (event instanceof UserMakesPaymentEvent) {
+			UserMakesPaymentEvent userMakesPaymentEvent = (UserMakesPaymentEvent) event;
+			createUserMakesPaymentNotificationEmail(userMakesPaymentEvent.getContract());
+		}else if (event instanceof ProviderRegistrationEvent) {
 			ProviderRegistrationEvent registrationEvent = (ProviderRegistrationEvent) event;
 			createProviderRegistrationEmailMessage(registrationEvent.getId(), registrationEvent.getEmail(),
 					registrationEvent.getName(), registrationEvent.getAppUrl());
@@ -105,12 +112,18 @@ public class Mail implements ApplicationListener<GenericEvent>{
 		} else if (event instanceof ProviderVisitUnfulfilledEvent) {
 			ProviderVisitUnfulfilledEvent providerVisitUnfulfilledEvent = (ProviderVisitUnfulfilledEvent) event;
 			createProviderVisitUnfulfilledNotificationEmail(providerVisitUnfulfilledEvent.getVisit());
-		} else if (event instanceof ProviderNoAgreementEvent) {
-			ProviderNoAgreementEvent providerNoAgreementEvent = (ProviderNoAgreementEvent) event;
-			createProviderNoAgreementNotificationEmail(providerNoAgreementEvent.getWork());
-		} else if (event instanceof ProviderWorkRejectedEvent) {
-			ProviderWorkRejectedEvent providerWorkRejectedEvent = (ProviderWorkRejectedEvent) event;
-			createProviderWorkRejectedNotificationEmail(providerWorkRejectedEvent.getWork());
+		} else if (event instanceof ProviderCancelWorkEvent) {
+			ProviderCancelWorkEvent providerCancelWorkEvent = (ProviderCancelWorkEvent) event;
+			createProviderCancelWorkEventNotificationEmail(providerCancelWorkEvent.getWork());
+		} else if (event instanceof QuoteMadeEvent) {
+			QuoteMadeEvent quoteMadeEvent = (QuoteMadeEvent) event;
+			createQuoteMadeNotificationEmail(quoteMadeEvent.getProviderQuote().getWork());
+		}else if (event instanceof ProviderAcceptContractEvent) {
+			ProviderAcceptContractEvent providerAcceptContractEvent = (ProviderAcceptContractEvent) event;
+			createProviderAcceptContractEventNotificationEmail(providerAcceptContractEvent.getContract());
+		}else if (event instanceof ProviderModifiesContractEvent) {
+			ProviderModifiesContractEvent providerModifiesContractEvent = (ProviderModifiesContractEvent) event;
+			createProviderModifiesContractNotificationEmail(providerModifiesContractEvent.getContract());
 		}
 	}
 	
@@ -717,7 +730,7 @@ public class Mail implements ApplicationListener<GenericEvent>{
 		jmsTemplate.convertAndSend("mailbox",emailMessage);
 	}
 	
-	private void createUserNoAgreementNotificationEmail(Work work) {
+	private void createUserCancelWorkNotificationEmail(Work work) {
 		String subject = "¡La negociación ha finalizado! :(";
 		StringBuilder body = new StringBuilder();
 		body.append("<!DOCTYPE HTML>\n" + 
@@ -749,6 +762,73 @@ public class Mail implements ApplicationListener<GenericEvent>{
 		EmailMessage emailMessage = new EmailMessage(env.getProperty("support.email"), work.getProvider().getAccount().getEmail(), subject, body.toString());
 		jmsTemplate.convertAndSend("mailbox",emailMessage);
 	}
+	
+	private void createUserModifiesContractNotificationEmail(Contract contract) {
+		String subject = "¡Revisa el contrato!";
+		StringBuilder body = new StringBuilder();
+		body.append("<!DOCTYPE HTML>\n" + 
+				"<html>\n" + 
+				"  <head>\n" + 
+				"    <link href=\"https://fonts.googleapis.com/css?family=Open+Sans\" rel=\"stylesheet\">\n" + 
+				"  </head>\n" + 
+				"  <body style=\"background-color: #ffffff; padding-left: 30px; padding-right: 30px;\">\n" + 
+				"    <div style=\"background-color: #fafafa;\">\n" + 
+				"      <div style=\"background-color: #fafafa; margin:auto;\">\n" + 
+				"        <img style=\"display: table; margin: 0 auto; background-color: #fafafa;\" src=\"https://s3-sa-east-1.amazonaws.com/opusclick.com/assets/OpusClickLogo.png\">\n" + 
+				"      </div>\n" + 
+				"    <div style=\"display: table; margin: 0 auto; color: #202020\" >\n" + 
+				"      <h1 style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Contrato Modificado</h1>\n" + 
+				"    </div>\n" + 
+				"    <div style=\"display: inline-block; margin: 0 auto; text-align: justify; padding-left: 30px; padding-right: 30px;\" >\n" + 
+				"      <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Hola "+contract.getWork().getProvider().getAccount().getName()+",</p>\n" + 
+				"      <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\"><strong>"+contract.getWork().getUser().getAccount().getName()+" "+contract.getWork().getUser().getAccount().getLastname()+"</strong> ha hecho unos cambios al contrato"
+						+ "<strong>"+contract.getWork().getWorkNumber()+"</strong></p>" + 
+				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Revisa los cambios y si todo esta bien acepta.</p>\n" + 
+				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Si tienes alguna pregunta no dudes en contactarnos.</p>\n" + 
+				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Equipo OpusClick.</p>\n" + 
+				"      <br> \n" + 
+				"  </div>\n" + 
+				"  <div style=\"background-color: #fafafa; height:100px;\"></div>\n" + 
+				"  </div>\n" + 
+				"  </body>\n" + 
+				"</html>");
+		EmailMessage emailMessage = new EmailMessage(env.getProperty("support.email"), contract.getWork().getProvider().getAccount().getEmail(), subject, body.toString());
+		jmsTemplate.convertAndSend("mailbox",emailMessage);
+	}
+	
+	private void createUserMakesPaymentNotificationEmail(Contract contract) {
+		String subject = "¡Contratacion realizada!";
+		StringBuilder body = new StringBuilder();
+		body.append("<!DOCTYPE HTML>\n" + 
+				"<html>\n" + 
+				"  <head>\n" + 
+				"    <link href=\"https://fonts.googleapis.com/css?family=Open+Sans\" rel=\"stylesheet\">\n" + 
+				"  </head>\n" + 
+				"  <body style=\"background-color: #ffffff; padding-left: 30px; padding-right: 30px;\">\n" + 
+				"    <div style=\"background-color: #fafafa;\">\n" + 
+				"      <div style=\"background-color: #fafafa; margin:auto;\">\n" + 
+				"        <img style=\"display: table; margin: 0 auto; background-color: #fafafa;\" src=\"https://s3-sa-east-1.amazonaws.com/opusclick.com/assets/OpusClickLogo.png\">\n" + 
+				"      </div>\n" + 
+				"    <div style=\"display: table; margin: 0 auto; color: #202020\" >\n" + 
+				"      <h1 style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Contrato Modificado</h1>\n" + 
+				"    </div>\n" + 
+				"    <div style=\"display: inline-block; margin: 0 auto; text-align: justify; padding-left: 30px; padding-right: 30px;\" >\n" + 
+				"      <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Hola "+contract.getWork().getProvider().getAccount().getName()+",</p>\n" + 
+				"      <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\"><strong>"+contract.getWork().getUser().getAccount().getName()+" "+contract.getWork().getUser().getAccount().getLastname()+"</strong> ha hecho unos cambios al contrato"
+						+ "<strong>"+contract.getWork().getWorkNumber()+"</strong></p>" + 
+				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Revisa los cambios y si todo esta bien acepta.</p>\n" + 
+				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Si tienes alguna pregunta no dudes en contactarnos.</p>\n" + 
+				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Equipo OpusClick.</p>\n" + 
+				"      <br> \n" + 
+				"  </div>\n" + 
+				"  <div style=\"background-color: #fafafa; height:100px;\"></div>\n" + 
+				"  </div>\n" + 
+				"  </body>\n" + 
+				"</html>");
+		EmailMessage emailMessage = new EmailMessage(env.getProperty("support.email"), contract.getWork().getProvider().getAccount().getEmail(), subject, body.toString());
+		jmsTemplate.convertAndSend("mailbox",emailMessage);
+	}
+	
 	
 	private void createUserWorkRejectedNotificationEmail(Work work) {
 		String subject = "¡La negociación ha finalizado! :(";
@@ -1068,7 +1148,7 @@ public class Mail implements ApplicationListener<GenericEvent>{
 		jmsTemplate.convertAndSend("mailbox",emailMessage);
 	}
 	
-	private void createProviderNoAgreementNotificationEmail(Work work) {
+	private void createProviderCancelWorkEventNotificationEmail(Work work) {
 		String subject = "¡La negociación ha finalizado! :(";
 		StringBuilder body = new StringBuilder();
 		body.append("<!DOCTYPE HTML>\n" + 
@@ -1131,6 +1211,103 @@ public class Mail implements ApplicationListener<GenericEvent>{
 				"  </body>\n" + 
 				"</html>");
 		EmailMessage emailMessage = new EmailMessage(env.getProperty("support.email"), work.getUser().getAccount().getEmail(), subject, body.toString());
+		jmsTemplate.convertAndSend("mailbox",emailMessage);
+	}
+	
+	private void createQuoteMadeNotificationEmail(Work work) {
+		String subject = "!"+work.getProvider().getAccount().getName()+" ha realizado una cotización!";
+		StringBuilder body = new StringBuilder();
+		body.append("<!DOCTYPE HTML>\n" + 
+				"<html>\n" + 
+				"  <head>\n" + 
+				"    <link href=\"https://fonts.googleapis.com/css?family=Open+Sans\" rel=\"stylesheet\">\n" + 
+				"  </head>\n" + 
+				"  <body style=\"background-color: #ffffff; padding-left: 30px; padding-right: 30px;\">\n" + 
+				"    <div style=\"background-color: #fafafa;\">\n" + 
+				"      <div style=\"background-color: #fafafa; margin:auto;\">\n" + 
+				"        <img style=\"display: table; margin: 0 auto; background-color: #fafafa;\" src=\"https://s3-sa-east-1.amazonaws.com/opusclick.com/assets/OpusClickLogo.png\">\n" + 
+				"      </div>\n" + 
+				"    <div style=\"display: table; margin: 0 auto; color: #202020\" >\n" + 
+				"      <h1 style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Cotización</h1>\n" + 
+				"    </div>\n" + 
+				"    <div style=\"display: inline-block; margin: 0 auto; text-align: justify; padding-left: 30px; padding-right: 30px;\" >\n" + 
+				"      <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Hola "+work.getUser().getAccount().getName()+",</p>\n" + 
+				"      <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\"><strong>"+work.getProvider().getAccount().getName()+" "+work.getProvider().getAccount().getLastname()+"</strong> ha realizado una cotización "
+						+ "<strong>"+work.getProviderQuote().getNumber()+"</strong></p>" + 
+				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Si tienes alguna pregunta no dudes en contactarnos.</p>\n" + 
+				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Equipo OpusClick.</p>\n" + 
+				"      <br> \n" + 
+				"  </div>\n" + 
+				"  <div style=\"background-color: #fafafa; height:100px;\"></div>\n" + 
+				"  </div>\n" + 
+				"  </body>\n" + 
+				"</html>");
+		EmailMessage emailMessage = new EmailMessage(env.getProperty("support.email"), work.getUser().getAccount().getEmail(), subject, body.toString());
+		jmsTemplate.convertAndSend("mailbox",emailMessage);
+	}
+	
+	private void createProviderAcceptContractEventNotificationEmail(Contract contract) {
+		String subject = "!"+contract.getWork().getProvider().getAccount().getName()+" ha aceptado el contrato!";
+		StringBuilder body = new StringBuilder();
+		body.append("<!DOCTYPE HTML>\n" + 
+				"<html>\n" + 
+				"  <head>\n" + 
+				"    <link href=\"https://fonts.googleapis.com/css?family=Open+Sans\" rel=\"stylesheet\">\n" + 
+				"  </head>\n" + 
+				"  <body style=\"background-color: #ffffff; padding-left: 30px; padding-right: 30px;\">\n" + 
+				"    <div style=\"background-color: #fafafa;\">\n" + 
+				"      <div style=\"background-color: #fafafa; margin:auto;\">\n" + 
+				"        <img style=\"display: table; margin: 0 auto; background-color: #fafafa;\" src=\"https://s3-sa-east-1.amazonaws.com/opusclick.com/assets/OpusClickLogo.png\">\n" + 
+				"      </div>\n" + 
+				"    <div style=\"display: table; margin: 0 auto; color: #202020\" >\n" + 
+				"      <h1 style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Cotización</h1>\n" + 
+				"    </div>\n" + 
+				"    <div style=\"display: inline-block; margin: 0 auto; text-align: justify; padding-left: 30px; padding-right: 30px;\" >\n" + 
+				"      <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Hola "+contract.getWork().getUser().getAccount().getName()+",</p>\n" + 
+				"      <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\"><strong>"+contract.getWork().getProvider().getAccount().getName()+" "+contract.getWork().getProvider().getAccount().getLastname()+"</strong> ha realizado una cotización "
+						+ "<strong>"+contract.getWork().getProviderQuote().getNumber()+"</strong></p>" + 
+				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Si tienes alguna pregunta no dudes en contactarnos.</p>\n" + 
+				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Equipo OpusClick.</p>\n" + 
+				"      <br> \n" + 
+				"  </div>\n" + 
+				"  <div style=\"background-color: #fafafa; height:100px;\"></div>\n" + 
+				"  </div>\n" + 
+				"  </body>\n" + 
+				"</html>");
+		EmailMessage emailMessage = new EmailMessage(env.getProperty("support.email"), contract.getWork().getUser().getAccount().getEmail(), subject, body.toString());
+		jmsTemplate.convertAndSend("mailbox",emailMessage);
+	}
+	
+	
+	private void createProviderModifiesContractNotificationEmail(Contract contract) {
+		String subject = "!"+contract.getWork().getProvider().getAccount().getName()+" ha modificado el contrato!";
+		StringBuilder body = new StringBuilder();
+		body.append("<!DOCTYPE HTML>\n" + 
+				"<html>\n" + 
+				"  <head>\n" + 
+				"    <link href=\"https://fonts.googleapis.com/css?family=Open+Sans\" rel=\"stylesheet\">\n" + 
+				"  </head>\n" + 
+				"  <body style=\"background-color: #ffffff; padding-left: 30px; padding-right: 30px;\">\n" + 
+				"    <div style=\"background-color: #fafafa;\">\n" + 
+				"      <div style=\"background-color: #fafafa; margin:auto;\">\n" + 
+				"        <img style=\"display: table; margin: 0 auto; background-color: #fafafa;\" src=\"https://s3-sa-east-1.amazonaws.com/opusclick.com/assets/OpusClickLogo.png\">\n" + 
+				"      </div>\n" + 
+				"    <div style=\"display: table; margin: 0 auto; color: #202020\" >\n" + 
+				"      <h1 style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Cotización</h1>\n" + 
+				"    </div>\n" + 
+				"    <div style=\"display: inline-block; margin: 0 auto; text-align: justify; padding-left: 30px; padding-right: 30px;\" >\n" + 
+				"      <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Hola "+contract.getWork().getUser().getAccount().getName()+",</p>\n" + 
+				"      <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\"><strong>"+contract.getWork().getProvider().getAccount().getName()+" "+contract.getWork().getProvider().getAccount().getLastname()+"</strong> ha realizado una cotización "
+						+ "<strong>"+contract.getWork().getProviderQuote().getNumber()+"</strong></p>" + 
+				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Si tienes alguna pregunta no dudes en contactarnos.</p>\n" + 
+				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Equipo OpusClick.</p>\n" + 
+				"      <br> \n" + 
+				"  </div>\n" + 
+				"  <div style=\"background-color: #fafafa; height:100px;\"></div>\n" + 
+				"  </div>\n" + 
+				"  </body>\n" + 
+				"</html>");
+		EmailMessage emailMessage = new EmailMessage(env.getProperty("support.email"), contract.getWork().getUser().getAccount().getEmail(), subject, body.toString());
 		jmsTemplate.convertAndSend("mailbox",emailMessage);
 	}
 }

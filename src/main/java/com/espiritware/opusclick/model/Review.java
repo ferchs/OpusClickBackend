@@ -3,6 +3,7 @@ package com.espiritware.opusclick.model;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Set;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -32,7 +33,7 @@ public class Review implements Serializable{
 	@GeneratedValue(strategy= GenerationType.AUTO, generator="native")
 	@GenericGenerator(name = "native", strategy = "native")
 	@Column(name="id_review")
-	private String reviewId;
+	private int reviewId;
 	
 	@Column(name="datetime")
 	private Date datetime;
@@ -40,23 +41,19 @@ public class Review implements Serializable{
 	@Column(name="satisfaction_level")
 	private double satisfactionLevel;
 	
+	@Column(name="comment")
+	private String comment;
+	
 	@Column(name="recommend")
 	private boolean recommend;
 	
 	@Enumerated(EnumType.STRING)
 	@Column(name="type")
 	private Type type;
-	
-	@ManyToOne
-	@JoinColumn(name="fk_work$review")
-	private Work work;
 		
-	@OneToMany(mappedBy="review")
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+	@JoinColumn(name = "fk_review$completed_work_image")
 	private Set<CompletedWorkImage> completedWorkImages;
-	
-//	@OneToOne(cascade = CascadeType.ALL)
-//    @PrimaryKeyJoinColumn
-//	private Comment comment;
 	
 	public Review() {
 	}

@@ -3,8 +3,6 @@ package com.espiritware.opusclick.dto;
 import java.util.Set;
 import javax.persistence.Id;
 import com.espiritware.opusclick.model.Location;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import lombok.Getter;
 import lombok.Setter;
 

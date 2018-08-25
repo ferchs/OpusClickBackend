@@ -2,13 +2,11 @@ package com.espiritware.opusclick.service;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.espiritware.opusclick.dao.GenericDao;
 import com.espiritware.opusclick.model.State;
-import com.espiritware.opusclick.model.Visit;
 import com.espiritware.opusclick.model.Work;
 
 @Service("workService")

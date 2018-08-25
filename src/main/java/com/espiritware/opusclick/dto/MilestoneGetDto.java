@@ -5,19 +5,15 @@ import com.espiritware.opusclick.model.State;
 import lombok.Getter;
 
 @Getter
-public class WorkGetDto {
+public class MilestoneGetDto {
 
 	private int id;
 	
-	private String workNumber;
+	private Date startDate;
 	
-	private String providerLabel;
-
-	private String userLabel;
+	private Date endDate;
 	
-	private Date creationDate;
-
 	private State state;
 	
-	private int contractId;
+    private ItemGetDto item;
 }

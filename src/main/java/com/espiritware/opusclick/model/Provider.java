@@ -14,7 +14,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.MapsId;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
-import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
@@ -77,8 +76,8 @@ public class Provider implements Serializable, Comparable<Provider>{
 	@MapsId
 	private Account account;
 	
-	@OneToOne(fetch=FetchType.EAGER, cascade = CascadeType.ALL, optional = false)
-	@PrimaryKeyJoinColumn
+	@ManyToOne(fetch=FetchType.EAGER, cascade = CascadeType.ALL)
+	@JoinColumn(name="fk_global_rating$provider")
     private GlobalRating globalRating;
 	
 	@OneToMany(fetch=FetchType.LAZY, mappedBy="provider", cascade = CascadeType.ALL)

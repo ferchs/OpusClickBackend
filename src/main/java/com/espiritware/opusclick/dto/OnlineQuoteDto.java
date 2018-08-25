@@ -5,7 +5,6 @@ import javax.validation.constraints.NotNull;
 import org.apache.commons.lang3.RandomStringUtils;
 import com.espiritware.opusclick.model.State;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -20,7 +19,7 @@ public class OnlineQuoteDto {
 	private Date date = new Date();
 	
 	@NotNull
-	private JsonNode requirements;
+	private String requirements;
 	    
 	@JsonIgnore
     private final State state = State.PENDING_BY_QUOTATION;
