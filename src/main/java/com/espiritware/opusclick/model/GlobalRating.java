@@ -33,6 +33,9 @@ public class GlobalRating implements Serializable{
 	@Column(name="global_recommend")
 	private double globalRecommend;
 	
+	@Column(name="works_done")
+	private int worksDone;
+	
 	@Column(name="score")
 	private double score;
 	

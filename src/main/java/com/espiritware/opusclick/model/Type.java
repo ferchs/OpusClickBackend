@@ -2,8 +2,9 @@ package com.espiritware.opusclick.model;
 
 public enum Type {
 	
-	POSITIVE ("Positive"), 
-	NEGATIVE ("Negative");
+	POSITIVE ("POSITIVE"),
+	NEUTRAL ("NEUTRAL"), 
+	NEGATIVE ("NEGATIVE");
 	
 	private String type;
 

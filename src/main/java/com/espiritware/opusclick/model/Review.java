@@ -2,8 +2,6 @@ package com.espiritware.opusclick.model;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.Set;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -11,13 +9,8 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
-
 import org.hibernate.annotations.GenericGenerator;
-
 import lombok.Getter;
 import lombok.Setter;
 
@@ -41,19 +34,19 @@ public class Review implements Serializable{
 	@Column(name="satisfaction_level")
 	private double satisfactionLevel;
 	
+	@Enumerated(EnumType.STRING)
+	@Column(name="type")
+	private Type type;
+	
 	@Column(name="comment")
 	private String comment;
+	
+	@Column(name="image")
+	private String image;
 	
 	@Column(name="recommend")
 	private boolean recommend;
 	
-	@Enumerated(EnumType.STRING)
-	@Column(name="type")
-	private Type type;
-		
-	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-	@JoinColumn(name = "fk_review$completed_work_image")
-	private Set<CompletedWorkImage> completedWorkImages;
 	
 	public Review() {
 	}

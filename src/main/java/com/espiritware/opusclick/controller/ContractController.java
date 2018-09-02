@@ -30,6 +30,7 @@ import com.espiritware.opusclick.annotations.DTO;
 import com.espiritware.opusclick.dto.ContractDto;
 import com.espiritware.opusclick.dto.ContractGetDto;
 import com.espiritware.opusclick.dto.ContractUpdateDto;
+import com.espiritware.opusclick.dto.ContractUpdateMilestonesStateDto;
 import com.espiritware.opusclick.error.CustomErrorType;
 import com.espiritware.opusclick.event.Publisher;
 import com.espiritware.opusclick.model.Contract;
@@ -160,6 +161,71 @@ public class ContractController {
 		} else if(contract.getState().equals(State.CONTRACT_MODIFIED_BY_PROVIDER)) {
 			publisher.publishProviderModifiesContractEvent(contract);
 		}
+	}
+	
+	@RequestMapping(value = "/contracts/{id}/milestones", method = RequestMethod.PUT, headers = "Accept=application/json")
+	@ResponseBody
+	@Transactional
+	public ResponseEntity<?> updateContractMilestones(@PathVariable("id") String contractId,
+			@DTO(ContractUpdateMilestonesStateDto.class) Contract contract,UriComponentsBuilder uriComponentsBuilder, final HttpServletRequest request) {
+		
+		if(contract.getMilestones()!=null && contract!=null) {
+			updateWorkState(contract);
+			workService.updateWork(contract.getWork());
+			return new ResponseEntity<>(HttpStatus.OK);
+		}else {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	private Contract updateWorkState(Contract contract) {
+		boolean allSameState = true;
+		State referenceState = null;
+		int i = 0;
+		for (Milestone milestone : contract.getMilestones()) {
+			if (i == 0) {
+				referenceState = milestone.getState();
+			}
+			if (!referenceState.equals(milestone.getState())) {
+				allSameState = false;
+			}
+			if (milestone.getState().equals(State.REPROBATE)) {
+				contract.setState(State.REPROBATE);
+				contract.setHistoryStateChanges(contract.getHistoryStateChanges() + contract.getState().state() + ",");
+				contract.getWork().setState(State.REPROBATE);
+				contract.getWork().setHistoryStateChanges(contract.getWork().getHistoryStateChanges() + contract.getState().state() + ",");
+				return contract;
+			}
+			if (milestone.getState().equals(State.UNFULFILLED)) {
+				contract.setState(State.UNFULFILLED);
+				contract.setHistoryStateChanges(contract.getHistoryStateChanges() + contract.getState().state() + ",");
+				contract.getWork().setState(State.UNFULFILLED);
+				contract.getWork().setHistoryStateChanges(contract.getWork().getHistoryStateChanges() + contract.getState().state() + ",");
+				return contract;
+			}
+			if (milestone.getState().equals(State.FINALIZED)) {
+				contract.setState(State.PARTIALLY_FINISHED);
+				contract.setHistoryStateChanges(contract.getHistoryStateChanges() + contract.getState().state() + ",");
+				contract.getWork().setState(State.PARTIALLY_FINISHED);
+				contract.getWork().setHistoryStateChanges(contract.getWork().getHistoryStateChanges() + contract.getState().state() + ",");
+			}
+			i++;
+		}
+		if (allSameState) {
+			if (referenceState.equals(State.PAID_OUT)) {
+				contract.setState(State.PAID_OUT);
+				contract.setHistoryStateChanges(contract.getHistoryStateChanges() + contract.getState().state() + ",");
+				contract.getWork().setState(State.PAID_OUT);
+				contract.getWork().setHistoryStateChanges(contract.getWork().getHistoryStateChanges() + contract.getState().state() + ",");
+			} else {
+				contract.setState(referenceState);
+				contract.setHistoryStateChanges(contract.getHistoryStateChanges() + contract.getState().state() + ",");
+				contract.getWork().setState(referenceState);
+				contract.getWork().setHistoryStateChanges(contract.getWork().getHistoryStateChanges() + contract.getState().state() + ",");
+			}
+
+		}
+		return contract;
 	}
 	
 //	@RequestMapping(value = "/contracts/{id}/states", method = RequestMethod.PUT, headers = "Accept=application/json")

@@ -2,12 +2,17 @@ package com.espiritware.opusclick.dto;
 
 import java.util.Date;
 import java.util.Set;
+
+import javax.persistence.Id;
+
 import com.espiritware.opusclick.model.State;
+
 import lombok.Getter;
 
 @Getter
-public class ContractGetDto {
+public class ContractUpdateMilestonesStateDto {
 
+	@Id
 	private int id;
 	
 	private String contractNumber;
@@ -26,9 +31,8 @@ public class ContractGetDto {
 
 	private double administrationFee;
 	
-	private Double totalValue;
-	
-	private Set<MilestoneGetDto> milestones;
-	
-	private int workId;
+	private double totalValue;
+		
+	private Set<MilestoneUpdateStateDto> milestones;
+
 }
