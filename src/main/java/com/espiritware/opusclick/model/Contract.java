@@ -34,6 +34,9 @@ public class Contract {
 	@Column(name="contract_number")
 	private String contractNumber;
 	
+	@Column(name="name")
+	private String name;
+	
 	@Column(name="creation_date")
 	private Date creationDate;
 	

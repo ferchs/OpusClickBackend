@@ -10,6 +10,8 @@ import javax.persistence.Table;
 
 import org.hibernate.annotations.GenericGenerator;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -37,6 +39,7 @@ public class GlobalRating implements Serializable{
 	private int worksDone;
 	
 	@Column(name="score")
+	@JsonIgnore
 	private double score;
 	
 	

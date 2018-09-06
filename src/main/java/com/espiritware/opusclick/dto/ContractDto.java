@@ -17,6 +17,8 @@ public class ContractDto {
 	@JsonIgnore
     private final Date creationDate = new Date();
 	
+	private String name;
+	
 	private String clarifications;
 	
 	private State state;

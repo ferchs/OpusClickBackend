@@ -21,10 +21,13 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
 import com.espiritware.opusclick.annotations.DTO;
 import com.espiritware.opusclick.dto.ProviderGetByProfessionDto;
+import com.espiritware.opusclick.dto.ProviderGetContractReviewDto;
+import com.espiritware.opusclick.dto.ProviderGetProfileDto;
 import com.espiritware.opusclick.dto.ProviderUpdateDto;
 import com.espiritware.opusclick.error.CustomErrorType;
 import com.espiritware.opusclick.model.Provider;
-import com.espiritware.opusclick.service.AccountService;
+import com.espiritware.opusclick.model.State;
+import com.espiritware.opusclick.model.Work;
 import com.espiritware.opusclick.service.AmazonClient;
 import com.espiritware.opusclick.service.ProviderService;
 
@@ -37,9 +40,6 @@ public class ProviderController {
 	
 	@Autowired
 	private ProviderService providerService;
-	
-	@Autowired
-	private AccountService accountService;
 		
 	@Autowired
 	private AmazonClient amazonClient;
@@ -47,7 +47,7 @@ public class ProviderController {
 	@Autowired
 	private ModelMapper modelMapper;
 	
-	@RequestMapping(value = "/providers/{email:.+}", method = RequestMethod.PUT, headers = "Accept=application/json")
+	@RequestMapping(value = "/providers", method = RequestMethod.PUT, headers = "Accept=application/json")
 	@ResponseBody
 	@Transactional
 	public ResponseEntity<?> updateProvider(@DTO(ProviderUpdateDto.class) Provider provider,
@@ -95,72 +95,34 @@ public class ProviderController {
 		return dtoList;
 	}
 	
-	
-	@RequestMapping(value = "/providers/{email:.+}", method = RequestMethod.GET)
+	@RequestMapping(value = "/providers/{id}", method = RequestMethod.GET)
 	@Transactional
-	public ResponseEntity<?> getProviderById(@PathVariable("email") String providerEmail, Principal principal,
+	public ResponseEntity<?> getProviderById(@PathVariable("id") String providerId, Principal principal,
 			UriComponentsBuilder uriComponentsBuilder) {
-		Provider provider = accountService.findAccountByEmail(providerEmail).getProvider();
+		Provider provider = providerService.findProviderById(Integer.parseInt(providerId));
 		if (provider == null) {
-			return new ResponseEntity<>(new CustomErrorType("Provider with email " + providerEmail + " not found"),
+			return new ResponseEntity<>(new CustomErrorType("Provider with id " + providerId + " not found"),
 					HttpStatus.NOT_FOUND);
 		}
+		
+		ProviderGetProfileDto dto=modelMapper.map(provider, ProviderGetProfileDto.class);
 		//Medida temporal para evitar que un proveedor autenticado pueda averiguar proveedor de otro usuario
-		if(!principal.getName().equals(providerEmail)) {
-			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-		}		
-		return new ResponseEntity<Provider>(provider, HttpStatus.OK);
-	}
-	
-	@RequestMapping(value="/providers/images", method = RequestMethod.POST, headers ="content-type=multipart/form-data")
-	@Transactional
-	public ResponseEntity<?> uploadProviderImage(@RequestParam("email") String emailProvider,
-			@RequestParam("file") MultipartFile multipartFile, UriComponentsBuilder uriComponentsBuilder) {
-		if (emailProvider == null || emailProvider.isEmpty()) {
-			return new ResponseEntity<>(new CustomErrorType("Please set id_provider"), HttpStatus.NO_CONTENT);
-		}
-		if (multipartFile.isEmpty()) {
-			return new ResponseEntity<>(new CustomErrorType("Please select a file to upload"), HttpStatus.NO_CONTENT);
-		}
-		Provider provider = accountService.findAccountByEmail(emailProvider).getProvider();
-		if (provider == null) {
-			return new ResponseEntity<>(new CustomErrorType("Provider with id: " + emailProvider + " not found"),
-					HttpStatus.NOT_FOUND);
-		}
-		// || !provider.getPhoto().isEmpty()
-		if (provider.getPhoto() != null) {
-			if (!provider.getPhoto().isEmpty()) {
-				try {
-					amazonClient.deleteFileFromS3Bucket(PROVIDER_IMAGES_FOLDER,provider.getPhoto());
-				} catch (Exception e) {
-					return new ResponseEntity<>(
-							new CustomErrorType("Provider with id: " + emailProvider + " can't be erased"),
-							HttpStatus.INTERNAL_SERVER_ERROR);
-				}
-			}
-		}
-		try {
-			String fileUrl = amazonClient.uploadFile(PROVIDER_IMAGES_FOLDER,multipartFile);
-			provider.setPhoto(fileUrl);
-			providerService.updateProvider(provider);
-			return new ResponseEntity<String>(fileUrl, HttpStatus.OK);
-		} catch (Exception e) {
-			return new ResponseEntity<>(
-					new CustomErrorType("Image provider with id: " + emailProvider + " can't be upload"),
-					HttpStatus.INTERNAL_SERVER_ERROR);
-		}
+//		if(!principal.getName().equals(provider.getAccount().getEmail())) {
+//			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+//		}		
+		return new ResponseEntity<ProviderGetProfileDto>(dto, HttpStatus.OK);
 	}
 	
 	
-	@RequestMapping(value="/providers/{email_provider:.+}/images", method = RequestMethod.GET)
+	@RequestMapping(value="/providers/{id}/images", method = RequestMethod.GET)
 	@Transactional
-	public ResponseEntity<?> getProviderImage(@PathVariable("email_provider") String emailProvider){
-		if (emailProvider == null) {
+	public ResponseEntity<?> getProviderImage(@PathVariable("id") String providerId){
+		if (providerId == null) {
 			return new ResponseEntity<>(new CustomErrorType("Please set id_provider"), HttpStatus.NO_CONTENT);
 		}
-		Provider provider = accountService.findAccountByEmail(emailProvider).getProvider();
+		Provider provider = providerService.findProviderById(Integer.parseInt(providerId));
 		if (provider == null) {
-			return new ResponseEntity<>(new CustomErrorType("Provider with id: " + emailProvider + " not found"),
+			return new ResponseEntity<>(new CustomErrorType("Provider with id: " + providerId + " not found"),
 					HttpStatus.NOT_FOUND);
 		}
 		if (provider.getPhoto() != null) {
@@ -173,4 +135,86 @@ public class ProviderController {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 	}
+	
+	
+	@RequestMapping(value = "/providers/{id}/reviews", method = RequestMethod.GET)
+	@Transactional
+	public ResponseEntity<List<?>> getProviderWorks(@PathVariable("id") String providerId, Principal principal,
+			UriComponentsBuilder uriComponentsBuilder) {
+		Provider provider = providerService.findProviderById(Integer.parseInt(providerId));
+		if (provider == null) {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}	
+		List<ProviderGetContractReviewDto> dtoList=getProviderReviews(provider);
+		return new ResponseEntity<List<?>>(dtoList, HttpStatus.OK);
+	}
+	
+	private List<ProviderGetContractReviewDto> getProviderReviews(Provider provider) {
+		List<ProviderGetContractReviewDto> dtoList= new ArrayList<ProviderGetContractReviewDto>();
+		for(Work work:provider.getWorks()) {
+			if(work.getContract()!=null) {
+				if(work.getContract().getState().equals(State.QUALIFIED)) {
+					ProviderGetContractReviewDto dto=modelMapper.map(work.getContract(), ProviderGetContractReviewDto.class);
+					dtoList.add(dto);
+				}
+			}
+		}
+		return dtoList;
+	}
+	
+//	@RequestMapping(value = "/providers/{email:.+}", method = RequestMethod.GET)
+//	@Transactional
+//	public ResponseEntity<?> getProviderById(@PathVariable("email") String providerEmail, Principal principal,
+//			UriComponentsBuilder uriComponentsBuilder) {
+//		Provider provider = accountService.findAccountByEmail(providerEmail).getProvider();
+//		if (provider == null) {
+//			return new ResponseEntity<>(new CustomErrorType("Provider with email " + providerEmail + " not found"),
+//					HttpStatus.NOT_FOUND);
+//		}
+//		//Medida temporal para evitar que un proveedor autenticado pueda averiguar proveedor de otro usuario
+//		if(!principal.getName().equals(providerEmail)) {
+//			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+//		}		
+//		return new ResponseEntity<Provider>(provider, HttpStatus.OK);
+//	}
+	
+	@RequestMapping(value="/providers/{id}/images", method = RequestMethod.POST, headers ="content-type=multipart/form-data")
+	@Transactional
+	public ResponseEntity<?> uploadProviderImage(@PathVariable("id") String providerId,
+			@RequestParam("file") MultipartFile multipartFile, UriComponentsBuilder uriComponentsBuilder) {
+		if (providerId == null || providerId.isEmpty()) {
+			return new ResponseEntity<>(new CustomErrorType("Please set id_provider"), HttpStatus.NO_CONTENT);
+		}
+		if (multipartFile.isEmpty()) {
+			return new ResponseEntity<>(new CustomErrorType("Please select a file to upload"), HttpStatus.NO_CONTENT);
+		}
+		Provider provider = providerService.findProviderById(Integer.parseInt(providerId));
+		if (provider == null) {
+			return new ResponseEntity<>(new CustomErrorType("Provider with id: " + providerId + " not found"),
+					HttpStatus.NOT_FOUND);
+		}
+		// || !provider.getPhoto().isEmpty()
+		if (provider.getPhoto() != null) {
+			if (!provider.getPhoto().isEmpty()) {
+				try {
+					amazonClient.deleteFileFromS3Bucket(PROVIDER_IMAGES_FOLDER,provider.getPhoto());
+				} catch (Exception e) {
+					return new ResponseEntity<>(
+							new CustomErrorType("Provider with id: " + providerId + " can't be erased"),
+							HttpStatus.INTERNAL_SERVER_ERROR);
+				}
+			}
+		}
+		try {
+			String fileUrl = amazonClient.uploadFile(PROVIDER_IMAGES_FOLDER,multipartFile);
+			provider.setPhoto(fileUrl);
+			providerService.updateProvider(provider);
+			return new ResponseEntity<String>(fileUrl, HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(
+					new CustomErrorType("Image provider with id: " + providerId + " can't be upload"),
+					HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
 }

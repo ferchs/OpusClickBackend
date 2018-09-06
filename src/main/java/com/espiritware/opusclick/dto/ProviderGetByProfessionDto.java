@@ -16,5 +16,4 @@ public class ProviderGetByProfessionDto {
 	
 	public double globalRatingGlobalRecommend;
 	
-	public double globalNoRecommend=100-globalRatingGlobalRecommend;
 }
