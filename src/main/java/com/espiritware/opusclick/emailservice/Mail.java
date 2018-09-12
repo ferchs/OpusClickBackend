@@ -338,7 +338,7 @@ public class Mail implements ApplicationListener<GenericEvent>{
 				"      <br> \n" + 
 				"  </div>\n" + 
 				"  <div style=\"display: flex; margin: 0 auto; text-align: justify;\">\n" + 
-				"<a href=\"http://localhost:4200/dashboard_experto/visitas/nuevas\" style=\"font-family: 'Open Sans', sans-serif;\n" + 
+				"<a href=\"http://localhost:4200/dashboard_experto/negociaciones/en_proceso\" style=\"font-family: 'Open Sans', sans-serif;\n" + 
 				"    display: flex; margin: 0 auto;\n" + 
 				"    background-color: #294664;\n" + 
 				"    border: none;\n" + 
@@ -429,7 +429,7 @@ public class Mail implements ApplicationListener<GenericEvent>{
 				"      <br> \n" + 
 				"  </div>\n" + 
 				"  <div style=\"display: flex; margin: 0 auto; text-align: justify;\">\n" + 
-				"<a href=\"http://localhost:4200/dashboard_usuario/visitas/pendientes\" style=\"font-family: 'Open Sans', sans-serif;\n" + 
+				"<a href=\"http://localhost:4200/dashboard_usuario/negociaciones/en_proceso\" style=\"font-family: 'Open Sans', sans-serif;\n" + 
 				"    display: flex; margin: 0 auto;\n" + 
 				"    background-color: #008d98;\n" + 
 				"    border: none;\n" + 
@@ -438,7 +438,7 @@ public class Mail implements ApplicationListener<GenericEvent>{
 				"    text-align: center;\n" + 
 				"    text-decoration: none;\n" + 
 				"    display: inline-block;\n" + 
-				"    font-size: 16px;\">VER VISITA</a>\n" + 
+				"    font-size: 16px;\">VER SOLICITUD</a>\n" + 
 				"  </div>\n" + 
 				"  <div style=\"background-color: #fafafa; height:100px;\"></div>\n" + 
 				"  </div>\n" + 
@@ -927,7 +927,7 @@ public class Mail implements ApplicationListener<GenericEvent>{
 				"      <br> \n" + 
 				"  </div>\n" + 
 				"  <div style=\"display: flex; margin: 0 auto; text-align: justify;\">\n" + 
-				"<a href=\"http://localhost:4200/dashboard_usuario/visitas/nuevas\" style=\"font-family: 'Open Sans', sans-serif;\n" + 
+				"<a href=\"http://localhost:4200/dashboard_usuario/visitas/pendientes\" style=\"font-family: 'Open Sans', sans-serif;\n" + 
 				"    display: flex; margin: 0 auto;\n" + 
 				"    background-color:#008d98;\n" + 
 				"    border: none;\n" + 
@@ -1237,6 +1237,18 @@ public class Mail implements ApplicationListener<GenericEvent>{
 				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Si tienes alguna pregunta no dudes en contactarnos.</p>\n" + 
 				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Equipo OpusClick.</p>\n" + 
 				"      <br> \n" + 
+				"  </div>\n" + 
+				"  <div style=\"display: flex; margin: 0 auto; text-align: justify;\">\n" + 
+				"	<a href=\"http://localhost:4200/dashboard_experto/negociaciones/en_proceso\" style=\"font-family: 'Open Sans', sans-serif;\n" + 
+				"    display: flex; margin: 0 auto;\n" + 
+				"    background-color: #008d98;\n" + 
+				"    border: none;\n" + 
+				"    color: white;\n" + 
+				"    padding: 15px 32px;\n" + 
+				"    text-align: center;\n" + 
+				"    text-decoration: none;\n" + 
+				"    display: inline-block;\n" + 
+				"    font-size: 16px;\">VER COTIZACIÓN</a>\n" + 
 				"  </div>\n" + 
 				"  <div style=\"background-color: #fafafa; height:100px;\"></div>\n" + 
 				"  </div>\n" + 

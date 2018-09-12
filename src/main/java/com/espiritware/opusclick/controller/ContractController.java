@@ -36,6 +36,7 @@ import com.espiritware.opusclick.event.Publisher;
 import com.espiritware.opusclick.model.Contract;
 import com.espiritware.opusclick.model.Milestone;
 import com.espiritware.opusclick.model.State;
+import com.espiritware.opusclick.model.Visit;
 import com.espiritware.opusclick.model.Work;
 import com.espiritware.opusclick.service.AmazonClient;
 import com.espiritware.opusclick.service.ContractService;
@@ -69,6 +70,22 @@ public class ContractController {
 	private AmazonClient amazonClient;
 	
 	
+	
+	@RequestMapping(value = "/contracts/{id}", method = RequestMethod.GET)
+	@Transactional
+	public ResponseEntity<?> getProviderById(@PathVariable("id") String contractId, Principal principal,
+			UriComponentsBuilder uriComponentsBuilder) {
+		Contract contract = contractService.findContractById(Integer.parseInt(contractId));
+		if (contract == null) {
+			return new ResponseEntity<>(new CustomErrorType("Contract with id " + contractId + " not found"),
+					HttpStatus.NOT_FOUND);
+		}
+		
+		ContractGetDto dto=modelMapper.map(contract, ContractGetDto.class);
+		return new ResponseEntity<ContractGetDto>(dto, HttpStatus.OK);
+	}
+	
+	
 	@RequestMapping(value = "/contracts", method = RequestMethod.POST, headers = "Accept=application/json")
 	@ResponseBody
 	@Transactional
@@ -86,6 +103,7 @@ public class ContractController {
 			Work work = workService.findWorkById(Integer.parseInt(workId));
 			work.setState(contract.getState());
 			work.setHistoryStateChanges(work.getHistoryStateChanges()+contract.getState().state() + ",");
+			UpdateVisitsState(work);
 			workService.updateWork(work);
 			contract.setWork(work);
 			work.setContract(contract);
@@ -100,19 +118,11 @@ public class ContractController {
 		}
 	}
 	
-	
-	@RequestMapping(value = "/contracts/{id}", method = RequestMethod.GET)
-	@Transactional
-	public ResponseEntity<?> getProviderById(@PathVariable("id") String contractId, Principal principal,
-			UriComponentsBuilder uriComponentsBuilder) {
-		Contract contract = contractService.findContractById(Integer.parseInt(contractId));
-		if (contract == null) {
-			return new ResponseEntity<>(new CustomErrorType("Contract with id " + contractId + " not found"),
-					HttpStatus.NOT_FOUND);
+	private void UpdateVisitsState(Work work) {
+		for (Visit visit : work.getVisits()) {
+			visit.setState(State.VISIT_MADE);
+			visit.setHistoryStateChanges(visit.getHistoryStateChanges()+visit.getState().state() + ",");
 		}
-		
-		ContractGetDto dto=modelMapper.map(contract, ContractGetDto.class);
-		return new ResponseEntity<ContractGetDto>(dto, HttpStatus.OK);
 	}
 	
 	
@@ -154,6 +164,31 @@ public class ContractController {
 		}
 
 	}
+	
+	private Set<Milestone> updateItems(Set<Milestone> milestones) throws AmazonServiceException, AmazonClientException, IOException {
+		for (Milestone milestone : milestones) {
+			if(milestone.getItem().getImageContract()!=null) {
+				if(milestone.getItem().getImageContract().contains("data:image")) {
+					String url = amazonClient.uploadFile(CONTRACT_IMAGES_FOLDER, createTmpFile(milestone.getItem().getImageContract()));
+					milestone.getItem().setImageContract(url);
+				}
+			}
+			itemService.updateItem(milestone.getItem());
+		}
+		return milestones;
+	}
+	
+	private File createTmpFile(String base64) throws IOException {
+		String base64Image = base64.split(",")[1];
+		String metadata= base64.split(",")[0];
+		String extension = "."+metadata.substring(metadata.indexOf("/")+1, metadata.indexOf(";"));
+		byte[] decodedFile = Base64.getDecoder().decode(base64Image.getBytes(StandardCharsets.UTF_8));
+		File file = File.createTempFile("tmp",extension, new File(TMP_FOLDER));
+		file.deleteOnExit();
+		Files.write(file.toPath(), decodedFile);
+		return file;
+	}
+	
 	
 	private void sendNotificationEmail(Contract contract) {
 		if(contract.getState().equals(State.CONTRACT_ACCEPTED_BY_PROVIDER)) {
@@ -363,30 +398,6 @@ public class ContractController {
 		return calendar.getTime();
 	}
 
-	
-	private Set<Milestone> updateItems(Set<Milestone> milestones) throws AmazonServiceException, AmazonClientException, IOException {
-		for (Milestone milestone : milestones) {
-			if(milestone.getItem().getImageContract()!=null) {
-				if(milestone.getItem().getImageContract().contains("data:image")) {
-					String url = amazonClient.uploadFile(CONTRACT_IMAGES_FOLDER, createTmpFile(milestone.getItem().getImageContract()));
-					milestone.getItem().setImageContract(url);
-				}
-			}
-			itemService.updateItem(milestone.getItem());
-		}
-		return milestones;
-	}
-	
-	private File createTmpFile(String base64) throws IOException {
-		String base64Image = base64.split(",")[1];
-		String metadata= base64.split(",")[0];
-		String extension = "."+metadata.substring(metadata.indexOf("/")+1, metadata.indexOf(";"));
-		byte[] decodedFile = Base64.getDecoder().decode(base64Image.getBytes(StandardCharsets.UTF_8));
-		File file = File.createTempFile("tmp",extension, new File(TMP_FOLDER));
-		file.deleteOnExit();
-		Files.write(file.toPath(), decodedFile);
-		return file;
-	}
 
 //	@RequestMapping(value = "/provider_quotes/images", method = RequestMethod.POST, headers = "content-type=multipart/form-data")
 //	@Transactional

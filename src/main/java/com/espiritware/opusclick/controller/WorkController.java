@@ -1,5 +1,6 @@
 package com.espiritware.opusclick.controller;
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -14,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -22,8 +24,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.espiritware.opusclick.annotations.DTO;
 import com.espiritware.opusclick.dto.WorkGetDto;
 import com.espiritware.opusclick.dto.WorkUpdateDto;
+import com.espiritware.opusclick.error.CustomErrorType;
 import com.espiritware.opusclick.event.Publisher;
-import com.espiritware.opusclick.model.Contract;
 import com.espiritware.opusclick.model.Milestone;
 import com.espiritware.opusclick.model.State;
 import com.espiritware.opusclick.model.Visit;
@@ -43,6 +45,20 @@ public class WorkController {
 	
 	@Autowired
 	private Publisher publisher;
+	
+	
+	@RequestMapping(value = "/works/{id}", method = RequestMethod.GET)
+	@Transactional
+	public ResponseEntity<?> getProviderById(@PathVariable("id") String workId, Principal principal,
+			UriComponentsBuilder uriComponentsBuilder) {
+		Work work = workService.findWorkById(Integer.parseInt(workId));
+		if (work == null) {
+			return new ResponseEntity<>(new CustomErrorType("Work with id " + workId + " not found"),
+					HttpStatus.NOT_FOUND);
+		}
+		WorkGetDto dto=modelMapper.map(work, WorkGetDto.class);
+		return new ResponseEntity<WorkGetDto>(dto, HttpStatus.OK);
+	}
 	
 	
 	@RequestMapping(value = "/works", method = RequestMethod.GET, headers = "Accept=application/json")
