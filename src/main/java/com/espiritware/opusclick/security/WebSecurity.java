@@ -79,7 +79,7 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
 		configuration.setAllowedMethods(Arrays.asList("GET","POST","PUT"));
 		configuration.addAllowedHeader("*");
 //		configuration.addAllowedMethod("*");
-		configuration.addAllowedOrigin("http://localhost:4200");
+		configuration.addAllowedOrigin("http://opusclick.com");
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 		source.registerCorsConfiguration("/**", configuration);
 		return source;
