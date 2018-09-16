@@ -64,7 +64,7 @@ public class ProviderRegistrationDto {
     private final double providerGlobalRatingGlobalSatisfactionLevel=100;
 	
 	@JsonIgnore
-    private final double providerGlobalRatingGlobalRecommend=0;
+    private final double providerGlobalRatingGlobalRecommend=100;
 	
 	@JsonIgnore
     private final double providerGlobalRatingScore=0;

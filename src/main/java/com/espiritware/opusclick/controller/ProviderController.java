@@ -70,7 +70,7 @@ public class ProviderController {
 		if (professionName != null) {
 			providers = providerService.findProvidersByProfessionName(professionName);
 			if (providers.isEmpty()) {
-				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+				return new ResponseEntity<List<?>>(providers, HttpStatus.OK);
 			} else {
 				Collections.sort(providers);
 				List<ProviderGetByProfessionDto> dtoList=getProviderDtoList(providers);

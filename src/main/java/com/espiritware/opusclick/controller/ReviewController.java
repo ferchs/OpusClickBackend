@@ -22,6 +22,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.amazonaws.AmazonClientException;
 import com.espiritware.opusclick.annotations.DTO;
 import com.espiritware.opusclick.dto.ReviewDto;
+import com.espiritware.opusclick.event.Publisher;
 import com.espiritware.opusclick.model.Milestone;
 import com.espiritware.opusclick.model.Provider;
 import com.espiritware.opusclick.model.Review;
@@ -53,6 +54,9 @@ public class ReviewController {
 	@Autowired
 	private AmazonClient amazonClient;
 	
+	@Autowired
+	private Publisher publisher;
+	
 	@RequestMapping(value = "/reviews", method = RequestMethod.POST, headers = "Accept=application/json")
 	@ResponseBody
 	@Transactional
@@ -70,6 +74,7 @@ public class ReviewController {
 		updateProviderGlobalRating(work.getProvider(), review);
 		work.setReview(review);
 		workService.updateWork(work);
+		publisher.publishReviewEvent(work);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	

@@ -109,9 +109,7 @@ public class ContractController {
 			work.setContract(contract);
 			contract.setHistoryStateChanges(contract.getState().state() + ",");
 			contractService.createContract(contract);
-			if(contract.getState().equals(State.CONTRACT_MODIFIED_BY_USER)) {
-				publisher.publishUserModifiesContractEvent(contract);
-			} 
+			sendNotificationEmail(contract);
 			return new ResponseEntity<>(HttpStatus.OK);
 		} else {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -191,10 +189,19 @@ public class ContractController {
 	
 	
 	private void sendNotificationEmail(Contract contract) {
-		if(contract.getState().equals(State.CONTRACT_ACCEPTED_BY_PROVIDER)) {
+		if(contract.getState().equals(State.IN_PROGRESS)) {
+			publisher.publishUserMakesPaymentEvent(contract);
+		}else if(contract.getState().equals(State.CONTRACT_MODIFIED_BY_USER)) {
+			publisher.publishUserModifiesContractEvent(contract);
+		}else if(contract.getState().equals(State.CONTRACT_ACCEPTED_BY_PROVIDER)) {
 			publisher.publishProviderAcceptContractEvent(contract);
 		} else if(contract.getState().equals(State.CONTRACT_MODIFIED_BY_PROVIDER)) {
 			publisher.publishProviderModifiesContractEvent(contract);
+		}else if(contract.getState().equals(State.PARTIALLY_FINISHED)) {
+			//Para este apartado hay que revisar cada uno de los items y saber su estado, y de acuerdo a este debe ser enviado un correo
+			//(Esto es aplicable cuando un experto solicita un pago o un usuario aprueba un pago solicitado)
+		}else if(contract.getState().equals(State.FINALIZED)) {
+		}else if(contract.getState().equals(State.PAID_OUT)) {
 		}
 	}
 	
@@ -207,6 +214,7 @@ public class ContractController {
 		if(contract.getMilestones()!=null && contract!=null) {
 			updateWorkState(contract);
 			workService.updateWork(contract.getWork());
+			sendNotificationEmail(contract);
 			return new ResponseEntity<>(HttpStatus.OK);
 		}else {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

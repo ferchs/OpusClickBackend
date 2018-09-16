@@ -33,6 +33,11 @@ public class Publisher {
         applicationEventPublisher.publishEvent(resetPasswordEvent);
     }
     
+    public void publishReviewEvent(final Work work ) {
+    	ReviewEvent reviewEvent = new ReviewEvent(this, work);
+        applicationEventPublisher.publishEvent(reviewEvent);
+    }
+    
     public void publishUserVisitRequestEvent(final Visit visit) {
     	UserVisitRequestEvent userVisitRequestEvent = new UserVisitRequestEvent(this,visit);
         applicationEventPublisher.publishEvent(userVisitRequestEvent);

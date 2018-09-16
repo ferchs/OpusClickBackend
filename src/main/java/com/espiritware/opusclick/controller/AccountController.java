@@ -3,6 +3,7 @@ package com.espiritware.opusclick.controller;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +32,9 @@ import com.espiritware.opusclick.model.State;
 @RequestMapping("/v1")
 public class AccountController {
 	
+	@Value("${app.hostname}")
+	private String hostname;
+	
 	@Autowired
 	private AccountService accountService;
 	
@@ -48,7 +52,7 @@ public class AccountController {
 	
 	@Autowired
 	private PasswordEncoder passwordEncoder;
-	
+		
 	
 	@RequestMapping(value = "/accounts/user", method = RequestMethod.POST, headers = "Accept=application/json")
 	@ResponseBody
@@ -148,19 +152,21 @@ public class AccountController {
 	}
 
 //De esta manera se detecta la url y puerto en donde se encuentra desplegado
-//	 private String getAppUrl(HttpServletRequest request) {
-//		return "http://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath();
+//	 private String getAppUrlOpus(HttpServletRequest request) {
+//		 String url="http://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath();
+//		 url=request.getHeader("referer");
+//		 return url;
 //	 }
 	
 //Pendiente por implementarlo para que cree la url de manera automatica
 	 private String getAppUrl(HttpServletRequest request) {
-			return "http://" + "localhost" + ":" + "4200" + "/confirmar_registro";
+			return  hostname+ "/confirmar_registro";
 		 //return "http://" + "localhost" + ":" + "8083" + "/confirmar_registro";
 		 //return "http://" + "opusclick.com" + "/confirmar_registro";
 	 }
 	 
 	 private String getResetUrl(HttpServletRequest request) {
-			return "http://" + "localhost" + ":" + "4200" + "/reestablecer_contraseña";
+			return hostname+ "/reestablecer_contraseña";
 		 //return "http://" + "localhost" + ":" + "8083" + "/reestablecer_contraseña";
 		 //return "http://" + "opusclick.com" + "/reestablecer_contraseña";
 	 }
