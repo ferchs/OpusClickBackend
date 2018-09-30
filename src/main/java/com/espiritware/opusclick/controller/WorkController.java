@@ -33,7 +33,7 @@ import com.espiritware.opusclick.model.Work;
 import com.espiritware.opusclick.service.WorkService;
 
 @Controller
-@CrossOrigin(origins = {"http://localhost:4200"}, maxAge = 4800, allowCredentials = "false")
+//@CrossOrigin(origins = {"http://localhost:4200"}, maxAge = 4800, allowCredentials = "false")
 @RequestMapping("/v1")
 public class WorkController {
 

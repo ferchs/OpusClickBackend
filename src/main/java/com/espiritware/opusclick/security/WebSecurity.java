@@ -10,9 +10,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
 import java.util.Arrays;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -46,19 +44,17 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http.cors().and().csrf().disable()
-		 .authorizeRequests().anyRequest().permitAll().and()
-//		.authorizeRequests().antMatchers(HttpMethod.POST, USER_REGISTRATION_URL).permitAll()
-//		.antMatchers(HttpMethod.POST, PROVIDER_REGISTRATION_URL).permitAll()
-//		.antMatchers(HttpMethod.GET, PROVIDER_LIST_URL).permitAll()
-//		.antMatchers(HttpMethod.GET, CONFIRM_REGISTRATION_URL).permitAll()
-//		.antMatchers(HttpMethod.POST, SEND_RESET_PASSWORD_EMAIL).permitAll()
-//		.antMatchers(HttpMethod.POST, RESET_PASSWORD).permitAll()
-//		.antMatchers(HttpMethod.GET, CITIES_LIST_URL).permitAll()
-//		.antMatchers(HttpMethod.GET, PROFESSIONS_LIST_URL).permitAll()
-//		.anyRequest().authenticated().and()
-		.addFilter(new JWTAuthenticationFilter(authenticationManager(), getApplicationContext()))
+		.authorizeRequests().antMatchers(HttpMethod.POST, USER_REGISTRATION_URL).permitAll()
+		.antMatchers(HttpMethod.POST, PROVIDER_REGISTRATION_URL).permitAll()
+		.antMatchers(HttpMethod.GET, PROVIDER_LIST_URL).permitAll()
+		.antMatchers(HttpMethod.GET, CONFIRM_REGISTRATION_URL).permitAll()
+		.antMatchers(HttpMethod.POST, SEND_RESET_PASSWORD_EMAIL).permitAll()
+		.antMatchers(HttpMethod.POST, RESET_PASSWORD).permitAll()
+		.antMatchers(HttpMethod.GET, CITIES_LIST_URL).permitAll()
+		.antMatchers(HttpMethod.GET, PROFESSIONS_LIST_URL).permitAll()
+		.anyRequest().authenticated()
+		.and().addFilter(new JWTAuthenticationFilter(authenticationManager(), getApplicationContext()))
 		.addFilter(new JWTAuthorizationFilter(authenticationManager(), getApplicationContext()))
-		// this disables session creation on Spring Security
 		.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 	}
 
@@ -68,22 +64,17 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
 		//en este caso se usa a userDetailsService como AuthenticationProvider que es implementado por la clase userDetailsServiceImp
 		auth.userDetailsService(userDetailsService).passwordEncoder(bCryptPasswordEncoder);
 	}
-
+	
 	@Bean
 	CorsConfigurationSource corsConfigurationSource() {
-//		final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-//		source.registerCorsConfiguration("/**", new CorsConfiguration().applyPermitDefaultValues());
-//		return source;
 		CorsConfiguration configuration = new CorsConfiguration();
-//		configuration.setAllowedOrigins(Arrays.asList("http://localhost:4200/*"));
-		configuration.setAllowedMethods(Arrays.asList("GET","POST","PUT"));
+		configuration.setAllowedOrigins(Arrays.asList("http://localhost:4200","http://opusclick.com"));
 		configuration.addAllowedHeader("*");
-//		configuration.addAllowedMethod("*");
-		configuration.addAllowedOrigin("http://localhost:4200");
+		configuration.setAllowedMethods(Arrays.asList("GET","POST","PUT","PATCH"));
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 		source.registerCorsConfiguration("/**", configuration);
 		return source;
 		
 	}
-  
+	
 }

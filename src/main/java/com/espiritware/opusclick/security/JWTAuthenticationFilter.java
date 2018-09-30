@@ -51,32 +51,30 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 		
 		try {
 			LoginDto creds = new ObjectMapper().readValue(req.getInputStream(), LoginDto.class);
-			if(!tokenService.accountExist(creds.getEmail())) {
+			Account account = accountService.findAccountByEmail(creds.getEmail());
+			if (account == null) {
 				throw new AccountNotFoundException("No se ha registrado una cuenta con este Email");
 			}
-			if(!tokenService.accountConfirmed(creds.getEmail(),creds.isUserLogin())) {
-				throw new AccountNotConfirmedException("Debes confirmar tu cuenta para iniciar sesion. ¡Revisa tu Email!");
-			}
-			if(tokenService.validateLoginRolExist(creds.getEmail(), creds.isUserLogin())) {
-				Account account=accountService.findAccountByEmail(creds.getEmail());
-				if(creds.isUserLogin()) {
-					this.userId=account.getUser().getId();
-					this.userLogin=true;
-				}else {
-					this.providerId=account.getProvider().getId();
-					this.userLogin=false;
-				}
-				//UserDetailsServiceImpl class implements the authentication package com.espiritware.opusclick.service
-				return authenticationManager.authenticate(
-						new UsernamePasswordAuthenticationToken(creds.getEmail(), creds.getPassword(), new ArrayList<>()));
-			}
-			else {
+			if (!tokenService.validateLoginRolExist(creds.getEmail(), account.getId(), creds.isUserLogin())) {
 				throw new RoleNotFoundException("No existe una cuenta asociada a este rol");
 			}
-			
+			if (!tokenService.accountConfirmed(creds.getEmail(), account.getId(), creds.isUserLogin())) {
+				throw new AccountNotConfirmedException(
+						"Debes confirmar tu cuenta para iniciar sesion. ¡Revisa tu Email!");
+			}
+			if (creds.isUserLogin()) {
+				this.userId = account.getUser().getId();
+				this.userLogin = true;
+			} else {
+				this.providerId = account.getProvider().getId();
+				this.userLogin = false;
+			}
+			// UserDetailsServiceImpl class implements the authentication package com.espiritware.opusclick.service
+			return authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(creds.getEmail(),
+					creds.getPassword(), new ArrayList<>()));
 		} catch (IOException e) {
 			throw new RuntimeException(e);
-		}	
+		}
 	}
 
 	@Override

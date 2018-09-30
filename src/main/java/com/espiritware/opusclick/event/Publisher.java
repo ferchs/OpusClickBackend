@@ -82,7 +82,22 @@ public class Publisher {
     	UserModifiesContractEvent userModifiesContractEvent = new UserModifiesContractEvent(this,contract);
         applicationEventPublisher.publishEvent(userModifiesContractEvent);
     }
-     
+    
+    public void publishUserMakesPaymentEvent(final Contract contract) {
+    	UserMakesPaymentEvent userMakesPaymentEvent = new UserMakesPaymentEvent(this,contract);
+        applicationEventPublisher.publishEvent(userMakesPaymentEvent);
+    }
+    
+    public void publishUserAuthorizesPaymentEvent(final Contract contract) {
+    	UserAuthorizesPaymentEvent userAuthorizesPaymentEvent = new UserAuthorizesPaymentEvent(this,contract);
+        applicationEventPublisher.publishEvent(userAuthorizesPaymentEvent);
+    }
+    
+    public void publishUserDenyPaymentEvent(final Contract contract) {
+    	UserDenyPaymentEvent userDenyPaymentEvent = new UserDenyPaymentEvent(this,contract);
+        applicationEventPublisher.publishEvent(userDenyPaymentEvent);
+    }
+    
     public void publishProviderVisitChangeDateEvent(final Visit visit) {
     	ProviderVisitChangeDateEvent providerVisitChangeDateEvent = new ProviderVisitChangeDateEvent(this,visit);
         applicationEventPublisher.publishEvent(providerVisitChangeDateEvent);
@@ -128,8 +143,13 @@ public class Publisher {
         applicationEventPublisher.publishEvent(providerModifiesContractEvent);
     }
     
-    public void publishUserMakesPaymentEvent(final Contract contract) {
-    	UserMakesPaymentEvent userMakesPaymentEvent = new UserMakesPaymentEvent(this,contract);
-        applicationEventPublisher.publishEvent(userMakesPaymentEvent);
+    public void publishProviderRequestPaymentEvent(final Contract contract) {
+    	ProviderRequestPaymentEvent providerRequestPaymentEvent = new ProviderRequestPaymentEvent(this,contract);
+        applicationEventPublisher.publishEvent(providerRequestPaymentEvent);
+    }
+    
+    public void publishProviderFinalizedContractEvent(final Contract contract) {
+    	ProviderFinalizedContractEvent providerFinalizedContractEvent = new ProviderFinalizedContractEvent(this,contract);
+        applicationEventPublisher.publishEvent(providerFinalizedContractEvent);
     }
 }

@@ -2,6 +2,7 @@ package com.espiritware.opusclick.security;
 
 import java.util.Date;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
@@ -18,9 +19,10 @@ import io.jsonwebtoken.SignatureAlgorithm;
 @Component
 public class TokenService {
 		
-	long expirationTime = new Long(86400000); // 1 day	
-	public static final String SECRET = "SecretKeyToGenJWTs";
-	public static final long EXPIRATION_TIME = 86_400_000; // 1 day
+	@Value("${app.jwt-secret-key}")
+	public String SECRET;
+//	public static final long EXPIRATION_TIME = 86_400_000; // 1 day
+	public static final long EXPIRATION_TIME = 86_400_000;
 	public static final String TOKEN_PREFIX = "Bearer ";
 	public static final String HEADER_STRING = "Authorization";
 	
@@ -42,7 +44,7 @@ public class TokenService {
 				.setId(id+"")
 				.setSubject(email)
 				.setIssuedAt(new Date())
-				.setExpiration(new Date(System.currentTimeMillis() + expirationTime))
+				.setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
 				.signWith(SignatureAlgorithm.HS512, SECRET).compact();
 		System.out.println("Token Creado: "+ emailToken);
 		return emailToken;
@@ -54,8 +56,18 @@ public class TokenService {
 				&& accountService.getAccountState((String) claims.get("sub")).equals(State.WAITING_EMAIL_CONFIRMATION)
 				&& !isTokenExpired(claims)) {
 			return true;
+		}else if (accountService.accountExist((String) claims.get("sub")) 
+				&& accountService.getAccountState((String) claims.get("sub")).equals(State.ACCOUNT_CONFIRMED)
+				&& !isTokenExpired(claims)) {
+			if(accountService.findAccountByEmail((String) claims.get("sub")).getUser().getState().equals(State.WAITING_EMAIL_CONFIRMATION) ||
+					accountService.findAccountByEmail((String) claims.get("sub")).getProvider().getState().equals(State.WAITING_EMAIL_CONFIRMATION)	) {
+				return true;
+			}else {
+				return false;
+			}
+		}else {
+			return false;
 		}
-		return false;
 	}
 	
 	private boolean isTokenExpired(Claims claims) {
@@ -95,7 +107,7 @@ public class TokenService {
 		String token = Jwts.builder()
 				.setSubject(((User) auth.getPrincipal()).getUsername())
 				.setIssuedAt(new Date())
-				.setExpiration(new Date(System.currentTimeMillis() + expirationTime))
+				.setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
 				.signWith(SignatureAlgorithm.HS512, SECRET.getBytes()).compact();
 		return token;
 	}
@@ -115,7 +127,7 @@ public class TokenService {
 	
 	public String createResetPasswordToken(String email) {
 		String emailToken = Jwts.builder().setSubject(email).setIssuedAt(new Date())
-				.setExpiration(new Date(System.currentTimeMillis() + expirationTime))
+				.setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
 				.signWith(SignatureAlgorithm.HS512, SECRET).compact();
 		System.out.println("Token Creado: " + emailToken);
 		return emailToken;
@@ -130,24 +142,31 @@ public class TokenService {
 		}
 	}
 	
-	public boolean validateLoginRolExist(String email, boolean isUserLogin) {
-		Account account=accountService.findAccountByEmail(email);
-		if(account!=null) {
-			if (isUserLogin) {
-				return userService.userExist(account.getId());
-			} else if(!isUserLogin) {
-				return providerService.providerExist(account.getId());
-			}
+	public boolean validateLoginRolExist(String email, int id, boolean isUserLogin) {
+		if (isUserLogin) {
+			return userService.userExist(id);
+		} else {
+			return providerService.providerExist(id);
 		}
-		return false;
 	}
 	
 	public boolean accountExist(String email) {
 		return accountService.accountExist(email);
 	}
 	
-	public boolean accountConfirmed(String email, boolean isUser) {
-		return accountService.accountConfirmed(email);
+	public boolean accountConfirmed(String email, int id, boolean isUser) {
+		if(isUser) {
+			if(accountService.accountConfirmed(email) && userService.findUserById(id).getState()!=State.WAITING_EMAIL_CONFIRMATION) {
+				return true;
+			}else {
+				return false;
+			}
+		}else {
+			if(accountService.accountConfirmed(email) && providerService.findProviderById(id).getState()!=State.WAITING_EMAIL_CONFIRMATION) {
+				return true;
+			}else {
+				return false;
+			}
+		}
 	}
-	
 }

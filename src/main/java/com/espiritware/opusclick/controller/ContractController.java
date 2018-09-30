@@ -197,11 +197,6 @@ public class ContractController {
 			publisher.publishProviderAcceptContractEvent(contract);
 		} else if(contract.getState().equals(State.CONTRACT_MODIFIED_BY_PROVIDER)) {
 			publisher.publishProviderModifiesContractEvent(contract);
-		}else if(contract.getState().equals(State.PARTIALLY_FINISHED)) {
-			//Para este apartado hay que revisar cada uno de los items y saber su estado, y de acuerdo a este debe ser enviado un correo
-			//(Esto es aplicable cuando un experto solicita un pago o un usuario aprueba un pago solicitado)
-		}else if(contract.getState().equals(State.FINALIZED)) {
-		}else if(contract.getState().equals(State.PAID_OUT)) {
 		}
 	}
 	
@@ -209,15 +204,29 @@ public class ContractController {
 	@ResponseBody
 	@Transactional
 	public ResponseEntity<?> updateContractMilestones(@PathVariable("id") String contractId,
-			@DTO(ContractUpdateMilestonesStateDto.class) Contract contract,UriComponentsBuilder uriComponentsBuilder, final HttpServletRequest request) {
+			//Se usa para saber si un usuario aprueba un pago, o es el proveedor que solicita un pago
+			@RequestParam(value = "operation", required = false) String operation,
+			@DTO(ContractUpdateMilestonesStateDto.class) Contract contract,
+			UriComponentsBuilder uriComponentsBuilder, final HttpServletRequest request) {
 		
 		if(contract.getMilestones()!=null && contract!=null) {
 			updateWorkState(contract);
 			workService.updateWork(contract.getWork());
+			sendNotificationEmailOperation(contract,operation);
 			sendNotificationEmail(contract);
 			return new ResponseEntity<>(HttpStatus.OK);
 		}else {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	private void sendNotificationEmailOperation(Contract contract, String operation) {
+		if(operation.equalsIgnoreCase("requestPayment")) {
+			publisher.publishProviderRequestPaymentEvent(contract);
+		}else if(operation.equalsIgnoreCase("authorizePayment")) {
+			publisher.publishUserAuthorizesPaymentEvent(contract);
+		}else if(operation.equalsIgnoreCase("denyPayment")) {
+			publisher.publishUserDenyPaymentEvent(contract);
 		}
 	}
 	
@@ -251,6 +260,7 @@ public class ContractController {
 				contract.setHistoryStateChanges(contract.getHistoryStateChanges() + contract.getState().state() + ",");
 				contract.getWork().setState(State.PARTIALLY_FINISHED);
 				contract.getWork().setHistoryStateChanges(contract.getWork().getHistoryStateChanges() + contract.getState().state() + ",");
+				return contract;
 			}
 			i++;
 		}

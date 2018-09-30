@@ -53,42 +53,72 @@ public class AccountController {
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 		
-	
+	//Cuenta Con ususuario
 	@RequestMapping(value = "/accounts/user", method = RequestMethod.POST, headers = "Accept=application/json")
 	@ResponseBody
 	@Transactional
 	public ResponseEntity<String> registerUserAccount(@Valid @DTO(UserRegistrationDto.class) Account account,
 			UriComponentsBuilder uriComponentsBuilder, final HttpServletRequest request) {
 		if (accountService.accountExist(account.getEmail())) {
-			return new ResponseEntity<String>("Ya existe una cuenta registrada con este email", HttpStatus.CONFLICT);
+			Account registredAccount = accountService.findAccountByEmail(account.getEmail());
+			if (registredAccount.getUser() != null) {
+				return new ResponseEntity<String>("Ya existe una cuenta registrada con este email",
+						HttpStatus.CONFLICT);
+			} else {
+				account.getUser().setId(registredAccount.getId());
+				registredAccount.setUser(account.getUser());
+				registredAccount.getUser().setAccount(registredAccount);
+				accountService.updateAccount(registredAccount);
+				publisher.publishUserRegistrationEvent(registredAccount.getId(), registredAccount.getEmail(), registredAccount.getName(),
+						request.getLocale(), getAppUrl(request));
+				HttpHeaders headers = new HttpHeaders();
+				headers.setLocation(
+						uriComponentsBuilder.path("/cuenta_creada").buildAndExpand(account.getEmail()).toUri());
+				return new ResponseEntity<String>(headers, HttpStatus.CREATED);
+			}
 		} else {
 			account.setPassword(passwordEncoder.encode(account.getPassword()));
 			account.getUser().setAccount(account);
-			account=accountService.createAccount(account);
-			publisher.publishUserRegistrationEvent(account.getId(),account.getEmail(),account.getName(),request.getLocale(), getAppUrl(request));
+			account = accountService.createAccount(account);
+			publisher.publishUserRegistrationEvent(account.getId(), account.getEmail(), account.getName(),
+					request.getLocale(), getAppUrl(request));
 			HttpHeaders headers = new HttpHeaders();
 			headers.setLocation(uriComponentsBuilder.path("/cuenta_creada").buildAndExpand(account.getEmail()).toUri());
 			return new ResponseEntity<String>(headers, HttpStatus.CREATED);
 		}
 	}
 	
+	//Cuenta Con proveedor
 	@RequestMapping(value = "/accounts/provider", method = RequestMethod.POST, headers = "Accept=application/json")
 	@ResponseBody
 	@Transactional
-	public ResponseEntity<String> registerProviderAccount(
-			@Valid @DTO(ProviderRegistrationDto.class) Account account,
+	public ResponseEntity<String> registerProviderAccount(@Valid @DTO(ProviderRegistrationDto.class) Account account,
 			UriComponentsBuilder uriComponentsBuilder, final HttpServletRequest request) {
 		
-		if (accountService.accountExist(account.getEmail())) {
-			return new ResponseEntity<String>("409-1", HttpStatus.CONFLICT);
-		} else if(providerService.phoneExist(account.getProvider().getPhone())) {
+		if (providerService.phoneExist(account.getProvider().getPhone())) {
 			return new ResponseEntity<String>("409-2", HttpStatus.CONFLICT);
-		}
-		else {
+		}else if (accountService.accountExist(account.getEmail())) {
+			Account registredAccount = accountService.findAccountByEmail(account.getEmail());
+			if (registredAccount.getProvider() != null) {
+				return new ResponseEntity<String>("409-1", HttpStatus.CONFLICT);
+			} else {
+				account.getProvider().setId(registredAccount.getId());
+				registredAccount.setProvider(account.getProvider());
+				registredAccount.getProvider().setAccount(registredAccount);
+				accountService.updateAccount(registredAccount);
+				publisher.publishProviderRegistrationEvent(registredAccount.getId(), registredAccount.getEmail(), registredAccount.getName(),
+						request.getLocale(), getAppUrl(request));
+				HttpHeaders headers = new HttpHeaders();
+				headers.setLocation(
+						uriComponentsBuilder.path("/cuenta_creada").buildAndExpand(account.getEmail()).toUri());
+				return new ResponseEntity<String>(headers, HttpStatus.CREATED);
+			}
+		} else {
 			account.setPassword(passwordEncoder.encode(account.getPassword()));
 			account.getProvider().setAccount(account);
 			accountService.createAccount(account);
-			publisher.publishProviderRegistrationEvent(account.getId(),account.getEmail(),account.getName(), request.getLocale(), getAppUrl(request));
+			publisher.publishProviderRegistrationEvent(account.getId(), account.getEmail(), account.getName(),
+					request.getLocale(), getAppUrl(request));
 			HttpHeaders headers = new HttpHeaders();
 			headers.setLocation(uriComponentsBuilder.path("/cuenta_creada").buildAndExpand(account.getEmail()).toUri());
 			return new ResponseEntity<String>(headers, HttpStatus.CREATED);

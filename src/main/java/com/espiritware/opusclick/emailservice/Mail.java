@@ -14,6 +14,7 @@ import com.espiritware.opusclick.event.ProviderAcceptContractEvent;
 import com.espiritware.opusclick.event.ProviderCancelWorkEvent;
 import com.espiritware.opusclick.event.ProviderModifiesContractEvent;
 import com.espiritware.opusclick.event.ProviderRegistrationEvent;
+import com.espiritware.opusclick.event.ProviderRequestPaymentEvent;
 import com.espiritware.opusclick.event.ProviderVisitAcceptedEvent;
 import com.espiritware.opusclick.event.ProviderVisitChangeDateEvent;
 import com.espiritware.opusclick.event.ProviderVisitPostponedEvent;
@@ -22,7 +23,9 @@ import com.espiritware.opusclick.event.ProviderVisitUnfulfilledEvent;
 import com.espiritware.opusclick.event.QuoteMadeEvent;
 import com.espiritware.opusclick.event.ResetPasswordEvent;
 import com.espiritware.opusclick.event.ReviewEvent;
+import com.espiritware.opusclick.event.UserAuthorizesPaymentEvent;
 import com.espiritware.opusclick.event.UserCancelWorkEvent;
+import com.espiritware.opusclick.event.UserDenyPaymentEvent;
 import com.espiritware.opusclick.event.UserMakesPaymentEvent;
 import com.espiritware.opusclick.event.UserModifiesContractEvent;
 import com.espiritware.opusclick.event.UserQuotationEvent;
@@ -100,6 +103,12 @@ public class Mail implements ApplicationListener<GenericEvent>{
 			UserMakesPaymentEvent userMakesPaymentEvent = (UserMakesPaymentEvent) event;
 			createUserMakesPaymentNotificationEmail(userMakesPaymentEvent.getContract());
 			createUserMakesPaymentReminderEmail(userMakesPaymentEvent.getContract());
+		}else if (event instanceof UserAuthorizesPaymentEvent) {
+			UserAuthorizesPaymentEvent userAuthorizesPaymentEvent = (UserAuthorizesPaymentEvent) event;
+			createUserAuthorizesPaymentNotificationEmail(userAuthorizesPaymentEvent.getContract());
+		}else if (event instanceof UserDenyPaymentEvent) {
+			UserDenyPaymentEvent userDenyPaymentEvent = (UserDenyPaymentEvent) event;
+			createUserDenyPaymentNotificationEmail(userDenyPaymentEvent.getContract());
 		}else if (event instanceof ProviderRegistrationEvent) {
 			ProviderRegistrationEvent registrationEvent = (ProviderRegistrationEvent) event;
 			createProviderRegistrationEmailMessage(registrationEvent.getId(), registrationEvent.getEmail(),
@@ -132,6 +141,9 @@ public class Mail implements ApplicationListener<GenericEvent>{
 		}else if (event instanceof ProviderModifiesContractEvent) {
 			ProviderModifiesContractEvent providerModifiesContractEvent = (ProviderModifiesContractEvent) event;
 			createProviderModifiesContractNotificationEmail(providerModifiesContractEvent.getContract());
+		}else if (event instanceof ProviderRequestPaymentEvent) {
+			ProviderRequestPaymentEvent providerRequestPaymentEvent = (ProviderRequestPaymentEvent) event;
+			createProviderRequestPaymentNotificationEmail(providerRequestPaymentEvent.getContract());
 		}
 	}
 	
@@ -296,7 +308,7 @@ public class Mail implements ApplicationListener<GenericEvent>{
 				" "+visit.getWork().getUser().getAccount().getLastname()+"</strong> se ha interesado en tu trabajo y ha solicitado que lo visites, \n" + 
 				"        por favor revisa toda la información y confirma tu asistencia para la hora y fecha indicada, si no puedes asistir puedes proponer una nueva fecha \n" + 
 				"        de visita o por el contrario cancelarla.</p>\n" + 
-				"      <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Recuerda que cumplir con cada visita aumentará tu reputación en la plataforma</p>\n" +
+				"      <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Recuerda que tienes un plazo máximo de <strong>2 días</strong> para responder esta solicitud.</p>\n" +
 				"      <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Equipo OpusClick.</p>\n" + 
 				"      <br> \n" + 
 				"  </div>\n" + 
@@ -341,7 +353,7 @@ public class Mail implements ApplicationListener<GenericEvent>{
 				"      <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\"><strong>"+onlineQuote.getWork().getUser().getAccount().getName()+
 				" "+onlineQuote.getWork().getUser().getAccount().getLastname()+"</strong> te ha elegido entre todos los expertos para que realices una cotización, \n" + 
 				"        por favor revisa toda la información y hazle una oferta sincera para realizar este trabajo.</p>\n" + 
-				"      <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Recuerda que el hecho de realizar esta cotización aumentará tu reputación en la plataforma</p>\n" +
+				"      <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Recuerda que tienes un plazo máximo de <strong>2 días</strong> para realizar esta cotización.</p>\n" +
 				"      <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Equipo OpusClick.</p>\n" + 
 				"      <br> \n" + 
 				"  </div>\n" + 
@@ -432,7 +444,7 @@ public class Mail implements ApplicationListener<GenericEvent>{
 				"      <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Hola "+onlineQuote.getWork().getUser().getAccount().getName()+",</p>\n" + 
 				"      <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Haz solicitado la cotización de código <strong>"+onlineQuote.getQuotationNumber()+
 				"</strong> al experto <strong>"+onlineQuote.getWork().getProvider().getAccount().getName()+" "+onlineQuote.getWork().getProvider().getAccount().getLastname()+"</strong>, recuerda que \n" + 
-				"        debes esperar a que "+onlineQuote.getWork().getProvider().getAccount().getName()+" elabore la cotización. Una vez elaborada, serás notificado por este medio.</p>\n" + 
+				"        debes esperar a que "+onlineQuote.getWork().getProvider().getAccount().getName()+" elabore la cotización en un plazo máximo de 2 días. Una vez elaborada, serás notificado por este medio.</p>\n" + 
 				"      <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Equipo OpusClick.</p>\n" + 
 				"      <br> \n" + 
 				"  </div>\n" + 
@@ -785,13 +797,12 @@ public class Mail implements ApplicationListener<GenericEvent>{
 				"        <img style=\"display: table; margin: 0 auto; background-color: #fafafa;\" src=\"https://s3-sa-east-1.amazonaws.com/opusclick.com/assets/OpusClickLogo.png\">\n" + 
 				"      </div>\n" + 
 				"    <div style=\"display: table; margin: 0 auto; color: #202020\" >\n" + 
-				"      <h1 style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Contrato Modificado</h1>\n" + 
+				"      <h1 style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Contrato modificado</h1>\n" + 
 				"    </div>\n" + 
 				"    <div style=\"display: inline-block; margin: 0 auto; text-align: justify; padding-left: 30px; padding-right: 30px;\" >\n" + 
 				"      <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Hola "+contract.getWork().getProvider().getAccount().getName()+",</p>\n" + 
 				"      <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\"><strong>"+contract.getWork().getUser().getAccount().getName()+" "+contract.getWork().getUser().getAccount().getLastname()+
-				"</strong> ha definido un contrato para la cotización "+contract.getWork().getProviderQuote().getId()+", por favor revisa todos los términos en detalle."
-						+ "<strong>"+contract.getWork().getWorkNumber()+"</strong></p>" + 
+				"</strong> ha definido un contrato para la cotización "+contract.getWork().getProviderQuote().getNumber()+", por favor revisa todos los términos en detalle."+
 				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Si estás de acuerdo puedes aceptar el contrato para iniciar el trabajo, de lo contrario puedes modificar o añadir algunas condiciones, sujetas a aceptación por parte del cliente.</p>\n" + 
 				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Si tienes alguna pregunta no dudes en contactarnos (321)-832-3768.</p>\n" + 
 				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Equipo OpusClick.</p>\n" + 
@@ -836,7 +847,7 @@ public class Mail implements ApplicationListener<GenericEvent>{
 				"    <div style=\"display: inline-block; margin: 0 auto; text-align: justify; padding-left: 30px; padding-right: 30px;\" >\n" + 
 				"      <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Hola "+contract.getWork().getProvider().getAccount().getName()+",</p>\n" + 
 				"      <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Has sido elegido por <strong>"+contract.getWork().getUser().getAccount().getName()+" "+contract.getWork().getUser().getAccount().getLastname()+
-				"</strong> para ejecutar el contrato <strong>"+contract.getId()+"</strong>;"+
+				"</strong> para ejecutar el contrato <strong>"+contract.getContractNumber()+"</strong>;"+
 				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">El tiempo de entrega inicia a partir del siguiente día hábil a este comunicado o según como se haya definido en el contrato.</p>\n" + 
 				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Recuerde que de su calidad y cumplimiento en el trabajo dependerá su reputación en la web para futuras contrataciones.</p>\n" + 
 				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Equipo OpusClick.</p>\n" + 
@@ -880,7 +891,7 @@ public class Mail implements ApplicationListener<GenericEvent>{
 				"    </div>\n" + 
 				"    <div style=\"display: inline-block; margin: 0 auto; text-align: justify; padding-left: 30px; padding-right: 30px;\" >\n" + 
 				"      <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Hola "+contract.getWork().getUser().getAccount().getName()+",</p>\n" + 
-				"      <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Le informamos que el pago realizado en OpusClick para el contrato "+contract.getId()+" ha sido aprobado.El trabajo entrará en ejecución a partir del siguiente día hábil o según como se haya definido."+
+				"      <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Le informamos que el pago realizado en OpusClick para el contrato "+contract.getContractNumber()+" ha sido aprobado.El trabajo entrará en ejecución a partir del siguiente día hábil."+
 				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Queremos agradecerte por hacer parte de esta nueva manera de contratar servicios.</p>\n" + 
 				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Equipo OpusClick.</p>\n" + 
 				"      <br> \n" + 
@@ -902,6 +913,97 @@ public class Mail implements ApplicationListener<GenericEvent>{
 				"  </body>\n" + 
 				"</html>");
 		EmailMessage emailMessage = new EmailMessage(env.getProperty("support.email"), contract.getWork().getUser().getAccount().getEmail(), subject, body.toString());
+		jmsTemplate.convertAndSend("mailbox",emailMessage);
+	}
+	
+	private void createUserAuthorizesPaymentNotificationEmail(Contract contract){
+		String subject = "¡Tu pago ha sido aprobado!";
+		StringBuilder body = new StringBuilder();
+		body.append("<!DOCTYPE HTML>\n" + 
+				"<html>\n" + 
+				"  <head>\n" + 
+				"    <link href=\"https://fonts.googleapis.com/css?family=Open+Sans\" rel=\"stylesheet\">\n" + 
+				"  </head>\n" + 
+				"  <body style=\"background-color: #ffffff; padding-left: 30px; padding-right: 30px;\">\n" + 
+				"    <div style=\"background-color: #fafafa;\">\n" + 
+				"      <div style=\"background-color: #fafafa; margin:auto;\">\n" + 
+				"        <img style=\"display: table; margin: 0 auto; background-color: #fafafa;\" src=\"https://s3-sa-east-1.amazonaws.com/opusclick.com/assets/OpusClickLogo.png\">\n" + 
+				"      </div>\n" + 
+				"    <div style=\"display: table; margin: 0 auto; color: #202020\" >\n" + 
+				"      <h1 style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Autorización de pago</h1>\n" + 
+				"    </div>\n" + 
+				"    <div style=\"display: inline-block; margin: 0 auto; text-align: justify; padding-left: 30px; padding-right: 30px;\" >\n" + 
+				"      <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Hola "+contract.getWork().getProvider().getAccount().getName()+",</p>\n" + 
+				"      <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\"><strong>"+contract.getWork().getUser().getAccount().getName()+" "+contract.getWork().getUser().getAccount().getLastname()+
+				"</strong> ha aprobado el pago para el contrato <strong>"+contract.getContractNumber()+"</strong>;"+
+				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">OpusClick procederá a realizar el respectivo desembolso que se verá reflejado en tu cuenta bancaria de acuerdo con los plazos establecidos en nuestra política de pagos.</p>\n" + 
+				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">¡Muchas gracias por la calidad y cumplimiento de su trabajo!.</p>\n" + 
+				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Si tienes alguna pregunta no dudes en contactarnos (321)-832-3768.</p>\n" + 
+				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Equipo OpusClick.</p>\n" + 
+				"      <br> \n" + 
+				"  </div>\n" + 
+				"  <div style=\"display: flex; margin: 0 auto; text-align: justify;\">\n" + 
+				"<a href=\""+hostname+"/dashboard_experto/negociaciones/concretadas\" "+"style=\"font-family: 'Open Sans', sans-serif;\n" + 
+				"    display: flex; margin: 0 auto;\n" + 
+				"    background-color: #294664;\n" + 
+				"    border: none;\n" + 
+				"    color: white;\n" + 
+				"    padding: 15px 32px;\n" + 
+				"    text-align: center;\n" + 
+				"    text-decoration: none;\n" + 
+				"    display: inline-block;\n" + 
+				"    font-size: 16px;\">VER CONTRATO</a>\n" + 
+				"  </div>\n" + 
+				"  <div style=\"background-color: #fafafa; height:100px;\"></div>\n" + 
+				"  </div>\n" + 
+				"  </body>\n" + 
+				"</html>");
+		EmailMessage emailMessage = new EmailMessage(env.getProperty("support.email"), contract.getWork().getProvider().getAccount().getEmail(), subject, body.toString());
+		jmsTemplate.convertAndSend("mailbox",emailMessage);
+	}
+	
+	private void createUserDenyPaymentNotificationEmail(Contract contract) {
+		String subject = "¡Tu pago ha sido denegado!";
+		StringBuilder body = new StringBuilder();
+		body.append("<!DOCTYPE HTML>\n" + 
+				"<html>\n" + 
+				"  <head>\n" + 
+				"    <link href=\"https://fonts.googleapis.com/css?family=Open+Sans\" rel=\"stylesheet\">\n" + 
+				"  </head>\n" + 
+				"  <body style=\"background-color: #ffffff; padding-left: 30px; padding-right: 30px;\">\n" + 
+				"    <div style=\"background-color: #fafafa;\">\n" + 
+				"      <div style=\"background-color: #fafafa; margin:auto;\">\n" + 
+				"        <img style=\"display: table; margin: 0 auto; background-color: #fafafa;\" src=\"https://s3-sa-east-1.amazonaws.com/opusclick.com/assets/OpusClickLogo.png\">\n" + 
+				"      </div>\n" + 
+				"    <div style=\"display: table; margin: 0 auto; color: #202020\" >\n" + 
+				"      <h1 style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Denegación de pago</h1>\n" + 
+				"    </div>\n" + 
+				"    <div style=\"display: inline-block; margin: 0 auto; text-align: justify; padding-left: 30px; padding-right: 30px;\" >\n" + 
+				"      <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Hola "+contract.getWork().getProvider().getAccount().getName()+",</p>\n" + 
+				"      <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\"><strong>"+contract.getWork().getUser().getAccount().getName()+" "+contract.getWork().getUser().getAccount().getLastname()+
+				"</strong> ha denegado el pago para el contrato <strong>"+contract.getId()+"</strong>;"+
+				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">OpusClick procederá a realizar un seguimiento del caso para resolver este inconveniente.</p>\n" + 
+				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Si tienes alguna pregunta no dudes en contactarnos (321)-832-3768.</p>\n" + 
+				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Equipo OpusClick.</p>\n" + 
+				"      <br> \n" + 
+				"  </div>\n" + 
+				"  <div style=\"display: flex; margin: 0 auto; text-align: justify;\">\n" + 
+				"<a href=\""+hostname+"/dashboard_experto/negociaciones/concretadas\" "+"style=\"font-family: 'Open Sans', sans-serif;\n" + 
+				"    display: flex; margin: 0 auto;\n" + 
+				"    background-color: #294664;\n" + 
+				"    border: none;\n" + 
+				"    color: white;\n" + 
+				"    padding: 15px 32px;\n" + 
+				"    text-align: center;\n" + 
+				"    text-decoration: none;\n" + 
+				"    display: inline-block;\n" + 
+				"    font-size: 16px;\">VER CONTRATO</a>\n" + 
+				"  </div>\n" + 
+				"  <div style=\"background-color: #fafafa; height:100px;\"></div>\n" + 
+				"  </div>\n" + 
+				"  </body>\n" + 
+				"</html>");
+		EmailMessage emailMessage = new EmailMessage(env.getProperty("support.email"), contract.getWork().getProvider().getAccount().getEmail(), subject, body.toString());
 		jmsTemplate.convertAndSend("mailbox",emailMessage);
 	}
 	
@@ -1335,7 +1437,7 @@ public class Mail implements ApplicationListener<GenericEvent>{
 	}
 	
 	private void createProviderAcceptContractEventNotificationEmail(Contract contract) {
-		String subject = "¡Contrato Aceptado!";
+		String subject = "¡Contrato aceptado!";
 		StringBuilder body = new StringBuilder();
 		body.append("<!DOCTYPE HTML>\n" + 
 				"<html>\n" + 
@@ -1352,9 +1454,9 @@ public class Mail implements ApplicationListener<GenericEvent>{
 				"    </div>\n" + 
 				"    <div style=\"display: inline-block; margin: 0 auto; text-align: justify; padding-left: 30px; padding-right: 30px;\" >\n" + 
 				"      <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Hola "+contract.getWork().getUser().getAccount().getName()+",</p>\n" + 
-				"      <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Le informamos que el contrato "+contract.getId()+" ha sido aprobado por"+contract.getWork().getProvider().getAccount().getName()
-				+" "+contract.getWork().getProvider().getAccount().getLastname()+ " experto en "
-				+contract.getWork().getProvider().getProfession().getName()+
+				"      <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Le informamos que el contrato "+contract.getContractNumber()+" ha sido aprobado por <strong>"+contract.getWork().getProvider().getAccount().getName()
+				+" "+contract.getWork().getProvider().getAccount().getLastname()+ "</strong> experto en <strong>"
+				+contract.getWork().getProvider().getProfession().getName()+"</strong>"+
 				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Ingresa a la plataforma para que puedas realizar el pago y comenzar con el trabajo propuesto.</p>\n" + 
 				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Si tienes alguna pregunta no dudes en contactarnos (321)-832-3768.</p>\n" + 
 				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Equipo OpusClick.</p>\n" + 
@@ -1426,6 +1528,50 @@ public class Mail implements ApplicationListener<GenericEvent>{
 		jmsTemplate.convertAndSend("mailbox",emailMessage);
 	}
 	
+	private void createProviderRequestPaymentNotificationEmail(Contract contract) {
+		String subject = "Autorización de pago";
+		StringBuilder body = new StringBuilder();
+		body.append("<!DOCTYPE HTML>\n" + 
+				"<html>\n" + 
+				"  <head>\n" + 
+				"    <link href=\"https://fonts.googleapis.com/css?family=Open+Sans\" rel=\"stylesheet\">\n" + 
+				"  </head>\n" + 
+				"  <body style=\"background-color: #ffffff; padding-left: 30px; padding-right: 30px;\">\n" + 
+				"    <div style=\"background-color: #fafafa;\">\n" + 
+				"      <div style=\"background-color: #fafafa; margin:auto;\">\n" + 
+				"        <img style=\"display: table; margin: 0 auto; background-color: #fafafa;\" src=\"https://s3-sa-east-1.amazonaws.com/opusclick.com/assets/OpusClickLogo.png\">\n" + 
+				"      </div>\n" + 
+				"    <div style=\"display: table; margin: 0 auto; color: #202020\" >\n" + 
+				"      <h1 style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Autorización de pago</h1>\n" + 
+				"    </div>\n" + 
+				"    <div style=\"display: inline-block; margin: 0 auto; text-align: justify; padding-left: 30px; padding-right: 30px;\" >\n" + 
+				"      <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Hola "+contract.getWork().getUser().getAccount().getName()+",</p>\n" + 
+				"      <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Tienes una autorización de pago pendiente para el contrato "+contract.getContractNumber()+
+				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Si el experto culminó de manera correcta el trabajo, autorízanos para proceder con el pago, de lo contrario indícanos las razones de tu inconformidad para que el experto se encargue.</p>\n" + 
+				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Si tienes alguna pregunta no dudes en contactarnos (321)-832-3768.</p>\n" + 
+				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Equipo OpusClick.</p>\n" + 
+				"      <br> \n" + 
+				"  </div>\n" + 
+				"  <div style=\"display: flex; margin: 0 auto; text-align: justify;\">\n" + 
+				"<a href=\""+hostname+"/dashboard_usuario/negociaciones/concretadas\" "+"style=\"font-family: 'Open Sans', sans-serif;\n" + 
+				"    display: flex; margin: 0 auto;\n" + 
+				"    background-color: #008d98;\n" + 
+				"    border: none;\n" + 
+				"    color: white;\n" + 
+				"    padding: 15px 32px;\n" + 
+				"    text-align: center;\n" + 
+				"    text-decoration: none;\n" + 
+				"    display: inline-block;\n" + 
+				"    font-size: 16px;\">VER CONTRATO</a>\n" + 
+				"  </div>\n" + 
+				"  <div style=\"background-color: #fafafa; height:100px;\"></div>\n" + 
+				"  </div>\n" + 
+				"  </body>\n" + 
+				"</html>");
+		EmailMessage emailMessage = new EmailMessage(env.getProperty("support.email"), contract.getWork().getUser().getAccount().getEmail(), subject, body.toString());
+		jmsTemplate.convertAndSend("mailbox",emailMessage);
+	}
+	
 	private void createReviewEventNotificationEmail(Work work){
 		String subject = "¡Te han calificado!";
 		StringBuilder body = new StringBuilder();
@@ -1440,12 +1586,12 @@ public class Mail implements ApplicationListener<GenericEvent>{
 				"        <img style=\"display: table; margin: 0 auto; background-color: #fafafa;\" src=\"https://s3-sa-east-1.amazonaws.com/opusclick.com/assets/OpusClickLogo.png\">\n" + 
 				"      </div>\n" + 
 				"    <div style=\"display: table; margin: 0 auto; color: #202020\" >\n" + 
-				"      <h1 style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Nueva Calificación</h1>\n" + 
+				"      <h1 style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Nueva calificación</h1>\n" + 
 				"    </div>\n" + 
 				"    <div style=\"display: inline-block; margin: 0 auto; text-align: justify; padding-left: 30px; padding-right: 30px;\" >\n" + 
 				"      <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Hola "+work.getProvider().getAccount().getName()+",</p>\n" + 
 				"      <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Has recibido una nueva calificación por <strong>"+work.getUser().getAccount().getName()+" "+work.getUser().getAccount().getLastname()+
-				"</strong> relativa al trabajo realizado en el contrato <strong>"+work.getContract().getId()+"</strong>:"+
+				"</strong> relativa al trabajo realizado en el contrato <strong>"+work.getContract().getContractNumber()+"</strong>:"+
 				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Nivel de satisfacción con el trabajo que realizaste: <strong>"+work.getReview().getSatisfactionLevel()+"%"+"</strong></p>\n" + 
 				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Recuerda que tu reputación en la plataforma es resultado del promedio de todas las calificaciones recibidas, procura mantener una muy buena calificación para que te sigan contratando.</p>\n" + 				
 				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Equipo OpusClick.</p>\n" + 

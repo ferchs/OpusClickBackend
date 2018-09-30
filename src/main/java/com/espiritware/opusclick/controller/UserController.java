@@ -26,7 +26,7 @@ import com.espiritware.opusclick.service.AmazonClient;
 import com.espiritware.opusclick.service.UserService;
 
 @Controller
-@CrossOrigin(origins = {"http://localhost:4200"}, maxAge = 4800, allowCredentials = "false")
+//@CrossOrigin(origins = {"http://localhost:4200"}, maxAge = 4800, allowCredentials = "false")
 @RequestMapping("/v1")
 public class UserController {
 	

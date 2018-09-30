@@ -17,7 +17,7 @@ import com.espiritware.opusclick.model.Item;
 import com.espiritware.opusclick.service.ItemService;
 
 @Controller
-@CrossOrigin(origins = {"http://localhost:4200"}, maxAge = 4800, allowCredentials = "false")
+//@CrossOrigin(origins = {"http://localhost:4200"}, maxAge = 4800, allowCredentials = "false")
 @RequestMapping("/v1")
 public class ItemController {
 
