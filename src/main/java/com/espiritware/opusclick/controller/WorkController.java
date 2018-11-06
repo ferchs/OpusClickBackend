@@ -14,7 +14,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -22,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.util.UriComponentsBuilder;
 import com.espiritware.opusclick.annotations.DTO;
+import com.espiritware.opusclick.dto.ContractGetDto;
 import com.espiritware.opusclick.dto.WorkGetDto;
 import com.espiritware.opusclick.dto.WorkUpdateDto;
 import com.espiritware.opusclick.error.CustomErrorType;
@@ -33,7 +33,6 @@ import com.espiritware.opusclick.model.Work;
 import com.espiritware.opusclick.service.WorkService;
 
 @Controller
-//@CrossOrigin(origins = {"http://localhost:4200"}, maxAge = 4800, allowCredentials = "false")
 @RequestMapping("/v1")
 public class WorkController {
 
@@ -136,7 +135,7 @@ public class WorkController {
 			String previousStateChanges = workService.findWorkById(work.getId()).getHistoryStateChanges();
 			
 			if (work.getState().equals(State.IN_PROGRESS)) {
-				work.setHistoryStateChanges(work.getContract().getWork().getHistoryStateChanges() + work.getState().state() + ",");
+				/*work.setHistoryStateChanges(work.getContract().getWork().getHistoryStateChanges() + work.getState().state() + ",");
 				work.getContract().setState(work.getState());
 				work.getContract().setHistoryStateChanges(work.getContract().getHistoryStateChanges() +work.getState().state() + ",");
 				work.getContract().setStartDate(calculateStartContractDate(work.getContract().getCreationDate()));
@@ -147,7 +146,7 @@ public class WorkController {
 				work.getContract().getWork().setHistoryStateChanges(work.getContract().getWork().getHistoryStateChanges() + work.getContract().getState().state() + ",");
 				workService.updateWork(work.getContract().getWork());
 				publisher.publishUserMakesPaymentEvent(work.getContract());
-				return new ResponseEntity<>(HttpStatus.OK);
+				return new ResponseEntity<>(HttpStatus.OK);*/
 			} else if (work.getState().equals(State.CANCELLED_BY_USER)) {
 				if (previousStateChanges != null) {
 					work.setHistoryStateChanges(previousStateChanges + "CANCELLED_BY_USER,");
@@ -176,7 +175,7 @@ public class WorkController {
 		}
 	}
 
-	
+	/*
 	private Date calculateStartContractDate(Date paymentDate) {
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(paymentDate);
@@ -262,7 +261,7 @@ public class WorkController {
 		}
 		return calendar.getTime();
 	}
-	
+	*/
 	
 //	 else if (work.getState().equals(State.REJECTED_BY_USER)) {
 //			if (previousStateChanges != null) {
@@ -308,5 +307,24 @@ public class WorkController {
 		
 		return work;
 	}
+	
+	
+	@RequestMapping(value = "/works/{id}/contracts", method = RequestMethod.GET)
+	@Transactional
+	public ResponseEntity<?> getWorkContract(@PathVariable("id") String workId, Principal principal,
+			UriComponentsBuilder uriComponentsBuilder) {
+		Work work = workService.findWorkById(Integer.parseInt(workId));
+		if (work == null) {
+			return new ResponseEntity<>(new CustomErrorType("Work with id " + workId + " not found"),
+					HttpStatus.NOT_FOUND);
+		}else {
+			if(work.getContract()!=null) {
+				ContractGetDto dto=modelMapper.map(work.getContract(), ContractGetDto.class);
+				return new ResponseEntity<ContractGetDto>(dto, HttpStatus.OK);
+			}
+			return new ResponseEntity<>(null, HttpStatus.OK);
+		}
+	}
+
 	
 }

@@ -73,7 +73,7 @@ public class ContractController {
 	
 	@RequestMapping(value = "/contracts/{id}", method = RequestMethod.GET)
 	@Transactional
-	public ResponseEntity<?> getProviderById(@PathVariable("id") String contractId, Principal principal,
+	public ResponseEntity<?> getContractById(@PathVariable("id") String contractId, Principal principal,
 			UriComponentsBuilder uriComponentsBuilder) {
 		Contract contract = contractService.findContractById(Integer.parseInt(contractId));
 		if (contract == null) {
@@ -416,6 +416,25 @@ public class ContractController {
 		return calendar.getTime();
 	}
 
+	
+	@RequestMapping(value = "/contracts/{id}", method = RequestMethod.DELETE)
+	@Transactional
+	public ResponseEntity<?> deleteContractById(@PathVariable("id") String contractId, Principal principal,
+			UriComponentsBuilder uriComponentsBuilder) {
+		Contract contract = contractService.findContractById(Integer.parseInt(contractId));
+		Work work=contract.getWork();
+		if (contract == null) {
+			return new ResponseEntity<>(new CustomErrorType("Contract with id " + contractId + " not found"),
+					HttpStatus.NOT_FOUND);
+		}
+		contractService.deleteContract(contract);
+		work.setContract(null);
+		work.setState(State.QUOTE_MADE);
+		work.setHistoryStateChanges(work.getHistoryStateChanges()+",QUOTE_MADE");
+		workService.updateWork(work);
+		return new ResponseEntity<String>(HttpStatus.OK);
+	}
+	
 
 //	@RequestMapping(value = "/provider_quotes/images", method = RequestMethod.POST, headers = "content-type=multipart/form-data")
 //	@Transactional

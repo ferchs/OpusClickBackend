@@ -1,6 +1,7 @@
 package com.espiritware.opusclick.controller;
 
 import java.security.Principal;
+import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,7 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -21,9 +21,11 @@ import com.espiritware.opusclick.dto.UserGetProfileDto;
 import com.espiritware.opusclick.dto.UserUpdateDto;
 import com.espiritware.opusclick.error.CustomErrorType;
 import com.espiritware.opusclick.model.User;
+import com.espiritware.opusclick.model.Work;
 import com.espiritware.opusclick.service.AccountService;
 import com.espiritware.opusclick.service.AmazonClient;
 import com.espiritware.opusclick.service.UserService;
+import com.espiritware.opusclick.service.WorkService;
 
 @Controller
 //@CrossOrigin(origins = {"http://localhost:4200"}, maxAge = 4800, allowCredentials = "false")
@@ -44,6 +46,9 @@ public class UserController {
 	
 	@Autowired
 	private ModelMapper modelMapper;
+	
+	@Autowired
+	private WorkService workService;
 	
 	
 	@RequestMapping(value = "/users/{email:.+}", method = RequestMethod.GET)
@@ -138,6 +143,30 @@ public class UserController {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 		
+	}
+	
+	//Metodo usado para saber si se le hace el descuento del 8% por el primer servicio
+	@RequestMapping(value = "/users/{id}/bills", method = RequestMethod.GET, headers = "Accept=application/json")
+	@Transactional
+	public ResponseEntity<?> existsBillForUser(@PathVariable("id") String userId,
+			UriComponentsBuilder uriComponentsBuilder) {
+		if(billExists(workService.findAllWorksOfUser(Integer.parseInt(userId)))) {
+			return new ResponseEntity<Boolean>(true, HttpStatus.OK);
+		}
+		return new ResponseEntity<Boolean>(false, HttpStatus.OK);
+	}
+	
+	private boolean billExists(List<Work> works) {
+		boolean billFound=false;
+		for (Work work : works) {
+			if(work.getContract()!= null) {
+				if(work.getContract().getBill()!=null) {
+					billFound=true;
+					break;
+				}
+			}
+		}
+		return billFound;
 	}
 
 }

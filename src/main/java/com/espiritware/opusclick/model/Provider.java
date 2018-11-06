@@ -56,9 +56,6 @@ public class Provider implements Serializable, Comparable<Provider>{
 	@Column(name="opus_coins")
 	private int opusCoins;
 	
-	@Column(name="work_done")
-	private int workDone;
-	
 	@Enumerated(EnumType.STRING)
 	@Column(name="state", nullable = false)
 	private State state;
@@ -85,6 +82,10 @@ public class Provider implements Serializable, Comparable<Provider>{
 	
 	@OneToMany(fetch=FetchType.LAZY, mappedBy="provider", cascade = CascadeType.ALL)
 	private Set<Work> works;
+	
+	@ManyToOne(fetch=FetchType.LAZY, cascade = CascadeType.ALL)
+	@JoinColumn(name="fk_subscription$provider")
+    private Subscription subscription;
 	
 	public Provider() {
 	}

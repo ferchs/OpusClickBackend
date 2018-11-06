@@ -10,6 +10,10 @@ public interface ContractService {
 	Contract findContractById(int id);
 
 	Contract updateContract(Contract contract);
+	
+	void deleteContract(Contract contract);
+	
+	//List<Contract> findAllContractsOfUser(int idUser);
 		
 	Session getCurrentSession();
 }

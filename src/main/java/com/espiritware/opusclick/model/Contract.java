@@ -65,11 +65,15 @@ public class Contract {
 	@Column(name="total_value")
 	private Double totalValue;
 	
-	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@JoinColumn(name = "fk_contract$milestone", nullable=false)
 	private Set<Milestone> milestones;
 	
 	@OneToOne
     @JoinColumn(name="fk_work$contract")
     private Work work;
+	
+	@OneToOne
+	@JoinColumn(name="fk_bill$contract")
+	private Bill bill;
 }

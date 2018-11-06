@@ -12,6 +12,8 @@ public class ContractGetDto {
 	
 	private String contractNumber;
 	
+	private String name;
+	
 	private Date creationDate;
 	
 	private Date startDate;

@@ -1,5 +1,8 @@
 package com.espiritware.opusclick.dto;
 
+import java.util.Calendar;
+import java.util.Date;
+
 import javax.validation.constraints.NotNull;
 import org.hibernate.validator.constraints.NotEmpty;
 import com.espiritware.opusclick.annotations.PasswordMatches;
@@ -55,9 +58,6 @@ public class ProviderRegistrationDto {
 	private String photo="https://s3-sa-east-1.amazonaws.com/opusclick.com/provider-profile-images/default-profile-photo.png";
 	
 	@JsonIgnore
-    private final int providerWorkDone=0;
-	
-	@JsonIgnore
     private final int providerOpusCoins=0;
 
 	@JsonIgnore
@@ -67,6 +67,24 @@ public class ProviderRegistrationDto {
     private final double providerGlobalRatingGlobalRecommend=100;
 	
 	@JsonIgnore
+    private final int providerGlobalRatingWorkDone=0;
+	
+	@JsonIgnore
     private final double providerGlobalRatingScore=0;
+	
+	@JsonIgnore
+	private final Date providerSubscriptionLastPaymentDate= new Date();
+	
+	@JsonIgnore
+	private final Date providerSubscriptionExpirationDate=getExpirationDate();
+	
+	@JsonIgnore
+	private final State subscriptionState= State.ACTIVE;
+	
+	private Date getExpirationDate() {
+		Calendar calendar = Calendar.getInstance();
+		calendar.set(2020, 12, 31);
+		return calendar.getTime();
+	}
 	
 }

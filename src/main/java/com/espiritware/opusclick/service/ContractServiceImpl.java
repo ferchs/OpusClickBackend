@@ -41,4 +41,10 @@ public class ContractServiceImpl implements ContractService {
 	public Session getCurrentSession() {
 		return contractDao.getCurrentSession();
 	}
+
+	@Override
+	public void deleteContract(Contract contract) {
+		// TODO Auto-generated method stub
+		 contractDao.delete(contract);
+	}
 }
