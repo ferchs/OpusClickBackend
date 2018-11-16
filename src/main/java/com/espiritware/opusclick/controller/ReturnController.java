@@ -3,6 +3,8 @@ package com.espiritware.opusclick.controller;
 import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,7 +16,11 @@ import org.springframework.web.util.UriComponentsBuilder;
 @RequestMapping("/v1")
 public class ReturnController {
 
-	@RequestMapping(value = "/return", method = RequestMethod.POST, headers = "Accept=text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8")
+	@Value("${app.hostname}")
+	private String hostname;
+	
+	//headers = "Accept=text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8"
+	@RequestMapping(value = "/return", method = RequestMethod.POST, headers = "content-type=application/x-www-form-urlencoded")
 	@ResponseBody
 	@Transactional
 	public void returnData(UriComponentsBuilder uriComponentsBuilder, final HttpServletRequest request,
@@ -22,12 +28,15 @@ public class ReturnController {
 		
 		String transactionState=request.getParameter("transaccionAprobada");
 		String billCode=request.getParameter("codigoFactura");
+		System.out.println(request.getParameter("campoExtra2"));
+		String description=request.getParameter("campoExtra2").replace("%", " ");
 		String billValue=request.getParameter("valorFactura");
 		String paymentMethod=getPaymentMethodName(request.getParameter("metodoPago"));
 
 
-		response.sendRedirect("http://localhost:4200/resumen_pago?estado="+ transactionState
+		response.sendRedirect(hostname+"/resumen_pago?estado="+ transactionState
 				+"&"+"codigoFactura="+billCode
+				+"&"+"descripcion="+description
 				+"&"+"valorFactura="+billValue
 				+"&"+"medio="+paymentMethod);
 	}

@@ -1,7 +1,6 @@
 package com.espiritware.opusclick.dto;
 
 import java.util.Set;
-
 import javax.validation.constraints.NotNull;
 import org.hibernate.validator.constraints.NotEmpty;
 import com.espiritware.opusclick.annotations.PasswordMatches;
@@ -9,7 +8,6 @@ import com.espiritware.opusclick.annotations.ValidEmail;
 import com.espiritware.opusclick.model.Location;
 import com.espiritware.opusclick.model.State;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import lombok.Getter;
 import lombok.Setter;
 

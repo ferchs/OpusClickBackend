@@ -31,6 +31,9 @@ public class Bill {
 	@Column(name="date")
 	private Date date;
 	
+	@Column(name="payment_description")
+	private String paymentDescription;
+	
 	@Column(name="value")
 	private double value;
 	

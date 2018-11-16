@@ -14,7 +14,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.util.UriComponentsBuilder;
 import com.espiritware.opusclick.event.Publisher;
 import com.espiritware.opusclick.model.Bill;
@@ -46,12 +45,11 @@ public class BillController {
 	@Value("${app.payments-encryption-key}")
     private String paymentsEncryptionKey;
 	
-	@RequestMapping(value = "/bills", method = RequestMethod.POST, headers = "Accept=text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8")
-	@ResponseBody
+	@RequestMapping(value = "/bills", method = RequestMethod.POST, headers = "content-type=application/x-www-form-urlencoded")
 	@Transactional
 	public void createBill(UriComponentsBuilder uriComponentsBuilder, final HttpServletRequest request,
 			final HttpServletResponse response) throws IOException {
-
+		
 		if (isSuccessfulTransaction(request) && isValidSignature(request)) {
 			Work work = workService.findWorkById(Integer.parseInt(request.getParameter("campoExtra1")));
 			work.setState(State.IN_PROGRESS);
@@ -91,6 +89,7 @@ public class BillController {
 		Bill bill= new Bill();
 		bill.setBillNumber(request.getParameter("codigoFactura"));
 		bill.setDate(new Date());
+		bill.setPaymentDescription(request.getParameter("campoExtra2").replace("%", " "));
 		bill.setValue(Double.parseDouble(request.getParameter("valorFactura")));
 		bill.setTransactionState(getTransactionState(request));
 		bill.setAuthorizationCode(request.getParameter("codigoAutorizacion"));
@@ -103,6 +102,7 @@ public class BillController {
 		InvalidTransaction invalidTransaction= new InvalidTransaction();
 		invalidTransaction.setBillNumber(request.getParameter("codigoFactura"));
 		invalidTransaction.setDate(new Date());
+		invalidTransaction.setPaymentDescription(request.getParameter("campoExtra2").replace("%", " "));
 		invalidTransaction.setValue(Double.parseDouble(request.getParameter("valorFactura")));
 		invalidTransaction.setTransactionState(getTransactionState(request));
 		invalidTransaction.setAuthorizationCode(request.getParameter("codigoAutorizacion"));

@@ -3,6 +3,7 @@ package com.espiritware.opusclick.configuration;
 import java.util.Properties;
 import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
@@ -15,6 +16,17 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableTransactionManagement
 public class DatabaseConfiguration {
 	
+	@Value("${app.db.host}")
+	private String host;
+	@Value("${app.db.port}")
+	private String port;
+	@Value("${app.db.scheme}")
+	private String scheme;
+	@Value("${app.db.user}")
+	private String user;
+	@Value("${app.db.password}")
+	private String passsword;
+	
 	//pendiente...probar si yo cambio el nombre de este metodo; esta clase sigue funcionando... porque no se como la clase AbstractSession llama al objeto sesion
 	@Bean
 	public LocalSessionFactoryBean sessionFactory(){
@@ -25,16 +37,17 @@ public class DatabaseConfiguration {
 		return sessionFactoryBean;
 	}
 	
+	
 	@Bean
 	public DataSource dataSource(){
 		DriverManagerDataSource dataSource = new DriverManagerDataSource();
 		dataSource.setDriverClassName("com.mysql.jdbc.Driver");
-		//dataSource.setUrl("jdbc:mysql://aa1hq9j06vollj.chosobyrsnb7.sa-east-1.rds.amazonaws.com:3306/OpusClickBD");
-		dataSource.setUrl("jdbc:mysql://localhost:3306/OpusClickBD");
-		dataSource.setUsername("root");
-		dataSource.setPassword("3527Ferchs");
+		dataSource.setUrl("jdbc:mysql://"+host+":"+port+"/"+scheme);
+		dataSource.setUsername(user);
+		dataSource.setPassword(passsword);
 		return dataSource;
 	}
+
 	
 	public Properties hibernateProperties(){
 		Properties properties= new Properties();
