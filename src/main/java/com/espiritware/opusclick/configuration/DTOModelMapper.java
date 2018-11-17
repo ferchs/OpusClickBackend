@@ -1,11 +1,9 @@
 package com.espiritware.opusclick.configuration;
 
 import com.espiritware.opusclick.annotations.DTO;
-import com.espiritware.opusclick.dto.ProviderGetContractReviewDto;
 import com.espiritware.opusclick.dto.ProviderRegistrationDto;
 import com.espiritware.opusclick.dto.WorkUpdateDto;
 import com.espiritware.opusclick.model.Account;
-import com.espiritware.opusclick.model.Contract;
 import com.espiritware.opusclick.model.Work;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.modelmapper.ModelMapper;
