@@ -100,6 +100,7 @@ public class ProviderQuoteController {
 	}
 	
 	private File createTmpFile(String base64) throws IOException {
+		createTmpFolder();
 		String base64Image = base64.split(",")[1];
 		String metadata= base64.split(",")[0];
 		String extension = "."+metadata.substring(metadata.indexOf("/")+1, metadata.indexOf(";"));
@@ -108,6 +109,13 @@ public class ProviderQuoteController {
 		file.deleteOnExit();
 		Files.write(file.toPath(), decodedFile);
 		return file;
+	}
+	
+	private void createTmpFolder() {
+		File file = new File("tmp");
+        if (!file.exists()) {
+        	file.mkdir();
+        }
 	}
 	
 	@RequestMapping(value = "/provider_quotes/images", method = RequestMethod.POST, headers = "content-type=multipart/form-data")

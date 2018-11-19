@@ -54,6 +54,9 @@ public class Mail implements ApplicationListener<GenericEvent>{
 	@Value("${app.hostname}")
 	private String hostname;
 	
+	@Value("${support.phone}")
+	private String supportPhone;
+	
 	@Autowired
     private Environment env;
 	
@@ -493,7 +496,7 @@ public class Mail implements ApplicationListener<GenericEvent>{
 				"        referente a:</p>\n" + 
 				"         <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\"><i>"+visit.getDescription()+"</i>.</p>\n" + 
 				"         <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Recuerda estar atento a futuras solicitudes.</p>\n" + 
-				"        <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Si tienes alguna pregunta no dudes en contactarnos (321)-832-3768.</p>\n" + 
+				"        <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Si tienes alguna pregunta no dudes en contactarnos "+supportPhone+".</p>\n" + 
 				"        <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Equipo OpusClick.</p>\n" + 
 				"      <br> \n" + 
 				"  </div>\n" + 
@@ -526,7 +529,7 @@ public class Mail implements ApplicationListener<GenericEvent>{
 				"      <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\"><strong>"+visit.getWork().getUser().getAccount().getName()+" "+visit.getWork().getUser().getAccount().getLastname()+"</strong> ha "
 						+ "decidido posponer su visita, \n" + 
 				"        por lo cual te propone dos nuevas fechas para realizarla, por favor revísalas y elige la que mejor se ajuste a tu disponibilidad.</p>\n" + 
-				"      <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Si tienes alguna pregunta no dudes en contactarnos (321)-832-3768.</p>\n" + 
+				"      <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Si tienes alguna pregunta no dudes en contactarnos "+supportPhone+".</p>\n" + 
 				"      <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Equipo OpusClick.</p>\n" + 
 				"      <br> \n" + 
 				"  </div>\n" + 
@@ -771,7 +774,7 @@ public class Mail implements ApplicationListener<GenericEvent>{
 				"      <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\"><strong>"+work.getUser().getAccount().getName()+" "+work.getUser().getAccount().getLastname()+"</strong> ha finalizado la negociación "
 						+ "<strong>"+work.getWorkNumber()+"</strong></p>" + 
 				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Lastimosamente no has llegado a un acuerdo con "+work.getUser().getAccount().getName()+", recuerda estar atento a futuras solicitudes.</p>\n" + 
-				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Si tienes alguna pregunta no dudes en contactarnos (321)-832-3768.</p>\n" + 
+				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Si tienes alguna pregunta no dudes en contactarnos "+supportPhone+".</p>\n" + 
 				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Equipo OpusClick.</p>\n" + 
 				"      <br> \n" + 
 				"  </div>\n" + 
@@ -804,7 +807,7 @@ public class Mail implements ApplicationListener<GenericEvent>{
 				"      <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\"><strong>"+contract.getWork().getUser().getAccount().getName()+" "+contract.getWork().getUser().getAccount().getLastname()+
 				"</strong> ha definido un contrato para la cotización "+contract.getWork().getProviderQuote().getNumber()+", por favor revisa todos los términos en detalle."+
 				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Si estás de acuerdo puedes aceptar el contrato para iniciar el trabajo, de lo contrario puedes modificar o añadir algunas condiciones, sujetas a aceptación por parte del cliente.</p>\n" + 
-				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Si tienes alguna pregunta no dudes en contactarnos (321)-832-3768.</p>\n" + 
+				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Si tienes alguna pregunta no dudes en contactarnos "+supportPhone+".</p>\n" + 
 				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Equipo OpusClick.</p>\n" + 
 				"      <br> \n" + 
 				"  </div>\n" + 
@@ -890,7 +893,7 @@ public class Mail implements ApplicationListener<GenericEvent>{
 				"      <h1 style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Confirmación de pago</h1>\n" + 
 				"    </div>\n" + 
 				"    <div style=\"display: inline-block; margin: 0 auto; text-align: justify; padding-left: 30px; padding-right: 30px;\" >\n" + 
-				"      <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Hola "+contract.getWork().getUser().getAccount().getName()+",</p>\n" + 
+				"      <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Hola <strong>"+contract.getWork().getUser().getAccount().getName()+"</strong>,</p>\n" + 
 				"      <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Le informamos que el pago realizado en OpusClick para el contrato "+contract.getContractNumber()+" ha sido aprobado.El trabajo entrará en ejecución a partir del siguiente día hábil."+
 				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Queremos agradecerte por hacer parte de esta nueva manera de contratar servicios.</p>\n" + 
 				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Equipo OpusClick.</p>\n" + 
@@ -937,8 +940,8 @@ public class Mail implements ApplicationListener<GenericEvent>{
 				"      <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\"><strong>"+contract.getWork().getUser().getAccount().getName()+" "+contract.getWork().getUser().getAccount().getLastname()+
 				"</strong> ha aprobado el pago para el contrato <strong>"+contract.getContractNumber()+"</strong>;"+
 				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">OpusClick procederá a realizar el respectivo desembolso que se verá reflejado en tu cuenta bancaria de acuerdo con los plazos establecidos en nuestra política de pagos.</p>\n" + 
-				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">¡Muchas gracias por la calidad y cumplimiento de su trabajo!.</p>\n" + 
-				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Si tienes alguna pregunta no dudes en contactarnos (321)-832-3768.</p>\n" + 
+				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">¡Muchas gracias por la calidad y cumplimiento de su trabajo!</p>\n" + 
+				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Si tienes alguna pregunta no dudes en contactarnos "+supportPhone+".</p>\n" + 
 				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Equipo OpusClick.</p>\n" + 
 				"      <br> \n" + 
 				"  </div>\n" + 
@@ -983,7 +986,7 @@ public class Mail implements ApplicationListener<GenericEvent>{
 				"      <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\"><strong>"+contract.getWork().getUser().getAccount().getName()+" "+contract.getWork().getUser().getAccount().getLastname()+
 				"</strong> ha denegado el pago para el contrato <strong>"+contract.getId()+"</strong>;"+
 				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">OpusClick procederá a realizar un seguimiento del caso para resolver este inconveniente.</p>\n" + 
-				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Si tienes alguna pregunta no dudes en contactarnos (321)-832-3768.</p>\n" + 
+				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Si tienes alguna pregunta no dudes en contactarnos "+supportPhone+".</p>\n" + 
 				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Equipo OpusClick.</p>\n" + 
 				"      <br> \n" + 
 				"  </div>\n" + 
@@ -1028,7 +1031,7 @@ public class Mail implements ApplicationListener<GenericEvent>{
 				"      <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\"><strong>"+work.getUser().getAccount().getName()+" "+work.getUser().getAccount().getLastname()+"</strong> ha finalizado la negociación "
 						+ "<strong>"+work.getWorkNumber()+"</strong></p>" + 
 				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Lastimosamente no has llegado a un acuerdo con "+work.getUser().getAccount().getName()+", recuerda estar atento a futuras solicitudes.</p>\n" + 
-				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Si tienes alguna pregunta no dudes en contactarnos (321)-832-3768.</p>\n" + 
+				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Si tienes alguna pregunta no dudes en contactarnos "+supportPhone+".</p>\n" + 
 				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Equipo OpusClick.</p>\n" + 
 				"      <br> \n" + 
 				"  </div>\n" + 
@@ -1346,7 +1349,7 @@ public class Mail implements ApplicationListener<GenericEvent>{
 				"      <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\"><strong>"+work.getProvider().getAccount().getName()+" "+work.getProvider().getAccount().getLastname()+"</strong> ha finalizado la negociación "
 						+ "<strong>"+work.getWorkNumber()+"</strong></p>" + 
 				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Lastimosamente no has llegado a un acuerdo con "+work.getProvider().getAccount().getName()+", te recomendamos contactar a otro experto que pueda cumplir con tus requerimientos.</p>\n" + 
-				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Si tienes alguna pregunta no dudes en contactarnos (321)-832-3768.</p>\n" + 
+				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Si tienes alguna pregunta no dudes en contactarnos "+supportPhone+".</p>\n" + 
 				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Equipo OpusClick.</p>\n" + 
 				"      <br> \n" + 
 				"  </div>\n" + 
@@ -1379,7 +1382,7 @@ public class Mail implements ApplicationListener<GenericEvent>{
 				"      <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\"><strong>"+work.getProvider().getAccount().getName()+" "+work.getProvider().getAccount().getLastname()+"</strong> ha terminado la negociación "
 						+ "<strong>"+work.getWorkNumber()+"</strong></p>" + 
 				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Lastimosamente no has llegado a un acuerdo con "+work.getProvider().getAccount().getName()+", te recomendamos contactar a otro experto que pueda cumplir con tus requerimientos.</p>\n" + 
-				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Si tienes alguna pregunta no dudes en contactarnos (321)-832-3768.</p>\n" + 
+				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Si tienes alguna pregunta no dudes en contactarnos "+supportPhone+".</p>\n" + 
 				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Equipo OpusClick.</p>\n" + 
 				"      <br> \n" + 
 				"  </div>\n" + 
@@ -1412,7 +1415,7 @@ public class Mail implements ApplicationListener<GenericEvent>{
 				"      <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\"><strong>"+work.getProvider().getAccount().getName()+" "+work.getProvider().getAccount().getLastname()+"</strong> "
 						+ "ha dado respuesta a la solicitud de cotización que realizaste, por favor ingresa a la plataforma y revisa su propuesta en detalle."+
 				"      <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Recuerda que puedes definir el contrato para iniciar este trabajo o por el contrario rechazar la propuesta.</p>\n" + 
-				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Si tienes alguna pregunta no dudes en contactarnos (321)-832-3768.</p>\n" + 
+				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Si tienes alguna pregunta no dudes en contactarnos "+supportPhone+".</p>\n" + 
 				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Equipo OpusClick.</p>\n" + 
 				"      <br> \n" + 
 				"  </div>\n" + 
@@ -1458,7 +1461,7 @@ public class Mail implements ApplicationListener<GenericEvent>{
 				+" "+contract.getWork().getProvider().getAccount().getLastname()+ "</strong> experto en <strong>"
 				+contract.getWork().getProvider().getProfession().getName()+"</strong>"+
 				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Ingresa a la plataforma para que puedas realizar el pago y comenzar con el trabajo propuesto.</p>\n" + 
-				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Si tienes alguna pregunta no dudes en contactarnos (321)-832-3768.</p>\n" + 
+				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Si tienes alguna pregunta no dudes en contactarnos "+supportPhone+".</p>\n" + 
 				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Equipo OpusClick.</p>\n" + 
 				"      <br> \n" + 
 				"  </div>\n" + 
@@ -1548,7 +1551,7 @@ public class Mail implements ApplicationListener<GenericEvent>{
 				"      <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Hola "+contract.getWork().getUser().getAccount().getName()+",</p>\n" + 
 				"      <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Tienes una autorización de pago pendiente para el contrato "+contract.getContractNumber()+
 				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Si el experto culminó de manera correcta el trabajo, autorízanos para proceder con el pago, de lo contrario indícanos las razones de tu inconformidad para que el experto se encargue.</p>\n" + 
-				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Si tienes alguna pregunta no dudes en contactarnos (321)-832-3768.</p>\n" + 
+				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Si tienes alguna pregunta no dudes en contactarnos "+supportPhone+".</p>\n" + 
 				"       <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Equipo OpusClick.</p>\n" + 
 				"      <br> \n" + 
 				"  </div>\n" + 

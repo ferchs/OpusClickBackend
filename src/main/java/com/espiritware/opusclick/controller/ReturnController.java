@@ -4,6 +4,7 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,7 +30,7 @@ public class ReturnController {
 		String transactionState=request.getParameter("transaccionAprobada");
 		String billCode=request.getParameter("codigoFactura");
 		System.out.println(request.getParameter("campoExtra2"));
-		String description=request.getParameter("campoExtra2").replace("%", " ");
+		String description=removeAccents(request.getParameter("campoExtra2").replace("%", " "));
 		String billValue=request.getParameter("valorFactura");
 		String paymentMethod=getPaymentMethodName(request.getParameter("metodoPago"));
 
@@ -82,5 +83,9 @@ public class ReturnController {
         default:
         	return "No Identificado";
     }
+	}
+	
+	private String removeAccents(String text) {
+		return StringUtils.stripAccents(text); 
 	}
 }

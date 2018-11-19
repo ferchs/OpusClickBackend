@@ -92,6 +92,7 @@ public class ReviewController {
 	}
 	
 	private File createTmpFile(String base64) throws IOException {
+		createTmpFolder();
 		String base64Image = base64.split(",")[1];
 		String metadata= base64.split(",")[0];
 		String extension = "."+metadata.substring(metadata.indexOf("/")+1, metadata.indexOf(";"));
@@ -100,6 +101,13 @@ public class ReviewController {
 		file.deleteOnExit();
 		Files.write(file.toPath(), decodedFile);
 		return file;
+	}
+	
+	private void createTmpFolder() {
+		File file = new File("tmp");
+        if (!file.exists()) {
+        	file.mkdir();
+        }
 	}
 	
 	
@@ -141,15 +149,17 @@ public class ReviewController {
 
 	private void updateGlobalRecommend(Provider provider, Review review) {
 		if (review.isRecommend()) {
-			provider.getGlobalRating().setGlobalRecommend(calculateGlobalRecommend(
+			provider.getGlobalRating().setGlobalRecommend(calculatePositiveGlobalRecommend(
 					provider.getGlobalRating().getGlobalRecommend(), provider.getGlobalRating().getWorksDone(), 1));
 		} else {
-			provider.getGlobalRating().setGlobalRecommend(calculateGlobalRecommend(
+			provider.getGlobalRating().setGlobalRecommend(calculatePositiveGlobalRecommend(
 					provider.getGlobalRating().getGlobalRecommend(), provider.getGlobalRating().getWorksDone(), 0));
 		}
 	}
-
-	private double calculateGlobalRecommend(double globalRecommend, int worksNumber, int recommend) {
-		return ((worksNumber - 1) * globalRecommend + recommend) / worksNumber;
+	
+	private double calculatePositiveGlobalRecommend(double globalRecommend, int worksNumber, int recommend) {
+		double previousYesAmount=((globalRecommend/100)*(worksNumber-1));
+		int previousYsAmount=(int) Math.round(previousYesAmount);
+		return ((float)(previousYsAmount+recommend)/worksNumber)*100;
 	}
 }
