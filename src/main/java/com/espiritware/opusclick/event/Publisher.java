@@ -152,4 +152,9 @@ public class Publisher {
     	ProviderFinalizedContractEvent providerFinalizedContractEvent = new ProviderFinalizedContractEvent(this,contract);
         applicationEventPublisher.publishEvent(providerFinalizedContractEvent);
     }
+    
+    public void publishProblemEvent(final Work work) {
+    	ProblemEvent problemEvent = new ProblemEvent(this,work);
+        applicationEventPublisher.publishEvent(problemEvent);
+    }
 }

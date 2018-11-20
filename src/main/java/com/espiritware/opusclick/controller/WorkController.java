@@ -148,6 +148,7 @@ public class WorkController {
 				publisher.publishUserMakesPaymentEvent(work.getContract());
 				return new ResponseEntity<>(HttpStatus.OK);*/
 			} else if (work.getState().equals(State.CANCELLED_BY_USER)) {
+				publisher.publishProblemEvent(work);
 				if (previousStateChanges != null) {
 					work.setHistoryStateChanges(previousStateChanges + "CANCELLED_BY_USER,");
 				} else {
@@ -158,6 +159,7 @@ public class WorkController {
 				publisher.publishUserCancelWorkEvent(work);
 				return new ResponseEntity<>(HttpStatus.OK);
 			} else if (work.getState().equals(State.CANCELLED_BY_PROVIDER)) {
+				publisher.publishProblemEvent(work);
 				if (previousStateChanges != null) {
 					work.setHistoryStateChanges(previousStateChanges + "CANCELLED_BY_PROVIDER,");
 				} else {
@@ -169,6 +171,10 @@ public class WorkController {
 				return new ResponseEntity<>(HttpStatus.OK);
 			} else if (work.getState().equals(State.PENDING_BY_VISIT)) {
 				workService.updateWork(work);
+				return new ResponseEntity<>(HttpStatus.OK);
+			} else if (work.getState().equals(State.PARTIALLY_FINISHED)) {
+				workService.updateWork(work);
+				publisher.publishProblemEvent(work);
 				return new ResponseEntity<>(HttpStatus.OK);
 			}
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

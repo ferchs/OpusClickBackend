@@ -10,6 +10,7 @@ import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import com.espiritware.opusclick.event.GenericEvent;
+import com.espiritware.opusclick.event.ProblemEvent;
 import com.espiritware.opusclick.event.ProviderAcceptContractEvent;
 import com.espiritware.opusclick.event.ProviderCancelWorkEvent;
 import com.espiritware.opusclick.event.ProviderModifiesContractEvent;
@@ -38,6 +39,7 @@ import com.espiritware.opusclick.event.UserVisitRequestEvent;
 import com.espiritware.opusclick.event.UserVisitUnfulfilledEvent;
 import com.espiritware.opusclick.model.Contract;
 import com.espiritware.opusclick.model.OnlineQuote;
+import com.espiritware.opusclick.model.State;
 import com.espiritware.opusclick.model.Visit;
 import com.espiritware.opusclick.model.Work;
 import com.espiritware.opusclick.security.TokenService;
@@ -56,6 +58,9 @@ public class Mail implements ApplicationListener<GenericEvent>{
 	
 	@Value("${support.phone}")
 	private String supportPhone;
+	
+	@Value("${support.emailProblems}")
+	private String emailProblems;
 	
 	@Autowired
     private Environment env;
@@ -147,6 +152,9 @@ public class Mail implements ApplicationListener<GenericEvent>{
 		}else if (event instanceof ProviderRequestPaymentEvent) {
 			ProviderRequestPaymentEvent providerRequestPaymentEvent = (ProviderRequestPaymentEvent) event;
 			createProviderRequestPaymentNotificationEmail(providerRequestPaymentEvent.getContract());
+		}else if (event instanceof ProblemEvent) {
+			ProblemEvent providerRequestPaymentEvent = (ProblemEvent) event;
+			createProblemNotificationEmail(providerRequestPaymentEvent.getWork());
 		}
 	}
 	
@@ -1603,6 +1611,30 @@ public class Mail implements ApplicationListener<GenericEvent>{
 				"  </body>\n" + 
 				"</html>");
 		EmailMessage emailMessage = new EmailMessage(env.getProperty("support.email"), work.getProvider().getAccount().getEmail(), subject, body.toString());
+		jmsTemplate.convertAndSend("mailbox",emailMessage);
+	}
+	
+	private void createProblemNotificationEmail(Work work){
+		String subject = new String();
+		StringBuilder body = new StringBuilder();
+		body.append("<p>IdNegociación : "+work.getWorkNumber()+"</p>\n");
+		body.append("<p>IdUsuario : "+work.getUser().getId()+"</p>\n");
+		body.append("<p>Contacto : "+work.getUser().getPhone()+"</p>\n");
+		body.append("<p>IdExperto : "+work.getProvider().getId()+"</p>\n");
+		body.append("<p>Contacto : "+work.getProvider().getPhone()+"</p>\n");
+		if(work.getState().equals(State.PARTIALLY_FINISHED)) {
+			subject = "Experto dice que ha resuelto un inconveniente "+ work.getWorkNumber();
+		}else if(work.getState().equals(State.CANCELLED_BY_USER)) {
+			subject = "Usuario ha cancelado negociación "+ work.getWorkNumber();
+			body.append("<p>Causa : "+work.getComment()+"</p>\n");
+		}else if(work.getState().equals(State.CANCELLED_BY_PROVIDER)) {
+			subject = "Experto ha cancelado negociación "+ work.getWorkNumber();
+			body.append("<p>Causa : "+work.getComment()+"</p>\n");
+		}else if(work.getState().equals(State.DENIED)) {
+			subject = "Se ha denegado un pago "+ work.getWorkNumber();
+		}
+		
+		EmailMessage emailMessage = new EmailMessage(env.getProperty("support.email"), emailProblems, subject, body.toString());
 		jmsTemplate.convertAndSend("mailbox",emailMessage);
 	}
 }

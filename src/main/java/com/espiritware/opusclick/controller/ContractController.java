@@ -235,6 +235,7 @@ public class ContractController {
 			publisher.publishUserAuthorizesPaymentEvent(contract);
 		}else if(operation.equalsIgnoreCase("denyPayment")) {
 			publisher.publishUserDenyPaymentEvent(contract);
+			publisher.publishProblemEvent(contract.getWork());
 		}
 	}
 	
