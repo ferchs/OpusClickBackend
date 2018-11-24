@@ -31,7 +31,7 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
 	public static final String RESET_PASSWORD = "/v1/resetPassword";
 	public static final String CONFIRM_PAYMENT = "/v1/bills";
 	public static final String RETURN_DATA= "/v1/return";
-	//public static final String LOGIN = "/v1/login";
+	public static final String IMAGE = "/v1/images";
 
 
 	private UserDetailsService userDetailsService;
@@ -56,6 +56,7 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
 		.antMatchers(HttpMethod.GET, PROFESSIONS_LIST_URL).permitAll()
 		.antMatchers(HttpMethod.POST, CONFIRM_PAYMENT).permitAll()
 		.antMatchers(HttpMethod.POST, RETURN_DATA).permitAll()
+		.antMatchers(HttpMethod.POST, IMAGE).permitAll()
 		.anyRequest().authenticated()
 		.and().addFilter(new JWTAuthenticationFilter(authenticationManager(), getApplicationContext()))
 		.addFilter(new JWTAuthorizationFilter(authenticationManager(), getApplicationContext()))
