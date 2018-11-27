@@ -3,14 +3,12 @@ package com.espiritware.opusclick.controller;
 import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.util.UriComponentsBuilder;
 
 @Controller
@@ -20,16 +18,13 @@ public class ReturnController {
 	@Value("${app.hostname}")
 	private String hostname;
 	
-	//headers = "Accept=text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8"
 	@RequestMapping(value = "/return", method = RequestMethod.POST, headers = "content-type=application/x-www-form-urlencoded")
-	@ResponseBody
 	@Transactional
 	public void returnData(UriComponentsBuilder uriComponentsBuilder, final HttpServletRequest request,
 			final HttpServletResponse response) throws IOException {
 		
 		String transactionState=request.getParameter("transaccionAprobada");
 		String billCode=request.getParameter("codigoFactura");
-		System.out.println(request.getParameter("campoExtra2"));
 		String description=removeAccents(request.getParameter("campoExtra2").replace("%", " "));
 		String billValue=request.getParameter("valorFactura");
 		String paymentMethod=getPaymentMethodName(request.getParameter("metodoPago"));
@@ -40,6 +35,7 @@ public class ReturnController {
 				+"&"+"descripcion="+description
 				+"&"+"valorFactura="+billValue
 				+"&"+"medio="+paymentMethod);
+		return;
 	}
 	
 	private String getPaymentMethodName(String code) {
