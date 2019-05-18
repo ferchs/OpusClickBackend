@@ -23,7 +23,7 @@ public class AmazonClient {
 	@Autowired
     private AmazonS3 s3Client;
 
-    @Value("${amazonS3Properties.endpointUrl}")
+    @Value("${amazonS3Properties.endpointUrlBase}")
     private String endpointUrl;
     @Value("${amazonS3Properties.bucketName}")
     private String bucketName;
@@ -47,7 +47,7 @@ public class AmazonClient {
 	}
 
 	private File convertMultiPartToFile(MultipartFile file) throws IOException {
-		File convFile = new File(file.getOriginalFilename());
+		File convFile = new File(new Date().getTime() + file.getOriginalFilename());
 		FileOutputStream fos = new FileOutputStream(convFile);
 		fos.write(file.getBytes());
 		fos.close();

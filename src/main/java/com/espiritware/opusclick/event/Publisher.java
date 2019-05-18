@@ -157,4 +157,5 @@ public class Publisher {
     	ProblemEvent problemEvent = new ProblemEvent(this,work);
         applicationEventPublisher.publishEvent(problemEvent);
     }
+
 }

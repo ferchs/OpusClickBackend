@@ -13,7 +13,7 @@ import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 @Configuration
 public class AmazonS3Configuration {
 	
-	@Value("${amazonS3Properties.endpointUrl}")
+	@Value("${amazonS3Properties.endpointUrlBase}")
 	private String endpointUrl;
 	@Value("${amazonS3Properties.bucketName}")
 	private String bucketName;

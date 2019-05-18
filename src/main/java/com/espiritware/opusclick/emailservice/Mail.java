@@ -62,6 +62,9 @@ public class Mail implements ApplicationListener<GenericEvent>{
 	@Value("${support.emailProblems}")
 	private String emailProblems;
 	
+	@Value("${support.emailNotifications}")
+	private String emailNotifications;
+	
 	@Autowired
     private Environment env;
 	
@@ -171,7 +174,7 @@ public class Mail implements ApplicationListener<GenericEvent>{
 				"  <body style=\"background-color: #ffffff; padding-left: 30px; padding-right: 30px;\">\n" + 
 				"    <div style=\"background-color: #fafafa;\">\n" + 
 				"      <div style=\"background-color: #fafafa; margin:auto;\">\n" + 
-				"        <img style=\"display: table; margin: 0 auto; background-color: #fafafa;\" src=\"https://s3-sa-east-1.amazonaws.com/opusclick.com/assets/OpusClickLogo.png\">\n" + 
+				"        <img style=\"display: table; margin: 0 auto; background-color: #fafafa;\" src=\"https://s3.amazonaws.com/opusclick.com/assets/OpusClickLogo.png\">\n" + 
 				"      </div>\n" + 
 				"    <div style=\"display: table; margin: 0 auto; color: #202020\" >\n" + 
 				"      <h1 style=\"font-family: 'Open Sans', sans-serif; color: #202020\">¡Bienvenido a OpusClick!</h1>\n" + 
@@ -219,7 +222,7 @@ public class Mail implements ApplicationListener<GenericEvent>{
 				"  <body style=\"background-color: #ffffff; padding-left: 30px; padding-right: 30px;\">\n" + 
 				"    <div style=\"background-color: #fafafa;\">\n" + 
 				"      <div style=\"background-color: #fafafa; margin:auto;\">\n" + 
-				"        <img style=\"display: table; margin: 0 auto; background-color: #fafafa;\" src=\"https://s3-sa-east-1.amazonaws.com/opusclick.com/assets/OpusClickLogo.png\">\n" + 
+				"        <img style=\"display: table; margin: 0 auto; background-color: #fafafa;\" src=\"https://s3.amazonaws.com/opusclick.com/assets/OpusClickLogo.png\">\n" + 
 				"      </div>\n" + 
 				"    <div style=\"display: table; margin: 0 auto; color: #202020\" >\n" + 
 				"      <h1 style=\"font-family: 'Open Sans', sans-serif; color: #202020\">¡Bienvenido a OpusClick!</h1>\n" + 
@@ -266,7 +269,7 @@ public class Mail implements ApplicationListener<GenericEvent>{
 				"  <body style=\"background-color: #ffffff; padding-left: 30px; padding-right: 30px;\">\n" + 
 				"    <div style=\"background-color: #fafafa;\">\n" + 
 				"      <div style=\"background-color: #fafafa; margin:auto;\">\n" + 
-				"        <img style=\"display: table; margin: 0 auto; background-color: #fafafa;\" src=\"https://s3-sa-east-1.amazonaws.com/opusclick.com/assets/OpusClickLogo.png\">\n" + 
+				"        <img style=\"display: table; margin: 0 auto; background-color: #fafafa;\" src=\"https://s3.amazonaws.com/opusclick.com/assets/OpusClickLogo.png\">\n" + 
 				"      </div>\n" + 
 				"    <div style=\"display: table; margin: 0 auto; color: #202020\" >\n" + 
 				"      <h1 style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Restablecer Contraseña</h1>\n" + 
@@ -308,7 +311,7 @@ public class Mail implements ApplicationListener<GenericEvent>{
 				"  <body style=\"background-color: #ffffff; padding-left: 30px; padding-right: 30px;\">\n" + 
 				"    <div style=\"background-color: #fafafa;\">\n" + 
 				"      <div style=\"background-color: #fafafa; margin:auto;\">\n" + 
-				"        <img style=\"display: table; margin: 0 auto; background-color: #fafafa;\" src=\"https://s3-sa-east-1.amazonaws.com/opusclick.com/assets/OpusClickLogo.png\">\n" + 
+				"        <img style=\"display: table; margin: 0 auto; background-color: #fafafa;\" src=\"https://s3.amazonaws.com/opusclick.com/assets/OpusClickLogo.png\">\n" + 
 				"      </div>\n" + 
 				"    <div style=\"display: table; margin: 0 auto; color: #202020\" >\n" + 
 				"      <h1 style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Solicitud de visita</h1>\n" + 
@@ -341,6 +344,11 @@ public class Mail implements ApplicationListener<GenericEvent>{
 				"</html>");
 		EmailMessage emailMessage = new EmailMessage(env.getProperty("support.email"), visit.getWork().getProvider().getAccount().getEmail(), subject, body.toString());
 		jmsTemplate.convertAndSend("mailbox",emailMessage);
+		emailMessage.setTo(emailNotifications);
+		emailMessage.setBody("Evento: "+"Solicitud de visita"
+		+"Experto: "+ visit.getWork().getProvider().getAccount().getName()+" "+visit.getWork().getUser().getAccount().getLastname()+"\n"
+		+"Contacto: "+visit.getWork().getProvider().getPhone()+"\n");
+		jmsTemplate.convertAndSend("mailbox",emailMessage);
 	}
 	
 	private void createProviderQuoteNotificationEmail(OnlineQuote onlineQuote) {
@@ -354,7 +362,7 @@ public class Mail implements ApplicationListener<GenericEvent>{
 				"  <body style=\"background-color: #ffffff; padding-left: 30px; padding-right: 30px;\">\n" + 
 				"    <div style=\"background-color: #fafafa;\">\n" + 
 				"      <div style=\"background-color: #fafafa; margin:auto;\">\n" + 
-				"        <img style=\"display: table; margin: 0 auto; background-color: #fafafa;\" src=\"https://s3-sa-east-1.amazonaws.com/opusclick.com/assets/OpusClickLogo.png\">\n" + 
+				"        <img style=\"display: table; margin: 0 auto; background-color: #fafafa;\" src=\"https://s3.amazonaws.com/opusclick.com/assets/OpusClickLogo.png\">\n" + 
 				"      </div>\n" + 
 				"    <div style=\"display: table; margin: 0 auto; color: #202020\" >\n" + 
 				"      <h1 style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Solicitud de cotización</h1>\n" + 
@@ -386,6 +394,11 @@ public class Mail implements ApplicationListener<GenericEvent>{
 				"</html>");
 		EmailMessage emailMessage = new EmailMessage(env.getProperty("support.email"), onlineQuote.getWork().getProvider().getAccount().getEmail(), subject, body.toString());
 		jmsTemplate.convertAndSend("mailbox",emailMessage);
+		emailMessage.setTo(emailNotifications);
+		emailMessage.setBody("Evento: "+"Solicitud de cotizacion"
+		+"Experto: "+ onlineQuote.getWork().getProvider().getAccount().getName()+" "+onlineQuote.getWork().getUser().getAccount().getLastname()+"\n"
+		+"Contacto: "+onlineQuote.getWork().getProvider().getPhone()+"\n");
+		jmsTemplate.convertAndSend("mailbox",emailMessage);
 	}
 	
 	private void createUserVisitReminderEmail(Visit visit) {
@@ -399,7 +412,7 @@ public class Mail implements ApplicationListener<GenericEvent>{
 				"  <body style=\"background-color: #ffffff; padding-left: 30px; padding-right: 30px;\">\n" + 
 				"    <div style=\"background-color: #fafafa;\">\n" + 
 				"      <div style=\"background-color: #fafafa; margin:auto;\">\n" + 
-				"        <img style=\"display: table; margin: 0 auto; background-color: #fafafa;\" src=\"https://s3-sa-east-1.amazonaws.com/opusclick.com/assets/OpusClickLogo.png\">\n" + 
+				"        <img style=\"display: table; margin: 0 auto; background-color: #fafafa;\" src=\"https://s3.amazonaws.com/opusclick.com/assets/OpusClickLogo.png\">\n" + 
 				"      </div>\n" + 
 				"    <div style=\"display: table; margin: 0 auto; color: #202020\" >\n" + 
 				"      <h1 style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Recordatorio de visita</h1>\n" + 
@@ -446,7 +459,7 @@ public class Mail implements ApplicationListener<GenericEvent>{
 				"  <body style=\"background-color: #ffffff; padding-left: 30px; padding-right: 30px;\">\n" + 
 				"    <div style=\"background-color: #fafafa;\">\n" + 
 				"      <div style=\"background-color: #fafafa; margin:auto;\">\n" + 
-				"        <img style=\"display: table; margin: 0 auto; background-color: #fafafa;\" src=\"https://s3-sa-east-1.amazonaws.com/opusclick.com/assets/OpusClickLogo.png\">\n" + 
+				"        <img style=\"display: table; margin: 0 auto; background-color: #fafafa;\" src=\"https://s3.amazonaws.com/opusclick.com/assets/OpusClickLogo.png\">\n" + 
 				"      </div>\n" + 
 				"    <div style=\"display: table; margin: 0 auto; color: #202020\" >\n" + 
 				"      <h1 style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Solicitud de cotización</h1>\n" + 
@@ -492,7 +505,7 @@ public class Mail implements ApplicationListener<GenericEvent>{
 				"  <body style=\"background-color: #ffffff; padding-left: 30px; padding-right: 30px;\">\n" + 
 				"    <div style=\"background-color: #fafafa;\">\n" + 
 				"      <div style=\"background-color: #fafafa; margin:auto;\">\n" + 
-				"        <img style=\"display: table; margin: 0 auto; background-color: #fafafa;\" src=\"https://s3-sa-east-1.amazonaws.com/opusclick.com/assets/OpusClickLogo.png\">\n" + 
+				"        <img style=\"display: table; margin: 0 auto; background-color: #fafafa;\" src=\"https://s3.amazonaws.com/opusclick.com/assets/OpusClickLogo.png\">\n" + 
 				"      </div>\n" + 
 				"    <div style=\"display: table; margin: 0 auto; color: #202020\" >\n" + 
 				"      <h1 style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Visita Cancelada</h1>\n" + 
@@ -527,7 +540,7 @@ public class Mail implements ApplicationListener<GenericEvent>{
 				"  <body style=\"background-color: #ffffff; padding-left: 30px; padding-right: 30px;\">\n" + 
 				"    <div style=\"background-color: #fafafa;\">\n" + 
 				"      <div style=\"background-color: #fafafa; margin:auto;\">\n" + 
-				"        <img style=\"display: table; margin: 0 auto; background-color: #fafafa;\" src=\"https://s3-sa-east-1.amazonaws.com/opusclick.com/assets/OpusClickLogo.png\">\n" + 
+				"        <img style=\"display: table; margin: 0 auto; background-color: #fafafa;\" src=\"https://s3.amazonaws.com/opusclick.com/assets/OpusClickLogo.png\">\n" + 
 				"      </div>\n" + 
 				"    <div style=\"display: table; margin: 0 auto; color: #202020\" >\n" + 
 				"      <h1 style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Visita Postergada</h1>\n" + 
@@ -559,6 +572,11 @@ public class Mail implements ApplicationListener<GenericEvent>{
 				"</html>");
 		EmailMessage emailMessage = new EmailMessage(env.getProperty("support.email"), visit.getWork().getProvider().getAccount().getEmail(), subject, body.toString());
 		jmsTemplate.convertAndSend("mailbox",emailMessage);
+		emailMessage.setTo(emailNotifications);
+		emailMessage.setBody("Evento: "+"Visita postergada"
+				+"Experto: "+ visit.getWork().getProvider().getAccount().getName()+" "+visit.getWork().getUser().getAccount().getLastname()+"\n"
+				+"Contacto: "+visit.getWork().getProvider().getPhone()+"\n");
+				jmsTemplate.convertAndSend("mailbox",emailMessage);
 	}
 	
 	private void createUserVisitAcceptedNotificationEmail(Visit visit) {
@@ -574,7 +592,7 @@ public class Mail implements ApplicationListener<GenericEvent>{
 				"  <body style=\"background-color: #ffffff; padding-left: 30px; padding-right: 30px;\">\n" + 
 				"    <div style=\"background-color: #fafafa;\">\n" + 
 				"      <div style=\"background-color: #fafafa; margin:auto;\">\n" + 
-				"        <img style=\"display: table; margin: 0 auto; background-color: #fafafa;\" src=\"https://s3-sa-east-1.amazonaws.com/opusclick.com/assets/OpusClickLogo.png\">\n" + 
+				"        <img style=\"display: table; margin: 0 auto; background-color: #fafafa;\" src=\"https://s3.amazonaws.com/opusclick.com/assets/OpusClickLogo.png\">\n" + 
 				"      </div>\n" + 
 				"    <div style=\"display: table; margin: 0 auto; color: #202020\" >\n" + 
 				"      <h1 style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Visita aceptada</h1>\n" + 
@@ -622,7 +640,7 @@ public class Mail implements ApplicationListener<GenericEvent>{
 				"  <body style=\"background-color: #ffffff; padding-left: 30px; padding-right: 30px;\">\n" + 
 				"    <div style=\"background-color: #fafafa;\">\n" + 
 				"      <div style=\"background-color: #fafafa; margin:auto;\">\n" + 
-				"        <img style=\"display: table; margin: 0 auto; background-color: #fafafa;\" src=\"https://s3-sa-east-1.amazonaws.com/opusclick.com/assets/OpusClickLogo.png\">\n" + 
+				"        <img style=\"display: table; margin: 0 auto; background-color: #fafafa;\" src=\"https://s3.amazonaws.com/opusclick.com/assets/OpusClickLogo.png\">\n" + 
 				"      </div>\n" + 
 				"    <div style=\"display: table; margin: 0 auto; color: #202020\" >\n" + 
 				"      <h1 style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Recordatorio de visita</h1>\n" + 
@@ -673,7 +691,7 @@ public class Mail implements ApplicationListener<GenericEvent>{
 				"  <body style=\"background-color: #ffffff; padding-left: 30px; padding-right: 30px;\">\n" + 
 				"    <div style=\"background-color: #fafafa;\">\n" + 
 				"      <div style=\"background-color: #fafafa; margin:auto;\">\n" + 
-				"        <img style=\"display: table; margin: 0 auto; background-color: #fafafa;\" src=\"https://s3-sa-east-1.amazonaws.com/opusclick.com/assets/OpusClickLogo.png\">\n" + 
+				"        <img style=\"display: table; margin: 0 auto; background-color: #fafafa;\" src=\"https://s3.amazonaws.com/opusclick.com/assets/OpusClickLogo.png\">\n" + 
 				"      </div>\n" + 
 				"    <div style=\"display: table; margin: 0 auto; color: #202020\" >\n" + 
 				"      <h1 style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Visita Aceptada</h1>\n" + 
@@ -723,7 +741,7 @@ public class Mail implements ApplicationListener<GenericEvent>{
 				"  <body style=\"background-color: #ffffff; padding-left: 30px; padding-right: 30px;\">\n" + 
 				"    <div style=\"background-color: #fafafa;\">\n" + 
 				"      <div style=\"background-color: #fafafa; margin:auto;\">\n" + 
-				"        <img style=\"display: table; margin: 0 auto; background-color: #fafafa;\" src=\"https://s3-sa-east-1.amazonaws.com/opusclick.com/assets/OpusClickLogo.png\">\n" + 
+				"        <img style=\"display: table; margin: 0 auto; background-color: #fafafa;\" src=\"https://s3.amazonaws.com/opusclick.com/assets/OpusClickLogo.png\">\n" + 
 				"      </div>\n" + 
 				"    <div style=\"display: table; margin: 0 auto; color: #202020\" >\n" + 
 				"      <h1 style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Recordatorio de visita</h1>\n" + 
@@ -772,7 +790,7 @@ public class Mail implements ApplicationListener<GenericEvent>{
 				"  <body style=\"background-color: #ffffff; padding-left: 30px; padding-right: 30px;\">\n" + 
 				"    <div style=\"background-color: #fafafa;\">\n" + 
 				"      <div style=\"background-color: #fafafa; margin:auto;\">\n" + 
-				"        <img style=\"display: table; margin: 0 auto; background-color: #fafafa;\" src=\"https://s3-sa-east-1.amazonaws.com/opusclick.com/assets/OpusClickLogo.png\">\n" + 
+				"        <img style=\"display: table; margin: 0 auto; background-color: #fafafa;\" src=\"https://s3.amazonaws.com/opusclick.com/assets/OpusClickLogo.png\">\n" + 
 				"      </div>\n" + 
 				"    <div style=\"display: table; margin: 0 auto; color: #202020\" >\n" + 
 				"      <h1 style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Negociación Finalizada</h1>\n" + 
@@ -805,7 +823,7 @@ public class Mail implements ApplicationListener<GenericEvent>{
 				"  <body style=\"background-color: #ffffff; padding-left: 30px; padding-right: 30px;\">\n" + 
 				"    <div style=\"background-color: #fafafa;\">\n" + 
 				"      <div style=\"background-color: #fafafa; margin:auto;\">\n" + 
-				"        <img style=\"display: table; margin: 0 auto; background-color: #fafafa;\" src=\"https://s3-sa-east-1.amazonaws.com/opusclick.com/assets/OpusClickLogo.png\">\n" + 
+				"        <img style=\"display: table; margin: 0 auto; background-color: #fafafa;\" src=\"https://s3.amazonaws.com/opusclick.com/assets/OpusClickLogo.png\">\n" + 
 				"      </div>\n" + 
 				"    <div style=\"display: table; margin: 0 auto; color: #202020\" >\n" + 
 				"      <h1 style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Contrato modificado</h1>\n" + 
@@ -850,7 +868,7 @@ public class Mail implements ApplicationListener<GenericEvent>{
 				"  <body style=\"background-color: #ffffff; padding-left: 30px; padding-right: 30px;\">\n" + 
 				"    <div style=\"background-color: #fafafa;\">\n" + 
 				"      <div style=\"background-color: #fafafa; margin:auto;\">\n" + 
-				"        <img style=\"display: table; margin: 0 auto; background-color: #fafafa;\" src=\"https://s3-sa-east-1.amazonaws.com/opusclick.com/assets/OpusClickLogo.png\">\n" + 
+				"        <img style=\"display: table; margin: 0 auto; background-color: #fafafa;\" src=\"https://s3.amazonaws.com/opusclick.com/assets/OpusClickLogo.png\">\n" + 
 				"      </div>\n" + 
 				"    <div style=\"display: table; margin: 0 auto; color: #202020\" >\n" + 
 				"      <h1 style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Nuevo Contrato</h1>\n" + 
@@ -882,6 +900,11 @@ public class Mail implements ApplicationListener<GenericEvent>{
 				"</html>");
 		EmailMessage emailMessage = new EmailMessage(env.getProperty("support.email"), contract.getWork().getProvider().getAccount().getEmail(), subject, body.toString());
 		jmsTemplate.convertAndSend("mailbox",emailMessage);
+		emailMessage.setTo(emailNotifications);
+		emailMessage.setBody("Evento: "+"Pago a experto. Iniciar trabajo"
+				+"Experto: "+ contract.getWork().getProvider().getAccount().getName()+" "+contract.getWork().getUser().getAccount().getLastname()+"\n"
+				+"Contacto: "+contract.getWork().getProvider().getPhone()+"\n");
+		jmsTemplate.convertAndSend("mailbox",emailMessage);
 	}
 	
 	private void createUserMakesPaymentReminderEmail(Contract contract) {
@@ -895,7 +918,7 @@ public class Mail implements ApplicationListener<GenericEvent>{
 				"  <body style=\"background-color: #ffffff; padding-left: 30px; padding-right: 30px;\">\n" + 
 				"    <div style=\"background-color: #fafafa;\">\n" + 
 				"      <div style=\"background-color: #fafafa; margin:auto;\">\n" + 
-				"        <img style=\"display: table; margin: 0 auto; background-color: #fafafa;\" src=\"https://s3-sa-east-1.amazonaws.com/opusclick.com/assets/OpusClickLogo.png\">\n" + 
+				"        <img style=\"display: table; margin: 0 auto; background-color: #fafafa;\" src=\"https://s3.amazonaws.com/opusclick.com/assets/OpusClickLogo.png\">\n" + 
 				"      </div>\n" + 
 				"    <div style=\"display: table; margin: 0 auto; color: #202020\" >\n" + 
 				"      <h1 style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Confirmación de pago</h1>\n" + 
@@ -938,7 +961,7 @@ public class Mail implements ApplicationListener<GenericEvent>{
 				"  <body style=\"background-color: #ffffff; padding-left: 30px; padding-right: 30px;\">\n" + 
 				"    <div style=\"background-color: #fafafa;\">\n" + 
 				"      <div style=\"background-color: #fafafa; margin:auto;\">\n" + 
-				"        <img style=\"display: table; margin: 0 auto; background-color: #fafafa;\" src=\"https://s3-sa-east-1.amazonaws.com/opusclick.com/assets/OpusClickLogo.png\">\n" + 
+				"        <img style=\"display: table; margin: 0 auto; background-color: #fafafa;\" src=\"https://s3.amazonaws.com/opusclick.com/assets/OpusClickLogo.png\">\n" + 
 				"      </div>\n" + 
 				"    <div style=\"display: table; margin: 0 auto; color: #202020\" >\n" + 
 				"      <h1 style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Autorización de pago</h1>\n" + 
@@ -984,7 +1007,7 @@ public class Mail implements ApplicationListener<GenericEvent>{
 				"  <body style=\"background-color: #ffffff; padding-left: 30px; padding-right: 30px;\">\n" + 
 				"    <div style=\"background-color: #fafafa;\">\n" + 
 				"      <div style=\"background-color: #fafafa; margin:auto;\">\n" + 
-				"        <img style=\"display: table; margin: 0 auto; background-color: #fafafa;\" src=\"https://s3-sa-east-1.amazonaws.com/opusclick.com/assets/OpusClickLogo.png\">\n" + 
+				"        <img style=\"display: table; margin: 0 auto; background-color: #fafafa;\" src=\"https://s3.amazonaws.com/opusclick.com/assets/OpusClickLogo.png\">\n" + 
 				"      </div>\n" + 
 				"    <div style=\"display: table; margin: 0 auto; color: #202020\" >\n" + 
 				"      <h1 style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Denegación de pago</h1>\n" + 
@@ -1029,7 +1052,7 @@ public class Mail implements ApplicationListener<GenericEvent>{
 				"  <body style=\"background-color: #ffffff; padding-left: 30px; padding-right: 30px;\">\n" + 
 				"    <div style=\"background-color: #fafafa;\">\n" + 
 				"      <div style=\"background-color: #fafafa; margin:auto;\">\n" + 
-				"        <img style=\"display: table; margin: 0 auto; background-color: #fafafa;\" src=\"https://s3-sa-east-1.amazonaws.com/opusclick.com/assets/OpusClickLogo.png\">\n" + 
+				"        <img style=\"display: table; margin: 0 auto; background-color: #fafafa;\" src=\"https://s3.amazonaws.com/opusclick.com/assets/OpusClickLogo.png\">\n" + 
 				"      </div>\n" + 
 				"    <div style=\"display: table; margin: 0 auto; color: #202020\" >\n" + 
 				"      <h1 style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Negociación Finalizada</h1>\n" + 
@@ -1064,7 +1087,7 @@ public class Mail implements ApplicationListener<GenericEvent>{
 				"  <body style=\"background-color: #ffffff; padding-left: 30px; padding-right: 30px;\">\n" + 
 				"    <div style=\"background-color: #fafafa;\">\n" + 
 				"      <div style=\"background-color: #fafafa; margin:auto;\">\n" + 
-				"        <img style=\"display: table; margin: 0 auto; background-color: #fafafa;\" src=\"https://s3-sa-east-1.amazonaws.com/opusclick.com/assets/OpusClickLogo.png\">\n" + 
+				"        <img style=\"display: table; margin: 0 auto; background-color: #fafafa;\" src=\"https://s3.amazonaws.com/opusclick.com/assets/OpusClickLogo.png\">\n" + 
 				"      </div>\n" + 
 				"    <div style=\"display: table; margin: 0 auto; color: #202020\" >\n" + 
 				"      <h1 style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Visita Cancelada</h1>\n" + 
@@ -1100,7 +1123,7 @@ public class Mail implements ApplicationListener<GenericEvent>{
 				"  <body style=\"background-color: #ffffff; padding-left: 30px; padding-right: 30px;\">\n" + 
 				"    <div style=\"background-color: #fafafa;\">\n" + 
 				"      <div style=\"background-color: #fafafa; margin:auto;\">\n" + 
-				"        <img style=\"display: table; margin: 0 auto; background-color: #fafafa;\" src=\"https://s3-sa-east-1.amazonaws.com/opusclick.com/assets/OpusClickLogo.png\">\n" + 
+				"        <img style=\"display: table; margin: 0 auto; background-color: #fafafa;\" src=\"https://s3.amazonaws.com/opusclick.com/assets/OpusClickLogo.png\">\n" + 
 				"      </div>\n" + 
 				"    <div style=\"display: table; margin: 0 auto; color: #202020\" >\n" + 
 				"      <h1 style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Visita Pospuesta</h1>\n" + 
@@ -1145,7 +1168,7 @@ public class Mail implements ApplicationListener<GenericEvent>{
 				"  <body style=\"background-color: #ffffff; padding-left: 30px; padding-right: 30px;\">\n" + 
 				"    <div style=\"background-color: #fafafa;\">\n" + 
 				"      <div style=\"background-color: #fafafa; margin:auto;\">\n" + 
-				"        <img style=\"display: table; margin: 0 auto; background-color: #fafafa;\" src=\"https://s3-sa-east-1.amazonaws.com/opusclick.com/assets/OpusClickLogo.png\">\n" + 
+				"        <img style=\"display: table; margin: 0 auto; background-color: #fafafa;\" src=\"https://s3.amazonaws.com/opusclick.com/assets/OpusClickLogo.png\">\n" + 
 				"      </div>\n" + 
 				"    <div style=\"display: table; margin: 0 auto; color: #202020\" >\n" + 
 				"      <h1 style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Propuesta de visita</h1>\n" + 
@@ -1190,7 +1213,7 @@ public class Mail implements ApplicationListener<GenericEvent>{
 				"  <body style=\"background-color: #ffffff; padding-left: 30px; padding-right: 30px;\">\n" + 
 				"    <div style=\"background-color: #fafafa;\">\n" + 
 				"      <div style=\"background-color: #fafafa; margin:auto;\">\n" + 
-				"        <img style=\"display: table; margin: 0 auto; background-color: #fafafa;\" src=\"https://s3-sa-east-1.amazonaws.com/opusclick.com/assets/OpusClickLogo.png\">\n" + 
+				"        <img style=\"display: table; margin: 0 auto; background-color: #fafafa;\" src=\"https://s3.amazonaws.com/opusclick.com/assets/OpusClickLogo.png\">\n" + 
 				"      </div>\n" + 
 				"    <div style=\"display: table; margin: 0 auto; color: #202020\" >\n" + 
 				"      <h1 style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Propuesta de visita</h1>\n" + 
@@ -1243,7 +1266,7 @@ public class Mail implements ApplicationListener<GenericEvent>{
 				"  <body style=\"background-color: #ffffff; padding-left: 30px; padding-right: 30px;\">\n" + 
 				"    <div style=\"background-color: #fafafa;\">\n" + 
 				"      <div style=\"background-color: #fafafa; margin:auto;\">\n" + 
-				"        <img style=\"display: table; margin: 0 auto; background-color: #fafafa;\" src=\"https://s3-sa-east-1.amazonaws.com/opusclick.com/assets/OpusClickLogo.png\">\n" + 
+				"        <img style=\"display: table; margin: 0 auto; background-color: #fafafa;\" src=\"https://s3.amazonaws.com/opusclick.com/assets/OpusClickLogo.png\">\n" + 
 				"      </div>\n" + 
 				"    <div style=\"display: table; margin: 0 auto; color: #202020\" >\n" + 
 				"      <h1 style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Reporte de incumplimiento</h1>\n" + 
@@ -1299,7 +1322,7 @@ public class Mail implements ApplicationListener<GenericEvent>{
 				"  <body style=\"background-color: #ffffff; padding-left: 30px; padding-right: 30px;\">\n" + 
 				"    <div style=\"background-color: #fafafa;\">\n" + 
 				"      <div style=\"background-color: #fafafa; margin:auto;\">\n" + 
-				"        <img style=\"display: table; margin: 0 auto; background-color: #fafafa;\" src=\"https://s3-sa-east-1.amazonaws.com/opusclick.com/assets/OpusClickLogo.png\">\n" + 
+				"        <img style=\"display: table; margin: 0 auto; background-color: #fafafa;\" src=\"https://s3.amazonaws.com/opusclick.com/assets/OpusClickLogo.png\">\n" + 
 				"      </div>\n" + 
 				"    <div style=\"display: table; margin: 0 auto; color: #202020\" >\n" + 
 				"      <h1 style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Reporte de incumplimiento</h1>\n" + 
@@ -1334,6 +1357,11 @@ public class Mail implements ApplicationListener<GenericEvent>{
 				"</html>");
 		EmailMessage emailMessage = new EmailMessage(env.getProperty("support.email"), visit.getWork().getUser().getAccount().getEmail(), subject, body.toString());
 		jmsTemplate.convertAndSend("mailbox",emailMessage);
+		emailMessage.setTo(emailNotifications);
+		emailMessage.setBody("Evento: "+"Incumplimiento de experto"
+				+"Experto: "+ visit.getWork().getProvider().getAccount().getName()+" "+visit.getWork().getUser().getAccount().getLastname()+"\n"
+				+"Contacto: "+visit.getWork().getProvider().getPhone()+"\n");
+		jmsTemplate.convertAndSend("mailbox",emailMessage);
 	}
 	
 	private void createProviderCancelWorkEventNotificationEmail(Work work) {
@@ -1347,7 +1375,7 @@ public class Mail implements ApplicationListener<GenericEvent>{
 				"  <body style=\"background-color: #ffffff; padding-left: 30px; padding-right: 30px;\">\n" + 
 				"    <div style=\"background-color: #fafafa;\">\n" + 
 				"      <div style=\"background-color: #fafafa; margin:auto;\">\n" + 
-				"        <img style=\"display: table; margin: 0 auto; background-color: #fafafa;\" src=\"https://s3-sa-east-1.amazonaws.com/opusclick.com/assets/OpusClickLogo.png\">\n" + 
+				"        <img style=\"display: table; margin: 0 auto; background-color: #fafafa;\" src=\"https://s3.amazonaws.com/opusclick.com/assets/OpusClickLogo.png\">\n" + 
 				"      </div>\n" + 
 				"    <div style=\"display: table; margin: 0 auto; color: #202020\" >\n" + 
 				"      <h1 style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Negociación Finalizada</h1>\n" + 
@@ -1380,7 +1408,7 @@ public class Mail implements ApplicationListener<GenericEvent>{
 				"  <body style=\"background-color: #ffffff; padding-left: 30px; padding-right: 30px;\">\n" + 
 				"    <div style=\"background-color: #fafafa;\">\n" + 
 				"      <div style=\"background-color: #fafafa; margin:auto;\">\n" + 
-				"        <img style=\"display: table; margin: 0 auto; background-color: #fafafa;\" src=\"https://s3-sa-east-1.amazonaws.com/opusclick.com/assets/OpusClickLogo.png\">\n" + 
+				"        <img style=\"display: table; margin: 0 auto; background-color: #fafafa;\" src=\"https://s3.amazonaws.com/opusclick.com/assets/OpusClickLogo.png\">\n" + 
 				"      </div>\n" + 
 				"    <div style=\"display: table; margin: 0 auto; color: #202020\" >\n" + 
 				"      <h1 style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Negociación Finalizada</h1>\n" + 
@@ -1413,7 +1441,7 @@ public class Mail implements ApplicationListener<GenericEvent>{
 				"  <body style=\"background-color: #ffffff; padding-left: 30px; padding-right: 30px;\">\n" + 
 				"    <div style=\"background-color: #fafafa;\">\n" + 
 				"      <div style=\"background-color: #fafafa; margin:auto;\">\n" + 
-				"        <img style=\"display: table; margin: 0 auto; background-color: #fafafa;\" src=\"https://s3-sa-east-1.amazonaws.com/opusclick.com/assets/OpusClickLogo.png\">\n" + 
+				"        <img style=\"display: table; margin: 0 auto; background-color: #fafafa;\" src=\"https://s3.amazonaws.com/opusclick.com/assets/OpusClickLogo.png\">\n" + 
 				"      </div>\n" + 
 				"    <div style=\"display: table; margin: 0 auto; color: #202020\" >\n" + 
 				"      <h1 style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Cotización</h1>\n" + 
@@ -1458,7 +1486,7 @@ public class Mail implements ApplicationListener<GenericEvent>{
 				"  <body style=\"background-color: #ffffff; padding-left: 30px; padding-right: 30px;\">\n" + 
 				"    <div style=\"background-color: #fafafa;\">\n" + 
 				"      <div style=\"background-color: #fafafa; margin:auto;\">\n" + 
-				"        <img style=\"display: table; margin: 0 auto; background-color: #fafafa;\" src=\"https://s3-sa-east-1.amazonaws.com/opusclick.com/assets/OpusClickLogo.png\">\n" + 
+				"        <img style=\"display: table; margin: 0 auto; background-color: #fafafa;\" src=\"https://s3.amazonaws.com/opusclick.com/assets/OpusClickLogo.png\">\n" + 
 				"      </div>\n" + 
 				"    <div style=\"display: table; margin: 0 auto; color: #202020\" >\n" + 
 				"      <h1 style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Contrato Aceptado</h1>\n" + 
@@ -1505,7 +1533,7 @@ public class Mail implements ApplicationListener<GenericEvent>{
 				"  <body style=\"background-color: #ffffff; padding-left: 30px; padding-right: 30px;\">\n" + 
 				"    <div style=\"background-color: #fafafa;\">\n" + 
 				"      <div style=\"background-color: #fafafa; margin:auto;\">\n" + 
-				"        <img style=\"display: table; margin: 0 auto; background-color: #fafafa;\" src=\"https://s3-sa-east-1.amazonaws.com/opusclick.com/assets/OpusClickLogo.png\">\n" + 
+				"        <img style=\"display: table; margin: 0 auto; background-color: #fafafa;\" src=\"https://s3.amazonaws.com/opusclick.com/assets/OpusClickLogo.png\">\n" + 
 				"      </div>\n" + 
 				"    <div style=\"display: table; margin: 0 auto; color: #202020\" >\n" + 
 				"      <h1 style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Modificación de contrato</h1>\n" + 
@@ -1550,7 +1578,7 @@ public class Mail implements ApplicationListener<GenericEvent>{
 				"  <body style=\"background-color: #ffffff; padding-left: 30px; padding-right: 30px;\">\n" + 
 				"    <div style=\"background-color: #fafafa;\">\n" + 
 				"      <div style=\"background-color: #fafafa; margin:auto;\">\n" + 
-				"        <img style=\"display: table; margin: 0 auto; background-color: #fafafa;\" src=\"https://s3-sa-east-1.amazonaws.com/opusclick.com/assets/OpusClickLogo.png\">\n" + 
+				"        <img style=\"display: table; margin: 0 auto; background-color: #fafafa;\" src=\"https://s3.amazonaws.com/opusclick.com/assets/OpusClickLogo.png\">\n" + 
 				"      </div>\n" + 
 				"    <div style=\"display: table; margin: 0 auto; color: #202020\" >\n" + 
 				"      <h1 style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Autorización de pago</h1>\n" + 
@@ -1594,7 +1622,7 @@ public class Mail implements ApplicationListener<GenericEvent>{
 				"  <body style=\"background-color: #ffffff; padding-left: 30px; padding-right: 30px;\">\n" + 
 				"    <div style=\"background-color: #fafafa;\">\n" + 
 				"      <div style=\"background-color: #fafafa; margin:auto;\">\n" + 
-				"        <img style=\"display: table; margin: 0 auto; background-color: #fafafa;\" src=\"https://s3-sa-east-1.amazonaws.com/opusclick.com/assets/OpusClickLogo.png\">\n" + 
+				"        <img style=\"display: table; margin: 0 auto; background-color: #fafafa;\" src=\"https://s3.amazonaws.com/opusclick.com/assets/OpusClickLogo.png\">\n" + 
 				"      </div>\n" + 
 				"    <div style=\"display: table; margin: 0 auto; color: #202020\" >\n" + 
 				"      <h1 style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Nueva calificación</h1>\n" + 
@@ -1612,6 +1640,7 @@ public class Mail implements ApplicationListener<GenericEvent>{
 				"</html>");
 		EmailMessage emailMessage = new EmailMessage(env.getProperty("support.email"), work.getProvider().getAccount().getEmail(), subject, body.toString());
 		jmsTemplate.convertAndSend("mailbox",emailMessage);
+		emailMessage.setTo(emailNotifications);
 	}
 	
 	private void createProblemNotificationEmail(Work work){
