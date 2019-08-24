@@ -68,7 +68,7 @@ public class ProviderController {
 			UriComponentsBuilder uriComponentsBuilder) {
 		List<Provider> providers = new ArrayList<Provider>();
 		if (professionName != null) {
-			providers = providerService.findProvidersByProfessionName(professionName);
+			providers = providerService.findProvidersByProfessionId(Integer.parseInt(professionName));
 			if (providers.isEmpty()) {
 				return new ResponseEntity<List<?>>(providers, HttpStatus.OK);
 			} else {

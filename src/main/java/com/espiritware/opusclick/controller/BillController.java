@@ -75,7 +75,7 @@ public class BillController {
 		return (request.getParameter("transaccionAprobada").equals("0") || request.getParameter("transaccionAprobada").equals("1"))? true : false;
 	}
 	
-	private boolean isValidSignature(HttpServletRequest request) {
+	private boolean isValidSignature(HttpServletRequest request) {		
 	    String checkChain=paymentsEncryptionKey+";"+request.getParameter("codigoFactura")+";"+request.getParameter("valorFactura")+";"+request.getParameter("codigoAutorizacion");
 	    String md5Hex = DigestUtils.md5Hex(checkChain);
 	    if(md5Hex.equalsIgnoreCase(request.getParameter("firmaTuCompra"))) {

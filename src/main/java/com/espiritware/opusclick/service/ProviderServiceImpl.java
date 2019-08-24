@@ -42,8 +42,21 @@ public class ProviderServiceImpl implements ProviderService{
 	public Provider findProviderById(int id) {
 		return providerDao.findById(id);
 	}
-
+	
+	
 	@Override
+	public List<Provider> findProvidersByProfessionId(int id) {
+		List<Provider> providers=providerDao.findAll();
+		ArrayList professionals= new ArrayList();
+		for(Provider provider:providers) {
+			if(provider.getProfession().getProfessionId()==id) {
+				professionals.add(provider);
+			}
+		}
+		return professionals;
+	}
+
+	/*@Override
 	public List<Provider> findProvidersByProfessionName(String profession) {
 		List<Provider> providers=providerDao.findAll();
 		ArrayList professionals= new ArrayList();
@@ -53,7 +66,7 @@ public class ProviderServiceImpl implements ProviderService{
 			}
 		}
 		return professionals;
-	}
+	}*/
 
 	@Override
 	public List<Provider> findAllProviders() {

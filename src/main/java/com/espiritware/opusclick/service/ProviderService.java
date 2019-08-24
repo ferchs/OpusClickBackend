@@ -17,8 +17,10 @@ public interface ProviderService {
 	void updateProvider(Provider provider);
 	
 	Provider findProviderById(int id);
+	
+	List<Provider> findProvidersByProfessionId(int id);
 			
-	List<Provider> findProvidersByProfessionName(String profession);
+	//List<Provider> findProvidersByProfessionName(String profession);
 	
 	List<Provider> findAllProviders();
 	
