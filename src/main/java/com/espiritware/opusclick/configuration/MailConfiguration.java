@@ -13,11 +13,11 @@ public class MailConfiguration {
     public JavaMailSender javaMailService() {
         JavaMailSenderImpl javaMailSender = new JavaMailSenderImpl();
         javaMailSender.setDefaultEncoding("UTF-8");
-        javaMailSender.setHost("smtp.gmail.com");
+        javaMailSender.setHost("email-smtp.us-east-1.amazonaws.com");
         javaMailSender.setPort(465);
         javaMailSender.setProtocol("smtps");
-        javaMailSender.setUsername("opusclickmail@gmail.com");
-        javaMailSender.setPassword("3527Ferchs");
+        javaMailSender.setUsername("AKIAUQ2NL7SHHZTB2R4O");
+        javaMailSender.setPassword("BJcD4zH2xo2ToY3oGTQ1oYJx5maGhtv/+yjx4wqSk3Q0");
         javaMailSender.setJavaMailProperties(getMailProperties());
         return javaMailSender;
     }
