@@ -84,42 +84,54 @@ public class Mail implements ApplicationListener<GenericEvent>{
 			UserVisitRequestEvent userVisitRequestEvent = (UserVisitRequestEvent) event;
 			createProviderVisitNotificationEmail(userVisitRequestEvent.getVisit());
 			createUserVisitReminderEmail(userVisitRequestEvent.getVisit());
+			createTrackingNotificationEmail(userVisitRequestEvent.getVisit().getWork(),"Usuario Ha Solicitado Visita a Experto");
 		} else if (event instanceof UserQuotationEvent) {
 			UserQuotationEvent userQuotationEvent = (UserQuotationEvent) event;
 			createProviderQuoteNotificationEmail(userQuotationEvent.getOnlineQuote());
 			createUserQuoteReminderEmail(userQuotationEvent.getOnlineQuote());
+			createTrackingNotificationEmail(userQuotationEvent.getOnlineQuote().getWork(),"Usuario Ha Solicitado Cotizacion a Experto");
 		} else if (event instanceof UserVisitChangeDateEvent) {
 			UserVisitChangeDateEvent userVisitChangeDateEvent = (UserVisitChangeDateEvent) event;
 			createUserVisitChangeDateNotificationEmail(userVisitChangeDateEvent.getVisit());
+			createTrackingNotificationEmail(userVisitChangeDateEvent.getVisit().getWork(),"Usuario Ha Cambiado Fecha de Visita");
 		} else if (event instanceof UserVisitAcceptedEvent) {
 			UserVisitAcceptedEvent userVisitAcceptedEvent = (UserVisitAcceptedEvent) event;
 			createUserVisitAcceptedNotificationEmail(userVisitAcceptedEvent.getVisit());
 			createUserVisitAcceptedReminderEmail(userVisitAcceptedEvent.getVisit());
+			createTrackingNotificationEmail(userVisitAcceptedEvent.getVisit().getWork(),"Usuario Ha Aceptado una Visita");
 		} else if (event instanceof UserVisitRejectedEvent) {
 			UserVisitRejectedEvent userVisitRejectedEvent = (UserVisitRejectedEvent) event;
 			createUserRejectedVisitNotificationEmail(userVisitRejectedEvent.getVisit());
+			createTrackingNotificationEmail(userVisitRejectedEvent.getVisit().getWork(),"Usuario Cancela Visita");
 		} else if (event instanceof UserVisitUnfulfilledEvent) {
 			UserVisitUnfulfilledEvent userVisitUnfulfilledEvent = (UserVisitUnfulfilledEvent) event;
 			createUserVisitUnfulfillNotificationEmail(userVisitUnfulfilledEvent.getVisit());
+			createTrackingNotificationEmail(userVisitUnfulfilledEvent.getVisit().getWork(),"Usuario Incumple Cita");
 		} else if (event instanceof UserVisitPostponedEvent) {
 			UserVisitPostponedEvent userVisitPostponedEvent = (UserVisitPostponedEvent) event;
 			createUserVisitPostponedNotificationEmail(userVisitPostponedEvent.getVisit());
+			createTrackingNotificationEmail(userVisitPostponedEvent.getVisit().getWork(),"Usuario Ha Postergado Visita");
 		} else if (event instanceof UserCancelWorkEvent) {
 			UserCancelWorkEvent userCancelWorkEvent = (UserCancelWorkEvent) event;
 			createUserCancelWorkNotificationEmail(userCancelWorkEvent.getWork());
+			createTrackingNotificationEmail(userCancelWorkEvent.getWork(),"Usuario Ha Desistido de una Negociacion");
 		} else if (event instanceof UserModifiesContractEvent) {
 			UserModifiesContractEvent userModifiesContractEvent = (UserModifiesContractEvent) event;
 			createUserModifiesContractNotificationEmail(userModifiesContractEvent.getContract());
+			createTrackingNotificationEmail(userModifiesContractEvent.getContract().getWork(),"Usuario Modifica Condiciones Contrato");
 		}else if (event instanceof UserMakesPaymentEvent) {
 			UserMakesPaymentEvent userMakesPaymentEvent = (UserMakesPaymentEvent) event;
 			createUserMakesPaymentNotificationEmail(userMakesPaymentEvent.getContract());
 			createUserMakesPaymentReminderEmail(userMakesPaymentEvent.getContract());
+			createTrackingNotificationEmail(userMakesPaymentEvent.getContract().getWork(),"Usuario Realiza Pago de Trabajo");
 		}else if (event instanceof UserAuthorizesPaymentEvent) {
 			UserAuthorizesPaymentEvent userAuthorizesPaymentEvent = (UserAuthorizesPaymentEvent) event;
 			createUserAuthorizesPaymentNotificationEmail(userAuthorizesPaymentEvent.getContract());
+			createTrackingNotificationEmail(userAuthorizesPaymentEvent.getContract().getWork(), "Usuario Autoriza Pago");
 		}else if (event instanceof UserDenyPaymentEvent) {
 			UserDenyPaymentEvent userDenyPaymentEvent = (UserDenyPaymentEvent) event;
 			createUserDenyPaymentNotificationEmail(userDenyPaymentEvent.getContract());
+			createTrackingNotificationEmail(userDenyPaymentEvent.getContract().getWork(),"Usuario No Aprueba Pago");
 		}else if (event instanceof ProviderRegistrationEvent) {
 			ProviderRegistrationEvent registrationEvent = (ProviderRegistrationEvent) event;
 			createProviderRegistrationEmailMessage(registrationEvent.getId(), registrationEvent.getEmail(),
@@ -127,34 +139,44 @@ public class Mail implements ApplicationListener<GenericEvent>{
 		} else if (event instanceof ProviderVisitChangeDateEvent) {
 			ProviderVisitChangeDateEvent providerVisitChangeDateEvent = (ProviderVisitChangeDateEvent) event;
 			createProviderVisitChangeDateNotificationEmail(providerVisitChangeDateEvent.getVisit());
+			createTrackingNotificationEmail(providerVisitChangeDateEvent.getVisit().getWork(),"Experto Cambia fecha de visita");
 		} else if (event instanceof ProviderVisitAcceptedEvent) {
 			ProviderVisitAcceptedEvent providerVisitAcceptedEvent = (ProviderVisitAcceptedEvent) event;
 			createProviderVisitAcceptedNotificationEmail(providerVisitAcceptedEvent.getVisit());
 			createProviderVisitReminderEmail(providerVisitAcceptedEvent.getVisit());
+			createTrackingNotificationEmail(providerVisitAcceptedEvent.getVisit().getWork(),"Experto Acepta Visita");
 		} else if (event instanceof ProviderVisitRejectedEvent) {
 			ProviderVisitRejectedEvent providerVisitRejectedEvent = (ProviderVisitRejectedEvent) event;
 			createProviderRejectedVisitNotificationEmail(providerVisitRejectedEvent.getVisit());
+			createTrackingNotificationEmail(providerVisitRejectedEvent.getVisit().getWork(),"Experto Rechaza Visita");
 		} else if (event instanceof ProviderVisitPostponedEvent) {
 			ProviderVisitPostponedEvent providerVisitPostponedEvent = (ProviderVisitPostponedEvent) event;
 			createProviderVisitPostponedNotificationEmail(providerVisitPostponedEvent.getVisit());
+			createTrackingNotificationEmail(providerVisitPostponedEvent.getVisit().getWork(),"Experto Pospone Visita");
 		} else if (event instanceof ProviderVisitUnfulfilledEvent) {
 			ProviderVisitUnfulfilledEvent providerVisitUnfulfilledEvent = (ProviderVisitUnfulfilledEvent) event;
 			createProviderVisitUnfulfilledNotificationEmail(providerVisitUnfulfilledEvent.getVisit());
+			createTrackingNotificationEmail(providerVisitUnfulfilledEvent.getVisit().getWork(),"Experto Incumple Visita");
 		} else if (event instanceof ProviderCancelWorkEvent) {
 			ProviderCancelWorkEvent providerCancelWorkEvent = (ProviderCancelWorkEvent) event;
 			createProviderCancelWorkEventNotificationEmail(providerCancelWorkEvent.getWork());
+			createTrackingNotificationEmail(providerCancelWorkEvent.getWork(),"Experto Cancela Trabajo");
 		} else if (event instanceof QuoteMadeEvent) {
 			QuoteMadeEvent quoteMadeEvent = (QuoteMadeEvent) event;
 			createQuoteMadeNotificationEmail(quoteMadeEvent.getProviderQuote().getWork());
+			createTrackingNotificationEmail(quoteMadeEvent.getProviderQuote().getWork(),"Experto Realiza Cotizacion");
 		}else if (event instanceof ProviderAcceptContractEvent) {
 			ProviderAcceptContractEvent providerAcceptContractEvent = (ProviderAcceptContractEvent) event;
 			createProviderAcceptContractEventNotificationEmail(providerAcceptContractEvent.getContract());
+			createTrackingNotificationEmail(providerAcceptContractEvent.getContract().getWork(),"Experto Acepta Contrato");
 		}else if (event instanceof ProviderModifiesContractEvent) {
 			ProviderModifiesContractEvent providerModifiesContractEvent = (ProviderModifiesContractEvent) event;
 			createProviderModifiesContractNotificationEmail(providerModifiesContractEvent.getContract());
+			createTrackingNotificationEmail(providerModifiesContractEvent.getContract().getWork(),"Experto Modifica Contrato");
 		}else if (event instanceof ProviderRequestPaymentEvent) {
 			ProviderRequestPaymentEvent providerRequestPaymentEvent = (ProviderRequestPaymentEvent) event;
 			createProviderRequestPaymentNotificationEmail(providerRequestPaymentEvent.getContract());
+			createTrackingNotificationEmail(providerRequestPaymentEvent.getContract().getWork(),"Experto Solicita Pago");
 		}else if (event instanceof ProblemEvent) {
 			ProblemEvent providerRequestPaymentEvent = (ProblemEvent) event;
 			createProblemNotificationEmail(providerRequestPaymentEvent.getWork());
@@ -344,11 +366,6 @@ public class Mail implements ApplicationListener<GenericEvent>{
 				"</html>");
 		EmailMessage emailMessage = new EmailMessage(env.getProperty("support.email"), visit.getWork().getProvider().getAccount().getEmail(), subject, body.toString());
 		jmsTemplate.convertAndSend("mailbox",emailMessage);
-		emailMessage.setTo(emailNotifications);
-		emailMessage.setBody("Evento: "+"Solicitud de visita"
-		+"Experto: "+ visit.getWork().getProvider().getAccount().getName()+" "+visit.getWork().getUser().getAccount().getLastname()+"\n"
-		+"Contacto: "+visit.getWork().getProvider().getPhone()+"\n");
-		jmsTemplate.convertAndSend("mailbox",emailMessage);
 	}
 	
 	private void createProviderQuoteNotificationEmail(OnlineQuote onlineQuote) {
@@ -393,11 +410,6 @@ public class Mail implements ApplicationListener<GenericEvent>{
 				"  </body>\n" + 
 				"</html>");
 		EmailMessage emailMessage = new EmailMessage(env.getProperty("support.email"), onlineQuote.getWork().getProvider().getAccount().getEmail(), subject, body.toString());
-		jmsTemplate.convertAndSend("mailbox",emailMessage);
-		emailMessage.setTo(emailNotifications);
-		emailMessage.setBody("Evento: "+"Solicitud de cotizacion"
-		+"Experto: "+ onlineQuote.getWork().getProvider().getAccount().getName()+" "+onlineQuote.getWork().getUser().getAccount().getLastname()+"\n"
-		+"Contacto: "+onlineQuote.getWork().getProvider().getPhone()+"\n");
 		jmsTemplate.convertAndSend("mailbox",emailMessage);
 	}
 	
@@ -1648,9 +1660,9 @@ public class Mail implements ApplicationListener<GenericEvent>{
 		StringBuilder body = new StringBuilder();
 		body.append("<p>IdNegociación : "+work.getWorkNumber()+"</p>\n");
 		body.append("<p>IdUsuario : "+work.getUser().getId()+"</p>\n");
-		body.append("<p>Contacto : "+work.getUser().getPhone()+"</p>\n");
+		body.append("<p>Contacto : "+work.getUser().getPhone()+"/ "+work.getUser().getAccount().getEmail()+"</p>\n");
 		body.append("<p>IdExperto : "+work.getProvider().getId()+"</p>\n");
-		body.append("<p>Contacto : "+work.getProvider().getPhone()+"</p>\n");
+		body.append("<p>Contacto : "+work.getProvider().getPhone()+"/ "+work.getProvider().getAccount().getEmail()+"</p>\n");
 		if(work.getState().equals(State.PARTIALLY_FINISHED)) {
 			subject = "Experto dice que ha resuelto un inconveniente "+ work.getWorkNumber();
 		}else if(work.getState().equals(State.CANCELLED_BY_USER)) {
@@ -1664,6 +1676,19 @@ public class Mail implements ApplicationListener<GenericEvent>{
 		}
 		
 		EmailMessage emailMessage = new EmailMessage(env.getProperty("support.email"), emailProblems, subject, body.toString());
+		jmsTemplate.convertAndSend("mailbox",emailMessage);
+	}
+	
+	private void createTrackingNotificationEmail(Work work, String subject){
+		StringBuilder body = new StringBuilder();
+		body.append("<p>IdNegociación : "+work.getWorkNumber()+"</p>\n");
+		body.append("<p>IdUsuario : "+work.getUser().getId()+"</p>\n");
+		body.append("<p>NombreUsuario : "+work.getUser().getAccount().getName()+" "+work.getUser().getAccount().getLastname()+"</p>\n");
+		body.append("<p>Contacto : "+work.getUser().getPhone()+"/ "+work.getUser().getAccount().getEmail()+"</p>\n");
+		body.append("<p>IdExperto : "+work.getProvider().getId()+"</p>\n");
+		body.append("<p>NombreExperto : "+work.getProvider().getAccount().getName()+" "+work.getProvider().getAccount().getLastname()+"</p>\n");
+		body.append("<p>Contacto : "+work.getProvider().getPhone()+"/ "+work.getProvider().getAccount().getEmail()+"</p>\n");
+		EmailMessage emailMessage = new EmailMessage(env.getProperty("support.email"), emailNotifications, subject, body.toString());
 		jmsTemplate.convertAndSend("mailbox",emailMessage);
 	}
 }

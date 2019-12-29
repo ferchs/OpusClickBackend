@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.util.UriComponentsBuilder;
 
 @Controller
@@ -18,16 +19,17 @@ public class ReturnController {
 	@Value("${app.hostname}")
 	private String hostname;
 	
+	
 	@RequestMapping(value = "/return", method = RequestMethod.POST, headers = "content-type=application/x-www-form-urlencoded")
 	@Transactional
 	public void returnData(UriComponentsBuilder uriComponentsBuilder, final HttpServletRequest request,
 			final HttpServletResponse response) throws IOException {
 		
-		String transactionState=request.getParameter("transaccionAprobada");
-		String billCode=request.getParameter("codigoFactura");
-		String description=removeAccents(request.getParameter("campoExtra2").replace("%", " "));
-		String billValue=request.getParameter("valorFactura");
-		String paymentMethod=getPaymentMethodName(request.getParameter("metodoPago"));
+		String transactionState=request.getParameter("x_cod_transaction_state");
+		String billCode=request.getParameter("x_id_invoice");
+		String description=removeAccents(request.getParameter("x_description").replace("%", " "));
+		String billValue=request.getParameter("x_amount_ok");
+		String paymentMethod=getPaymentMethodName(request.getParameter("x_franchise"));
 
 
 		response.sendRedirect(hostname+"/resumen_pago?estado="+ transactionState
@@ -38,44 +40,46 @@ public class ReturnController {
 		return;
 	}
 	
+	
+	@RequestMapping(value = "/return", method = RequestMethod.GET, headers = "Accept=application/json")
+	@Transactional
+	public void returnData(UriComponentsBuilder uriComponentsBuilder, final HttpServletRequest request,
+			final HttpServletResponse response, @RequestParam(value = "ref_payco", required = false) String refPayco) throws IOException {
+		
+		response.sendRedirect(hostname+"/resumen_pago?estado="+ "10"
+				+"&"+"codigoFactura="+"N/A"
+				+"&"+"descripcion="+"Transaccion Abandonada"
+				+"&"+"valorFactura="+"N/A"
+				+"&"+"medio="+"N/A");
+		return;
+	}
+	
 	private String getPaymentMethodName(String code) {
 		switch (code) {
-        case "42":
-        	return "MovilRed";
-        case "43":
-        	return "Via Baloto";
-        case "44":
-        	return "Cajero ATH";
-        case "45":
+        case "PR":
+        	return "Punto Red";
+        case "BA":
+        	return "Baloto";
+        case "CR":
+        	return "Credencial";
+        case "EF":
         	return "Efecty";
-        case "11":
-        	return "Efecty Codigo Barras";
-        case "17":
-        	return "Codigo Barras";
-        case "35":
-        	return "ATH-Exito-Baloto";
-        case "47":
-        	return "Almacenes Exito";
-        case "3":
-        	return "Cuenta Ahorro/Corriente";
-        case "41":
-        	return "Cuenta Ahorro/Corriente";
-        case "37":
+        case "GA":
+        	return "Gana";
+        case "RS":
+        	return "Red Servi";
+        case "PSE":
+        	return "PSE";
+        case "VS":
         	return "Visa";
-        case "2":
-        	return "Visa";
-        case "38":
+        case "MC":
         	return "MasterCard";
-        case "1":
-        	return "MasterCard";
-        case "39":
+        case "AM":
         	return "American Express";
-        case "5":
-        	return "American Express";
-        case "40":
+        case "DC":
         	return "Diners Club";
-        case "4":
-        	return "Diners Club";
+        case "SP":
+        	return "SafetyPay";
         default:
         	return "No Identificado";
     }

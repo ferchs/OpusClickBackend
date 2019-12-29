@@ -43,6 +43,7 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
 	
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
+		//http.cors().and().csrf().disable().authorizeRequests().antMatchers("/**").permitAll();
 		http.cors().and().csrf().disable()
 		.authorizeRequests().antMatchers(HttpMethod.POST, USER_REGISTRATION_URL).permitAll()
 		.antMatchers(HttpMethod.POST, PROVIDER_REGISTRATION_URL).permitAll()
@@ -54,6 +55,8 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
 		.antMatchers(HttpMethod.GET, PROFESSIONS_LIST_URL).permitAll()
 		.antMatchers(HttpMethod.POST, CONFIRM_PAYMENT).permitAll()
 		.antMatchers(HttpMethod.POST, RETURN_DATA).permitAll()
+		.antMatchers(HttpMethod.GET, RETURN_DATA).permitAll()
+		.regexMatchers("\\/v1/return\\?ref_payco=\\**").permitAll()
 		.anyRequest().authenticated()
 		.and().addFilter(new JWTAuthenticationFilter(authenticationManager(), getApplicationContext()))
 		.addFilter(new JWTAuthorizationFilter(authenticationManager(), getApplicationContext()))

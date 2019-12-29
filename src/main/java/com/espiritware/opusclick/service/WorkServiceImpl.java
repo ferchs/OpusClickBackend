@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.espiritware.opusclick.dao.GenericDao;
 import com.espiritware.opusclick.model.State;
 import com.espiritware.opusclick.model.Work;
+import com.espiritware.opusclick.util.ReverseSortWorkByDate;
 
 @Service("workService")
 @Transactional
@@ -77,9 +78,11 @@ public class WorkServiceImpl implements WorkService{
 					providerWorksFiltered.add(work);
 				}
 			}
+			providerWorksFiltered.sort(new ReverseSortWorkByDate());
 			return providerWorksFiltered;
 		}
 		else {
+			providerWorksFiltered.sort(new ReverseSortWorkByDate());
 			return providerWorksFiltered;
 		}
 	}
@@ -94,9 +97,11 @@ public class WorkServiceImpl implements WorkService{
 					userWorksFiltered.add(work);
 				}
 			}
+			userWorksFiltered.sort(new ReverseSortWorkByDate());
 			return userWorksFiltered;
 		}
 		else {
+			userWorksFiltered.sort(new ReverseSortWorkByDate());
 			return userWorksFiltered;
 		}
 	}
@@ -112,6 +117,7 @@ public class WorkServiceImpl implements WorkService{
 				}
 			}
 		}
+		providerWorks.sort(new ReverseSortWorkByDate());
 		return providerWorks;
 	}
 
@@ -126,6 +132,7 @@ public class WorkServiceImpl implements WorkService{
 				}
 			}
 		}
+		userWorks.sort(new ReverseSortWorkByDate());
 		return userWorks;
 	}
 	

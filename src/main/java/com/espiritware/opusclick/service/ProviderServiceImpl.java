@@ -13,6 +13,7 @@ import com.espiritware.opusclick.model.Location;
 import com.espiritware.opusclick.model.Profession;
 import com.espiritware.opusclick.model.Provider;
 import com.espiritware.opusclick.model.State;
+import com.espiritware.opusclick.util.ReverseSortProviderByReputation;
 
 @Service("providerService")
 @Transactional
@@ -53,6 +54,7 @@ public class ProviderServiceImpl implements ProviderService{
 				professionals.add(provider);
 			}
 		}
+		professionals.sort(new ReverseSortProviderByReputation());
 		return professionals;
 	}
 

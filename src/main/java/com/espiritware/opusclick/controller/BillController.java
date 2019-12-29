@@ -51,7 +51,7 @@ public class BillController {
 			final HttpServletResponse response) throws IOException {
 		
 		if (isSuccessfulTransaction(request) && isValidSignature(request)) {
-			Work work = workService.findWorkById(Integer.parseInt(request.getParameter("campoExtra1")));
+			Work work = workService.findWorkById(Integer.parseInt(request.getParameter("x_extra1")));
 			work.setState(State.IN_PROGRESS);
 			work.setHistoryStateChanges(work.getContract().getWork().getHistoryStateChanges() + work.getState().state() + ",");
 			work.getContract().setState(work.getState());
@@ -72,13 +72,24 @@ public class BillController {
 	
 	
 	private boolean isSuccessfulTransaction(HttpServletRequest request) {
-		return (request.getParameter("transaccionAprobada").equals("0") || request.getParameter("transaccionAprobada").equals("1"))? true : false;
+		return (request.getParameter("x_cod_transaction_state").equals("1") || request.getParameter("x_cod_transaction_state").equals("3"))? true : false;
 	}
 	
 	private boolean isValidSignature(HttpServletRequest request) {		
-	    String checkChain=paymentsEncryptionKey+";"+request.getParameter("codigoFactura")+";"+request.getParameter("valorFactura")+";"+request.getParameter("codigoAutorizacion");
-	    String md5Hex = DigestUtils.md5Hex(checkChain);
-	    if(md5Hex.equalsIgnoreCase(request.getParameter("firmaTuCompra"))) {
+	    String checkChain=request.getParameter("x_cust_id_cliente")
+	    		+"^"+paymentsEncryptionKey
+	    		+"^"+request.getParameter("x_ref_payco")
+	    		+"^"+request.getParameter("x_transaction_id")
+	    		+"^"+request.getParameter("x_amount")
+	    		+"^"+request.getParameter("x_currency_code");
+	    
+	    System.out.println("Cadena: "+checkChain);
+	    
+	    String SHA256 = DigestUtils.sha256Hex(checkChain);
+	    
+	    System.out.println("SHA256: "+checkChain);
+	    
+	    if(SHA256.equalsIgnoreCase(request.getParameter("x_signature"))) {
 	    	return true;
 	    }else {
 	    	return false;
@@ -87,47 +98,68 @@ public class BillController {
 	
 	private Bill generateBill(HttpServletRequest request) {
 		Bill bill= new Bill();
-		bill.setBillNumber(request.getParameter("codigoFactura"));
+		bill.setBillNumber(request.getParameter("x_id_invoice"));
 		bill.setDate(new Date());
-		bill.setPaymentDescription(request.getParameter("campoExtra2").replace("%", " "));
-		bill.setValue(Double.parseDouble(request.getParameter("valorFactura")));
+		bill.setPaymentDescription(request.getParameter("x_description").replace("%", " "));
+		bill.setValue(Double.parseDouble(request.getParameter("x_amount_ok")));
 		bill.setTransactionState(getTransactionState(request));
-		bill.setAuthorizationCode(request.getParameter("codigoAutorizacion"));
-		bill.setTransactionNumber(request.getParameter("numeroTransaccion"));
-		bill.setPaymentMethod(request.getParameter("nombreMetodo"));
+		bill.setAuthorizationCode(request.getParameter("x_approval_code"));
+		bill.setTransactionNumber(request.getParameter("x_transaction_id"));
+		bill.setPaymentMethod(request.getParameter("x_franchise"));
 		return billService.createBill(bill);
 	}
 	
 	private void saveInvalidTransactionData(HttpServletRequest request) {
 		InvalidTransaction invalidTransaction= new InvalidTransaction();
-		invalidTransaction.setBillNumber(request.getParameter("codigoFactura"));
+		invalidTransaction.setBillNumber(request.getParameter("x_id_invoice"));
 		invalidTransaction.setDate(new Date());
-		invalidTransaction.setPaymentDescription(request.getParameter("campoExtra2").replace("%", " "));
-		invalidTransaction.setValue(Double.parseDouble(request.getParameter("valorFactura")));
+		invalidTransaction.setPaymentDescription(request.getParameter("x_description").replace("%", " "));
+		invalidTransaction.setValue(Double.parseDouble(request.getParameter("x_amount_ok")));
 		invalidTransaction.setTransactionState(getTransactionState(request));
-		invalidTransaction.setAuthorizationCode(request.getParameter("codigoAutorizacion"));
-		invalidTransaction.setTransactionNumber(request.getParameter("numeroTransaccion"));
-		invalidTransaction.setPaymentMethod(request.getParameter("nombreMetodo"));
+		invalidTransaction.setAuthorizationCode(request.getParameter("x_approval_code"));
+		invalidTransaction.setTransactionNumber(request.getParameter("x_transaction_id"));
+		invalidTransaction.setPaymentMethod(request.getParameter("x_franchise"));
 		invalidTransactionService.createInvalidTransaction(invalidTransaction);
 	}
 	
 	private State getTransactionState(HttpServletRequest request) {
-		switch (request.getParameter("transaccionAprobada")) {
+		switch (request.getParameter("x_cod_transaction_state")) {
 		
-		case "0":
-			return State.PENDING;
-
 		case "1":
 			return State.SUCCESSFUL;
-			
-		case "-1":
+
+		case "2":
 			return State.REJECTED;
 			
-		case "2":
-			return State.ABORTED;
+		case "3":
+			return State.PENDING;
+			
+		case "4":
+			return State.FAILED;
+		
+		case "6":
+			return State.REVERSED;
+
+		case "7":
+			return State.DETAINED;
+			
+		case "8":
+			return State.INITIATED;
+			
+		case "9":
+			return State.EXPIRED;
+			
+		case "10":
+			return State.ABANDONED;
+
+		case "11":
+			return State.CANCELED;
+			
+		case "12":
+			return State.ANTIFRAUD;
 
 		default:
-			return State.REVERSED;
+			return State.ABORTED;
 		}
 	}
 	

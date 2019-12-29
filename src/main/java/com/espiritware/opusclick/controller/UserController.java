@@ -33,7 +33,8 @@ import com.espiritware.opusclick.service.WorkService;
 public class UserController {
 	
 	private static final String USER_IMAGES_FOLDER="user-profile-images/";
-
+	
+	private static final String USER_DEFAULT_IMAGE="https://s3.amazonaws.com/opusclick.com/user-profile-images/default-profile-photo.png";
 
 	@Autowired
 	private AccountService accountService;
@@ -61,9 +62,9 @@ public class UserController {
 					HttpStatus.NOT_FOUND);
 		}
 		//Medida temporal para evitar que un proveedor autenticado pueda averiguar proveedor de otro usuario
-		if(!principal.getName().equals(userEmail)) {
+		/*if(!principal.getName().equals(userEmail)) {
 			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-		}
+		}*/
 		UserGetProfileDto dto=modelMapper.map(user, UserGetProfileDto.class);
 		return new ResponseEntity<UserGetProfileDto>(dto, HttpStatus.OK);
 	}
@@ -87,7 +88,10 @@ public class UserController {
 		if (user.getPhoto() != null) {
 			if (!user.getPhoto().isEmpty()) {
 				try {
-					amazonClient.deleteFileFromS3Bucket(USER_IMAGES_FOLDER,user.getPhoto());
+					if(!user.getPhoto().equalsIgnoreCase(USER_DEFAULT_IMAGE)) {
+						amazonClient.deleteFileFromS3Bucket(USER_IMAGES_FOLDER,user.getPhoto());
+					}
+					
 				} catch (Exception e) {
 					return new ResponseEntity<>(
 							new CustomErrorType("Provider with id: " + emailUser + " can't be erased"),
