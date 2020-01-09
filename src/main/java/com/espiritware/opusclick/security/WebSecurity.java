@@ -28,6 +28,7 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
 	public static final String PROFESSIONS_LIST_URL = "/v1/professions";
 	public static final String CONFIRM_REGISTRATION_URL = "/v1/registrationConfirm";
 	public static final String SEND_RESET_PASSWORD_EMAIL = "/v1/sendResetPasswordEmail";
+	public static final String RESEND_CONFIRMATION_EMAIL = "/v1/resendConfirmationEmail";
 	public static final String RESET_PASSWORD = "/v1/resetPassword";
 	public static final String CONFIRM_PAYMENT = "/v1/bills";
 	public static final String RETURN_DATA= "/v1/return";
@@ -50,6 +51,7 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
 		.antMatchers(HttpMethod.GET, PROVIDER_LIST_URL).permitAll()
 		.antMatchers(HttpMethod.GET, CONFIRM_REGISTRATION_URL).permitAll()
 		.antMatchers(HttpMethod.POST, SEND_RESET_PASSWORD_EMAIL).permitAll()
+		.antMatchers(HttpMethod.POST, RESEND_CONFIRMATION_EMAIL).permitAll()
 		.antMatchers(HttpMethod.POST, RESET_PASSWORD).permitAll()
 		.antMatchers(HttpMethod.GET, CITIES_LIST_URL).permitAll()
 		.antMatchers(HttpMethod.GET, PROFESSIONS_LIST_URL).permitAll()

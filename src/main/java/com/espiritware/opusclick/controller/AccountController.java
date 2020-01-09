@@ -19,6 +19,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.espiritware.opusclick.annotations.DTO;
 import com.espiritware.opusclick.dto.PasswordDto;
 import com.espiritware.opusclick.dto.ProviderRegistrationDto;
+import com.espiritware.opusclick.dto.ResendEmailDto;
 import com.espiritware.opusclick.dto.UserRegistrationDto;
 import com.espiritware.opusclick.event.Publisher;
 import com.espiritware.opusclick.security.TokenService;
@@ -176,6 +177,24 @@ public class AccountController {
 			account.setPassword(passwordEncoder.encode(passwordDto.getPassword()));
 			accountService.updateAccount(account);
 			return new ResponseEntity<String>(HttpStatus.OK);
+		} else {
+			return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	@RequestMapping(value = "/resendConfirmationEmail", method = RequestMethod.POST)
+	public ResponseEntity<String> resendConfirmationEmail(@Valid @RequestBody ResendEmailDto resendEmailDto, final HttpServletRequest request) {
+		Account registredAccount = accountService.findAccountByEmail(resendEmailDto.getEmail());
+		if(registredAccount!=null) {
+			if (resendEmailDto.getIsUser()) {
+				publisher.publishUserRegistrationEvent(registredAccount.getId(), registredAccount.getEmail(), registredAccount.getName(),
+						request.getLocale(), getAppUrl(request));
+				return new ResponseEntity<String>(HttpStatus.OK);
+			} else {
+				publisher.publishProviderRegistrationEvent(registredAccount.getId(), registredAccount.getEmail(), registredAccount.getName(),
+						request.getLocale(), getAppUrl(request));
+				return new ResponseEntity<String>(HttpStatus.OK);
+			}
 		} else {
 			return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
 		}

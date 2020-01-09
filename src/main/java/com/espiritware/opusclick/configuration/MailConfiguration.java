@@ -16,8 +16,8 @@ public class MailConfiguration {
         javaMailSender.setHost("email-smtp.us-east-1.amazonaws.com");
         javaMailSender.setPort(465);
         javaMailSender.setProtocol("smtps");
-        javaMailSender.setUsername("AKIAUQ2NL7SHHZTB2R4O");
-        javaMailSender.setPassword("BJcD4zH2xo2ToY3oGTQ1oYJx5maGhtv/+yjx4wqSk3Q0");
+        javaMailSender.setUsername("");
+        javaMailSender.setPassword("");
         javaMailSender.setJavaMailProperties(getMailProperties());
         return javaMailSender;
     }
