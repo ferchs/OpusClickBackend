@@ -13,15 +13,20 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.amazonaws.AmazonClientException;
 import com.espiritware.opusclick.annotations.DTO;
+import com.espiritware.opusclick.dto.ProviderUpdateDto;
 import com.espiritware.opusclick.dto.ReviewDto;
+import com.espiritware.opusclick.dto.ReviewImageUpdateDto;
+import com.espiritware.opusclick.error.CustomErrorType;
 import com.espiritware.opusclick.event.Publisher;
 import com.espiritware.opusclick.model.Milestone;
 import com.espiritware.opusclick.model.Provider;
@@ -40,6 +45,8 @@ public class ReviewController {
 	private static final String REVIEW_IMAGES_FOLDER="review-images/";
 	
 	private static final String TMP_FOLDER="tmp/";
+
+	private static final String PROVIDER_IMAGES_FOLDER="provider-profile-images/";
 
 
 	@Autowired
@@ -162,4 +169,34 @@ public class ReviewController {
 		int previousYsAmount=(int) Math.round(previousYesAmount);
 		return ((float)(previousYsAmount+recommend)/worksNumber)*100;
 	}
+	
+	
+	@RequestMapping(value = "/reviews/{id}/image", method = RequestMethod.PUT, headers = "Accept=application/json")
+	@ResponseBody
+	@Transactional
+	public ResponseEntity<?> updateReviewImage(@PathVariable("id") String reviewId, @RequestParam("file") MultipartFile multipartFile,
+			UriComponentsBuilder uriComponentsBuilder, final HttpServletRequest request) {
+		if (reviewId == null || reviewId.isEmpty()) {
+			return new ResponseEntity<>(new CustomErrorType("Please set id_review"), HttpStatus.NO_CONTENT);
+		}
+		if (multipartFile.isEmpty()) {
+			return new ResponseEntity<>(new CustomErrorType("Please select a file to upload"), HttpStatus.NO_CONTENT);
+		}
+		Review review = reviewService.findReviewById(Integer.parseInt(reviewId));
+		if (review == null) {
+			return new ResponseEntity<>(new CustomErrorType("Review with id: " + reviewId + " not found"),
+					HttpStatus.NOT_FOUND);
+		}
+		try {
+			String fileUrl = amazonClient.uploadFile(PROVIDER_IMAGES_FOLDER,multipartFile);
+			review.setImage(fileUrl);
+			reviewService.updateReview(review);
+			return new ResponseEntity<String>(fileUrl, HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(
+					new CustomErrorType("Image review with id: " + reviewId + " can't be upload"),
+					HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+		
 }

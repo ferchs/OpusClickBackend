@@ -26,7 +26,7 @@ public class Review implements Serializable{
 	@GeneratedValue(strategy= GenerationType.AUTO, generator="native")
 	@GenericGenerator(name = "native", strategy = "native")
 	@Column(name="id_review")
-	private int reviewId;
+	private int id;
 	
 	@Column(name="datetime")
 	private Date datetime;

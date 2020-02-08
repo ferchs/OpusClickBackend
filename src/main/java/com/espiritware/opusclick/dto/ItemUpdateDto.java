@@ -1,7 +1,5 @@
 package com.espiritware.opusclick.dto;
 
-import javax.persistence.Id;
-
 import lombok.Getter;
 
 @Getter

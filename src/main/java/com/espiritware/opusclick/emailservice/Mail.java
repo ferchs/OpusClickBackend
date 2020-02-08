@@ -299,7 +299,7 @@ public class Mail implements ApplicationListener<GenericEvent>{
 				"    <div style=\"display: inline-block; margin: 0 auto; text-align: justify; padding-left: 30px; padding-right: 30px;\" >\n" + 
 				"      <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Hola Fernando,</p>\n" + 
 				"      <p style=\"font-family: 'Open Sans', sans-serif; color: #202020\">Recibimos una solicitud para restablecer tu contraseña OpusClick. \n" + 
-				"        Haz click en el botón <strong>Restablecer</strong> elegir una nueva:</p>\n" + 
+				"        Haz click en el botón <strong>Restablecer</strong> para elegir una nueva:</p>\n" + 
 				"      <br> \n" + 
 				"  </div>\n" + 
 				"  <div style=\"display: flex; margin: 0 auto; text-align: justify;\">\n" + 
@@ -723,7 +723,7 @@ public class Mail implements ApplicationListener<GenericEvent>{
 				"      <br> \n" + 
 				"  </div>\n" + 
 				"  <div style=\"display: flex; margin: 0 auto; text-align: justify;\">\n" + 
-				"<a href=\""+hostname+"/dashboard_experto/visitas/aceptadas\" style=\"font-family: 'Open Sans', sans-serif;\n" + 
+				"<a href=\""+hostname+"/dashboard_usuario/visitas/aceptadas\" style=\"font-family: 'Open Sans', sans-serif;\n" + 
 				"    display: flex; margin: 0 auto;\n" + 
 				"    background-color: #008d98;\n" + 
 				"    border: none;\n" + 
@@ -772,7 +772,7 @@ public class Mail implements ApplicationListener<GenericEvent>{
 				"      <br> \n" + 
 				"  </div>\n" + 
 				"  <div style=\"display: flex; margin: 0 auto; text-align: justify;\">\n" + 
-				"<a href=\""+hostname+"/dashboard_expertos/visitas/aceptadas\" style=\"font-family: 'Open Sans', sans-serif;\n" + 
+				"<a href=\""+hostname+"/dashboard_experto/visitas/aceptadas\" style=\"font-family: 'Open Sans', sans-serif;\n" + 
 				"    display: flex; margin: 0 auto;\n" + 
 				"    background-color: #294664;\n" + 
 				"    border: none;\n" + 

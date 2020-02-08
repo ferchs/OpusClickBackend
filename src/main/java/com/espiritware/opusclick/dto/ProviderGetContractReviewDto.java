@@ -16,6 +16,8 @@ public class ProviderGetContractReviewDto {
 	
 	private Date date;
 	
+	private int reviewId;
+	
 	private double reviewSatisfactionLevel;
 	
 	private String reviewComment;

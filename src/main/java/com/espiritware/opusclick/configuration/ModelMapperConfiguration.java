@@ -27,6 +27,7 @@ public class ModelMapperConfiguration {
 				map().setReviewSatisfactionLevel(source.getWork().getReview().getSatisfactionLevel());
 				map().setReviewComment(source.getWork().getReview().getComment());
 				map().setReviewImage(source.getWork().getReview().getImage());
+				map().setReviewId(source.getWork().getReview().getId());
 			}
 		});
 		return modelMapper;
